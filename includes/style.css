@@ -1,0 +1,64 @@
+.jqmWindow {
+	display: none;
+	position:absolute; 
+	top: 17%;
+	left: 50%;
+    
+	margin-left: -300px;
+	width: 600px;
+	background-color: #EEE;
+	color: #333;
+	border: 1px solid black;
+	padding: 12px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+}
+
+.jqmOverlay { background-color: #000; }
+
+
+/*      adding item page styles */
+
+.selected_blue {
+	background-color:#0267cd; 
+	color: #fff; 
+	border: 1px #000 solid;
+} 
+
+.selected_yellow {
+	background-color: #e8e781;
+	color: #000;
+	border: 1px #000 solid;
+}	
+
+.unselected {
+	background-color: #eee; 
+	color: #000; 
+	border: 1px #eee solid
+}
+
+.selected_red {
+	background-color: #e61a1a; 
+	color: #fff;
+	border: 1px #000 solid}
+
+.option_text::-moz-selection {
+	background:transparent;
+}
+
+#submit, #cancel {
+	font-family:georgia;
+	font-size:30pt;
+	color:#333;
+	margin:0 15px;
+}
+
+#submit:hover, #cancel:hover {
+	color: #40ad34;
+	cursor:pointer;
+}
+
+h1 {
+	font-family:georgia;
+	font-size:12pt;
+}

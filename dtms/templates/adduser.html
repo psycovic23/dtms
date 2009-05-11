@@ -1,0 +1,41 @@
+<html>
+<head>
+	<script type="text/javascript" src="jquery.js"></script>
+
+	<script type="text/javascript">
+
+	$(document).ready(function(){
+		$("#submit").click(function(){
+			var data = {};
+			data.name = $("#username").val();
+			data.email = $("#email").val();
+			data.password = $("#password").val();
+			data.house_id = $("#house_id").val();
+			
+			$.post("adduser", data, function(responseData){
+				$('#content').html(responseData);
+			}, "html");
+		});
+	});
+	</script>
+
+</head>
+<body>
+		{% if success %}
+		<p>success</p>
+		{% endif %}
+		<p>username</p>
+		<input type="text" id="username"><br>
+		
+		<p>email</p>
+		<input type="text" id="email"><br>
+
+		<p>house id</p>
+		<input type="text" id="house_id"><br>
+		<p>password</p>
+		<input type="password" id="password"><br>
+		<input type="button" id="submit" value="submit"><br>
+
+	<div id="content"></div>
+</body>
+</html>

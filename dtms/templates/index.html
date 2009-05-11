@@ -1,0 +1,44 @@
+<html>
+<head>
+	<script type="text/javascript" src="jquery.js"></script>
+	<script type="text/javascript" src="jqModal.js"></script>
+	<script type="text/javascript" src="javascript.js"></script>
+	
+	<style type="text/css">
+		@import url("style.css")
+	</style>
+
+</head>
+<body>
+	<div id="content">index</div>
+	<div id="dialog" class="jqmWindow">
+		<h1>what was it?</h1>
+		<input type="text" id="name">
+		<h1>who bought it?</h1>
+		<div id="list_buyers">
+		{% for x in names %}
+		<span class="option_text_single" id="b{{forloop.counter0}}"> {{ x }}</span>
+		{% endfor %}
+		</div>
+		<br><br>
+		<h1>how much was it?</h1>
+		<span style="text-weight:bold; font-family:georgia; font-size:16pt;">$</span><input type="text" id="price">
+		<br><br>
+		<h1>who's using it?</h1>
+		<div id="list_users">
+			<span class="option_text" id="all_name">All</span>
+			{% for x in names %}
+			<span class="option_text" id="u{{forloop.counter0}}">{{ x }}</span>
+			{% endfor %}
+		</div>
+		<br>
+		<span style="font-size:10pt">purchase date</span> <input type="text" id="purch_date" size="10">
+		<span style="font-size:10pt">tags</span> <input type="text" id="tags">
+		<h1>any comments about it?</h1>
+		<span style="color:#eee">a</span><textarea id="comments" rows="6" cols="40"></textarea><br><br>
+		
+		<span id="submit">submit</span><span id="cancel" class="jqmClose">cancel</span>
+	</div>
+	<input type="button" value="aoeu" class="openjqm">
+</body>
+</html>
