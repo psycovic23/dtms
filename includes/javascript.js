@@ -1,89 +1,76 @@
-
-var num_users = $("#list_buyers span").length;
-var users_yes = new Array(num_users);
-var users_maybe = new Array(num_users);
-for (var i = 0; i < num_users; i++){
-	users_yes[i] = 0;
-	users_maybe[i] = 0;
-}
-// list of buyers
-jQuery.fn.toggle_selected = function (more_than_two) {
+// toggles colors for list_users
+jQuery.fn.toggle_selected = function () {
 	return this.each( function() {
-		$(this).unbind('mousedown');
-		$(this).mousedown( function(){
-			console.log('mousedown');
-			if ($(this).hasClass("unselected")){
-				console.log('unselected running');
-				$(this).removeClass("unselected").addClass("selected_red"); 
-				users_yes[parseInt($(this).attr('id'))] = 1;
-			}
-			else if ($(this).hasClass("selected_red")){
-				console.log('selected_red');
-				if (more_than_two){
-					users_maybe[parseInt($(this).attr('id'))] = 1;
-					users_yes[parseInt($(this).attr('id'))] = 0;
-					console.log('selected_red morethantwo');
-					$(this).removeClass("selected_red").addClass("selected_yellow");
-				}
-			} else if ($(this).hasClass("selected_yellow")) {
-				console.log('running');
-				$(this).removeClass("selected_yellow").addClass("unselected"); 
-			}
-		});
-		$(this).unbind('mouseover').unbind('mouseout');
-		console.log(users_yes, users_maybe);
-	});
-}
-
-jQuery.fn.toggle_unSelected = function () {
-	return this.each( function() {
-			$(this).removeClass("selected_red").addClass("unselected");
+		
+		// initialize each to unselected and add mouseover/out event
+		if (!$(this).hasClass("unselected")){
+			$(this).addClass("unselected");
 			$(this).mouseover( function() {
-				$(this).removeClass("unselected").addClass("selected_red");
+				$(this).addClass("hover");
 			});	
-			$(this).mouseout ( function() {
-				$(this).removeClass("selected_red").addClass("unselected");
+			$(this).mouseout( function() {
+				$(this).removeClass("hover");
 			});
+		}
+
+		$(this).mousedown( function(){
+			var id = parseInt($(this).attr('id'));
+
+			// second evaluation is to control when color goes from maybe
+			// to unselected. in that case, you want it to be unselected
+			// rather than hover
+			if ($(this).hasClass("hover") || $(this).hasClass('unselected')){
+				$(this).removeClass("hover").removeClass('unselected').addClass("selected_yes").unbind('mouseover').unbind('mouseout'); 
+				users_yes[id] = id;
+
+			} else if ($(this).hasClass("selected_yes")){
+				users_maybe[id] = id;
+				users_yes[id] = -1;
+				$(this).removeClass("selected_yes").addClass("selected_maybe");
+
+			} else if ($(this).hasClass("selected_maybe")) {
+				$(this).removeClass("selected_maybe").addClass('unselected'); 
+				users_maybe[id] = -1;
+				$(this).mouseover( function() {
+					$(this).addClass("hover");
+				});	
+				$(this).mouseout( function() {
+					$(this).removeClass("hover");
+				}); 
+			}
+			console.log(users_yes, users_maybe);
+		});
 	});
 }
 
-var buyer = -1;
-// selecting one single buyer
 $(document).ready(function() {
-	$('.option_text_single').toggle_unSelected();
-	$('.option_text_single').click(function(){
-		$('.option_text_single').not(this).toggle_unSelected();
-		$(this).toggle_selected();
-		buyer = $(this).attr('id');
-	});
-}); 
 
-// function for selecting multiple people who are using an item
-$(document).ready(function(){
+	// initialize arrays for who is a 'yes' and who's a 'maybe'
+	var num_users = $("#list_users span").length-1;
+	users_yes = new Array(num_users);
+	users_maybe = new Array(num_users);
+	for (var i = 0; i < num_users; i++){
+		users_yes[i] = -1;
+		users_maybe[i] = -1;
+	}
 
-	$('.option_text').addClass('unselected').click(function(){
-		$(this).toggle_selected(1);
-	});
-//	$('.option_text').toggle_unSelected();
-//	$('.option_text').toggle(function() {
-//		$(this).toggle_selected(1);
-//		users_yes[parseInt($(this).attr('id'))] = 1;
-//		},
-//		function(){
-//		$(this).toggle_unSelected();
-//		users_yes[parseInt($(this).attr('id'))] = 0;
-//	});
+
+	$('.option_text').toggle_selected();
+
 	var status=0;
 	$('#all_name').click(function() {
+		$('.option_text').removeClass().addClass('option_text');
 		if (status == 0){
-			$('.option_text').toggle_selected();
+			$('#all_name').addClass('selected_yes');
+			$('.option_text').addClass('selected_yes');
 			status = 1;
 			for (i = 0; i < ($('.option_text').length - 1); i++){
-				users_yes[i] = 1;
+				users_yes[i] = i;
 			}
 		}
 		else {
-			$('.option_text').toggle_unSelected();
+			$('#all_name').removeClass('selected_yes');
+			$('.option_text').addClass('unselected');
 			status = 0;
 			for (i = 0; i < ($('.option_text').length - 1); i++){
 				users_yes[i] = 0;
@@ -101,8 +88,9 @@ $(document).ready(function(){
 			'name': $("#name").val(),
 			'purch_date': d,
 			'price': $("#price").val(),
-			'buyer': buyer,
-			'user': users,
+			'buyer': 1,
+			'users_yes': users_yes,
+			'users_maybe': users_maybe,
 			'comments': $("#comments").val(),
 			'tags': $("#tags").val(),
 			'house_id': 1,
@@ -111,7 +99,7 @@ $(document).ready(function(){
 		};
 		var c = JSON.stringify(data);
 		$.ajax({
-			url: '/',
+			url: document.location.pathname, 
 			type: "POST",
 			data: {'string': c},
 			dataType: "json",
@@ -127,8 +115,6 @@ $(document).ready(function(){
 	var myOpen=function(hash){ hash.w.fadeIn('1600')}; 
 	$('#dialog').jqm({onShow: myOpen}).jqmAddTrigger('.openjqm');
 
-
-
 	// fill in today's date for purchase field
 	var currentTime = new Date()
 	var month = currentTime.getMonth() + 1;
@@ -137,7 +123,4 @@ $(document).ready(function(){
 	var str = month + "/" + day + "/" + year;
 
 	$('#purch_date').val(str);
-
-	var myOpen=function(hash){ hash.w.fadeIn('1600')}; 
-	$('#dialog').jqm({onShow: myOpen}).jqmAddTrigger('.openjqm');
 });

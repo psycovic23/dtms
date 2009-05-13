@@ -1,3 +1,10 @@
+
+
+/* to do: make nohighlight for safari */
+
+
+
+
 .jqmWindow {
 	display: none;
 	position:absolute; 
@@ -25,7 +32,7 @@
 	border: 1px #000 solid;
 } 
 
-.selected_yellow {
+.selected_maybe {
 	background-color: #e8e781;
 	color: #000;
 	border: 1px #000 solid;
@@ -37,12 +44,25 @@
 	border: 1px #eee solid
 }
 
-.selected_red {
+.selected_yes, .hover {
 	background-color: #e61a1a; 
 	color: #fff;
 	border: 1px #000 solid}
+#all_name::-moz-selection {
+	background:transparent;
+}
+
+#all_name {
+	cursor: default;
+}
 
 .option_text::-moz-selection {
+	background:transparent;
+}
+.option_text {
+	cursor: default;
+}
+#list_users::-moz-selection {
 	background:transparent;
 }
 

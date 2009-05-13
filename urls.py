@@ -9,6 +9,7 @@ urlpatterns = patterns('',
 	(r'^adduser$', 'mysite.dtms.views.adduser'),
 	(r'^adduser_run$', 'mysite.dtms.views.adduser_run'),
 	(r'^$', 'mysite.dtms.views.index'),
+	(r'^login$', 'mysite.dtms.views.login'),
 	(r'^(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/home/victor/django_projects/mysite/includes'}),
 )
 

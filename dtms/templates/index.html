@@ -5,30 +5,24 @@
 	<script type="text/javascript" src="javascript.js"></script>
 	
 	<style type="text/css">
-		@import url("style.css")
+		@import url("style.css");
 	</style>
 
 </head>
 <body>
-	<div id="content">index</div>
+	<div id="content">{{ sess }}</div>
 	<div id="dialog" class="jqmWindow">
 		<h1>what was it?</h1>
 		<input type="text" id="name">
-		<h1>who bought it?</h1>
-		<div id="list_buyers">
-		{% for x in names %}
-		<span class="option_text_single" id="b{{forloop.counter0}}"> {{ x }}</span>
-		{% endfor %}
-		</div>
 		<br><br>
 		<h1>how much was it?</h1>
-		<span style="text-weight:bold; font-family:georgia; font-size:16pt;">$</span><input type="text" id="price">
+		<span style="font-family:georgia; font-size:16pt;">$</span><input type="text" id="price">
 		<br><br>
 		<h1>who's using it?</h1>
 		<div id="list_users">
-			<span class="option_text" id="all_name">All</span>
+			<span id="all_name">All</span>
 			{% for x in names %}
-			<span class="option_text" id="u{{forloop.counter0}}">{{ x }}</span>
+			<span class="option_text" id="{{forloop.counter0}}u">{{ x }}</span>
 			{% endfor %}
 		</div>
 		<br>
