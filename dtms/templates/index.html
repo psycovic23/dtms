@@ -3,14 +3,21 @@
 	<script type="text/javascript" src="jquery.js"></script>
 	<script type="text/javascript" src="jqModal.js"></script>
 	<script type="text/javascript" src="javascript.js"></script>
+	<script type="text/javascript" src="jquery-ui.js"></script>
+	<link type="text/css" href="css/smoothness/jquery-ui-1.7.1.custom.css" rel="Stylesheet" />
+	<link type="text/css" href="style.css" rel="Stylesheet" />
 	
-	<style type="text/css">
-		@import url("style.css");
-	</style>
 
 </head>
 <body>
-	<div id="content">{{ sess }}</div>
+	<div id="content">
+	<div id="tabs">
+		<ul>
+			<li><a href="/list">Nunc tincidunt</a></li>
+		</ul>
+	</div>
+	
+	</div>
 	<div id="dialog" class="jqmWindow">
 		<h1>what was it?</h1>
 		<input type="text" id="name">
@@ -22,7 +29,7 @@
 		<div id="list_users">
 			<span id="all_name">All</span>
 			{% for x in names %}
-			<span class="option_text" id="{{forloop.counter0}}u">{{ x }}</span>
+			<span class="option_text" id="{{x.id}}">{{ x }}</span>
 			{% endfor %}
 		</div>
 		<br>
@@ -30,7 +37,6 @@
 		<span style="font-size:10pt">tags</span> <input type="text" id="tags">
 		<h1>any comments about it?</h1>
 		<span style="color:#eee">a</span><textarea id="comments" rows="6" cols="40"></textarea><br><br>
-		
 		<span id="submit">submit</span><span id="cancel" class="jqmClose">cancel</span>
 	</div>
 	<input type="button" value="aoeu" class="openjqm">

@@ -81,6 +81,10 @@ $(document).ready(function() {
 
 $(document).ready(function(){
 
+
+	$("#tabs").tabs();
+
+	// item submit buttong
 	$("#submit").click(function(){
 		var str= $("#purch_date").val();
 		var d = str.split("/");
@@ -98,19 +102,23 @@ $(document).ready(function(){
 				
 		};
 		var c = JSON.stringify(data);
+		console.log('pushed');
 		$.ajax({
-			url: document.location.pathname, 
+			url: '/add_item', 
 			type: "POST",
 			data: {'string': c},
 			dataType: "json",
 			success: function(data){
-				$("#content").html(data);
+				$('#tabs').tabs('load',0);
+				$('#dialog').jqmHide();
 			},
 			error: function(xhr, ts, et){
-				console.log(xhr);
-				$("#content").html(xhr.responseText);
+				console.log(xhr.responseText);
+				$('#dialog').jqmHide();
 			}
 		});
+
+		$('#tabs').tabs('load',0);
 	});
 	var myOpen=function(hash){ hash.w.fadeIn('1600')}; 
 	$('#dialog').jqm({onShow: myOpen}).jqmAddTrigger('.openjqm');

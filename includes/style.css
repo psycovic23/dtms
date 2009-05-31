@@ -3,6 +3,9 @@
 /* to do: make nohighlight for safari */
 
 
+.ui-tabs .ui-tabs-hide {
+     display: none;
+}
 
 
 .jqmWindow {

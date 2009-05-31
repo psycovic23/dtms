@@ -11,10 +11,9 @@
 		        $.ajax({
 				url: '/login',
 				type: 'POST',
-				data: { user_name:$('#username').val(),password:$('#password').val(),rand:Math.random() },
+				data: { login: 1, edit: 0, user_name:$('#username').val(),password:$('#password').val(),rand:Math.random() },
 				success: function(data) {
 					if(data=='yes'){
-
 						//if correct login detail
 						$("#msgbox").fadeTo(200,0.1,function(){ //start fading the messagebox
 							//add message and change the class of the box and start fading
