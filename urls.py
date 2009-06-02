@@ -13,6 +13,7 @@ urlpatterns = patterns('',
 	(r'^$', 'mysite.dtms.views.index'),
 	(r'^login$', 'mysite.dtms.views.login'),
 	(r'^add_item$', 'mysite.dtms.views.add_item'),
+	(r'^edit_item$', 'mysite.dtms.views.edit_item'),
 	(r'^(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/home/victor/Programming/django/mysite/includes'}),
 )
 

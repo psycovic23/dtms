@@ -69,7 +69,7 @@
 	background:transparent;
 }
 
-#submit, #cancel {
+#action, #cancel {
 	font-family:georgia;
 	font-size:30pt;
 	color:#333;

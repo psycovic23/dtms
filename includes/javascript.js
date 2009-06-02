@@ -81,11 +81,18 @@ $(document).ready(function() {
 
 $(document).ready(function(){
 
+	// coupling with list.html
+	//
 
 	$("#tabs").tabs();
+	$("#add_item").click(function(){
+		$("#action").text('submit');
+	});
 
 	// item submit buttong
-	$("#submit").click(function(){
+	$("#action").click(function(){
+
+
 		var str= $("#purch_date").val();
 		var d = str.split("/");
 		var data = {
@@ -98,17 +105,22 @@ $(document).ready(function(){
 			'comments': $("#comments").val(),
 			'tags': $("#tags").val(),
 			'house_id': 1,
-			'session_id': 0
-				
+			'session_id': 0,
 		};
+
+		if ($("#action").html() == 'edit'){
+			data = $.extend(data, {'edit_id': edit_id});
+		}
+		console.log(data)
+
 		var c = JSON.stringify(data);
-		console.log('pushed');
+
 		$.ajax({
 			url: '/add_item', 
 			type: "POST",
 			data: {'string': c},
-			dataType: "json",
 			success: function(data){
+				console.log(data);
 				$('#tabs').tabs('load',0);
 				$('#dialog').jqmHide();
 			},
@@ -128,7 +140,7 @@ $(document).ready(function(){
 	var month = currentTime.getMonth() + 1;
 	var day = currentTime.getDate();
 	var year = currentTime.getFullYear();
-	var str = month + "/" + day + "/" + year;
+	var str = year + "/" + month + "/" + day;
 
 	$('#purch_date').val(str);
 });

@@ -29,7 +29,7 @@
 		<div id="list_users">
 			<span id="all_name">All</span>
 			{% for x in names %}
-			<span class="option_text" id="{{x.id}}">{{ x }}</span>
+			<span class="option_text" id="{{x.id}}option">{{ x }}</span>
 			{% endfor %}
 		</div>
 		<br>
@@ -37,8 +37,8 @@
 		<span style="font-size:10pt">tags</span> <input type="text" id="tags">
 		<h1>any comments about it?</h1>
 		<span style="color:#eee">a</span><textarea id="comments" rows="6" cols="40"></textarea><br><br>
-		<span id="submit">submit</span><span id="cancel" class="jqmClose">cancel</span>
+		<span id="action">submit</span><span id="cancel" class="jqmClose">cancel</span>
 	</div>
-	<input type="button" value="aoeu" class="openjqm">
+	<input type="button" value="aoeu" class="openjqm" id="add_item">
 </body>
 </html>

@@ -1,6 +1,5 @@
 # Create your views here.
 
-from django.template.loader import get_template
 from django.http import HttpResponse
 from django.conf import settings
 from models import *
@@ -11,8 +10,6 @@ from django.utils import simplejson as json
 def list(request):
 	return render_to_response('list.html', {"items":Item.objects.all()})
 
-def list_items(request):
-	return render_to_response('list_items.html', {"names": User.objects.all(), "house_id": request.session['house_id']})
 
 
 def adduser(request):
@@ -25,26 +22,43 @@ def adduser(request):
 
 
 def index(request):
-	if not request.POST:
-		if request.session['edit'] == 0:
-			return render_to_response('index.html', {"names": User.objects.all(), "house_id": request.session['house_id']})
-		else:
-			return render_to_response('index.html', {"names": User.objects.all(), "house_id": request.session['house_id']})
-	else:
-		x = json.loads(request.POST['string'])
-		p_d = datetime.date(int(x['purch_date'][2]), int(x['purch_date'][0]), int(x['purch_date'][1]))
-		i = Item(name=x['name'], purch_date=p_d, price=x['price'],buyer=x['buyer'], users_yes=", ".join(map(str,[el for el in x['users_yes'] if el != None])),users_maybe=", ".join(map(str,[el for el in x['users_maybe'] if el != None])), comments=x['comments'], tags=x['tags'], house_id=x['house_id'], session_id=x['session_id'])
-		i.save()
-		return HttpResponse('success')
+	return render_to_response('index.html', {"names": User.objects.all(), "house_id": request.session['house_id']})
 
+
+
+# fix the bad naming of variables
 def add_item(request):
 	if request.POST:
 		x = json.loads(request.POST['string'])
-		p_d = datetime.date(int(x['purch_date'][2]), int(x['purch_date'][0]), int(x['purch_date'][1]))
-		i = Item(name=x['name'], purch_date=p_d, price=x['price'],buyer=x['buyer'], users_yes=", ".join(map(str,[el for el in x['users_yes'] if el != None])),users_maybe=", ".join(map(str,[el for el in x['users_maybe'] if el != None])), comments=x['comments'], tags=x['tags'], house_id=x['house_id'], session_id=x['session_id'])
-		i.save()
-		return HttpResponse('success')
+		# should i record when things were edited? and where?
 
+		# if there's an edit_id, then edit the record
+		if 'edit_id' in x:
+			p_d = datetime.date(int(x['purch_date'][0]), int(x['purch_date'][1]), int(x['purch_date'][2]))
+			i = Item.objects.get(id=x['edit_id'])
+			i.name = x['name']
+			i.purch_date = p_d
+			i.price = x['price']
+			i.users_yes = ",".join(map(str,[el for el in x['users_yes'] if el != None]))
+			i.users_maybe = ",".join(map(str,[el for el in x['users_maybe'] if el != None]))
+			i.comments = x['comments']
+			i.tags = x['tags']
+			i.save()
+			return HttpResponse('edited item')
+		else:
+			# add item to db
+			p_d = datetime.date(int(x['purch_date'][0]), int(x['purch_date'][1]), int(x['purch_date'][2]))
+			i = Item(name=x['name'], purch_date=p_d, price=x['price'],buyer=x['buyer'], users_yes=",".join(map(str,[el for el in x['users_yes'] if el != None])),users_maybe=",".join(map(str,[el for el in x['users_maybe'] if el != None])), comments=x['comments'], tags=x['tags'], house_id=x['house_id'], session_id=x['session_id'])
+			i.save()
+			return HttpResponse('added item')
+# sends item info to the add item page in order to fill it in
+def edit_item(request):
+	if request.POST:
+		i = Item.objects.get(id=request.POST.get('item_id'))
+		
+		info = {'name': i.name, 'price': str(i.price), 'users_yes': i.users_yes, 'users_maybe': i.users_maybe, 'purch_date': i.purch_date.isoformat().replace('-','/'), 'tags': i.tags, 'comments': i.comments} 
+
+		return HttpResponse(json.dumps(info))
 
 
 def login(request):

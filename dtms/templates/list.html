@@ -1,0 +1,92 @@
+<style type="text/css">
+	.item { 
+		width: 600px; 
+	}
+	.item_description {
+		width: 600px;
+		background-color: #eee;
+	}
+
+	#list .header { 
+		font-size:15pt;
+		width:600px; 
+		-moz-border-radius-topleft: 10px 10px; 
+		-moz-border-radius-topright: 10px 10px; 
+		background-color: #ff7070;
+	}
+	.price {
+		margin-left:50px;
+	}
+	.item_name {
+		float: left;
+		margin-left:5px;
+	}
+
+	.purch_date, .dispute, .edit{
+		float:right;
+		margin-right:5px;
+	}
+</style>
+
+<script type="text/javascript">
+	$().ready(function(){
+		$(".item").toggle(
+			function(){
+				$(this).find('.item_description').slideDown('normal');
+			}, function() {
+				$(this).find('.item_description').slideUp('normal');
+			}
+		);
+		$(".item:odd").css({'background-color': '#ffc97c'});
+		$(".item:even").css({'background-color': '#ffe1b5'});
+		$(".item_description").hide();
+		$(".edit").click(function(){
+			console.log('aoeu');
+			$("#action").text('edit');
+			edit_id = parseInt($(this).parent().attr('id'));
+			d = {'item_id': parseInt($(this).parent().attr('id'))};
+			$.ajax({
+				url: '/edit_item',
+				type: 'POST',
+				data: d,
+				dataType: 'json',
+				success: function(data){
+
+					// make sure purch_date is correct
+					// need buyer_id?
+
+					$('#dialog').jqmShow();
+					// reaching into the index.html code..
+					$('#name').val(data['name']);
+					$('#price').val(data['price']);
+					$('#purch_date').val(data['purch_date']);
+					$('#comments').val(data['comments']);
+					$('#tags').val(data['tabs']);
+					var yes = data['users_yes'].split(",");
+					for (t in yes){
+						if (yes[t] != -1){
+							console.log('yes' + yes[t]);
+							$('#' + yes[t] + 'option').removeClass('unselected').addClass('selected_yes');
+						}
+					}
+				}
+			});
+		});
+			
+	});
+</script>
+<div id="list">
+	<div class="header"> test</div>
+	{% for x in items %}
+	<div class="item" id= "{{ x.id }}list">
+		<span class="item_name">{{ x.name }}</span>
+		<span class="dispute">!</span>
+		<span class="edit">e</span>
+		<span class="purch_date">{{ x.purch_date }}</span>
+		<br>
+		<div class="item_description">
+			<div class="price">{{ x.price }}</div>
+		</div>
+	</div>
+	{% endfor %}
+</div>
