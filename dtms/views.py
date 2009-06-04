@@ -47,10 +47,27 @@ def add_item(request):
 			return HttpResponse('edited item')
 		else:
 			# add item to db
+
 			p_d = datetime.date(int(x['purch_date'][0]), int(x['purch_date'][1]), int(x['purch_date'][2]))
-			i = Item(name=x['name'], purch_date=p_d, price=x['price'],buyer=x['buyer'], users_yes=",".join(map(str,[el for el in x['users_yes'] if el != None])),users_maybe=",".join(map(str,[el for el in x['users_maybe'] if el != None])), comments=x['comments'], tags=x['tags'], house_id=x['house_id'], session_id=x['session_id'])
+
+			# get list of all users involved w/ item
+			total_users = map(lambda a,b: a or b, x['users_yes'], x['users_maybe'])
+			total_users = [s for s in total_users if s != 0]
+
+			i = Item(name=x['name'], purch_date=p_d, price=x['price'],buyer=x['buyer'], comments=x['comments'], tags=x['tags'], house_id=x['house_id'], archive_id=x['archive_id'])
 			i.save()
-			return HttpResponse('added item')
+
+			# for each user, create a link and whether they're buying or not 
+			for u in total_users:
+				person = User.objects.get(id=u)
+
+				#maybe.count(u) should always be 0 or 1
+				link = Item_status(user=person, item=i, maybe_buying=x['users_maybe'].count(u))
+				link.save()
+
+
+			return HttpResponse('success')
+
 # sends item info to the add item page in order to fill it in
 def edit_item(request):
 	if request.POST:
@@ -72,5 +89,3 @@ def login(request):
 			return HttpResponse('yes')
 		else:
 			return HttpResponse('no')
-
-

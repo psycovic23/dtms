@@ -13,16 +13,21 @@ class User(models.Model):
 class Item(models.Model):
 	name = models.CharField(max_length=40)
 	purch_date = models.DateField(default=datetime.datetime.now())
-	date_added = models.DateTimeField(auto_now_add=True)
+	date_edited = models.DateTimeField(auto_now_add=True)
 	price = models.DecimalField(max_digits=6, decimal_places=2)
 	buyer = models.IntegerField()
-	users_yes = models.CommaSeparatedIntegerField(max_length=10)
-	users_maybe = models.CommaSeparatedIntegerField(max_length=10)
+	users = models.ManyToManyField(User, through='Item_status')
 	comments = models.CharField(default='',max_length=400)
 	tags = models.CharField(default='',max_length=100)
 	house_id = models.IntegerField()
 
 	# for archiving purposes
-	session_id = models.IntegerField()
+	archive_id = models.IntegerField()
 
+# defining many-to-many relationship between User and Item
+class Item_status(models.Model):
+	user = models.ForeignKey(User)
+	item = models.ForeignKey(Item)
+	maybe_buying = models.BooleanField() # true means maybe buying, EXCLUDES BUYERS
+	date_added = models.DateTimeField(auto_now_add=True)
 

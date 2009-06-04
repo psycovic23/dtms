@@ -25,12 +25,12 @@ jQuery.fn.toggle_selected = function () {
 
 			} else if ($(this).hasClass("selected_yes")){
 				users_maybe[id] = id;
-				users_yes[id] = -1;
+				users_yes[id] = 0;
 				$(this).removeClass("selected_yes").addClass("selected_maybe");
 
 			} else if ($(this).hasClass("selected_maybe")) {
 				$(this).removeClass("selected_maybe").addClass('unselected'); 
-				users_maybe[id] = -1;
+				users_maybe[id] = 0;
 				$(this).mouseover( function() {
 					$(this).addClass("hover");
 				});	
@@ -50,8 +50,8 @@ $(document).ready(function() {
 	users_yes = new Array(num_users);
 	users_maybe = new Array(num_users);
 	for (var i = 0; i < num_users; i++){
-		users_yes[i] = -1;
-		users_maybe[i] = -1;
+		users_yes[i] = 0;
+		users_maybe[i] = 0;
 	}
 
 
@@ -105,13 +105,12 @@ $(document).ready(function(){
 			'comments': $("#comments").val(),
 			'tags': $("#tags").val(),
 			'house_id': 1,
-			'session_id': 0,
+			'archive_id': 0,
 		};
 
-		if ($("#action").html() == 'edit'){
+		// edit_id is a global variable used in index.html. fix this.
+		if ($("#action").html() == 'edit')
 			data = $.extend(data, {'edit_id': edit_id});
-		}
-		console.log(data)
 
 		var c = JSON.stringify(data);
 
@@ -121,8 +120,8 @@ $(document).ready(function(){
 			data: {'string': c},
 			success: function(data){
 				console.log(data);
-				$('#tabs').tabs('load',0);
 				$('#dialog').jqmHide();
+				refresh();
 			},
 			error: function(xhr, ts, et){
 				console.log(xhr.responseText);
@@ -130,7 +129,6 @@ $(document).ready(function(){
 			}
 		});
 
-		$('#tabs').tabs('load',0);
 	});
 	var myOpen=function(hash){ hash.w.fadeIn('1600')}; 
 	$('#dialog').jqm({onShow: myOpen}).jqmAddTrigger('.openjqm');
@@ -144,3 +142,9 @@ $(document).ready(function(){
 
 	$('#purch_date').val(str);
 });
+
+
+function refresh(){
+	$('#tabs').tabs('load',0);
+	console.log('refresh');
+}
