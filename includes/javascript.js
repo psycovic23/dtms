@@ -109,6 +109,7 @@ $(document).ready(function(){
 		};
 
 		// edit_id is a global variable used in index.html. fix this.
+		
 		if ($("#action").html() == 'edit')
 			data = $.extend(data, {'edit_id': edit_id});
 

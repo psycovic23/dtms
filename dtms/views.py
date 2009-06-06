@@ -5,6 +5,8 @@ from django.conf import settings
 from models import *
 from django.shortcuts import render_to_response
 from django.utils import simplejson as json
+import operator
+import pdb
 
 
 def list(request):
@@ -32,7 +34,7 @@ def add_item(request):
 		x = json.loads(request.POST['string'])
 		# should i record when things were edited? and where?
 
-		# if there's an edit_id, then edit the record
+		# if there's an edit_id attribute, then edit the record
 		if 'edit_id' in x:
 			p_d = datetime.date(int(x['purch_date'][0]), int(x['purch_date'][1]), int(x['purch_date'][2]))
 			i = Item.objects.get(id=x['edit_id'])
@@ -85,7 +87,56 @@ def login(request):
 		m = User.objects.get(name=request.POST.get('user_name'))		
 		if m.password == request.POST['password']:
 			request.session['house_id'] = m.house_id
-			request.session['edit'] = 0
 			return HttpResponse('yes')
 		else:
 			return HttpResponse('no')
+
+
+def individual_bill(request):
+	users = User.objects.filter(house_id=request.session['house_id'])
+	sum = {}
+	for a in users:
+		sum[a.id] = 0
+
+	for e in users:
+		# item_stat is the intermediate object, so it's a list of Item_status 
+		item_stat = e.item_status_set.all()
+
+		# get all items that match the archive_id through the intermediate object
+		# change archive_id to request.post object
+		it = [ s.item for s in item_stat if s.item.archive_id==0 ]
+
+		# now 'it' is a list of items the user is using that match the archive_id
+		for i in it:
+			num_users_per_item = len(i.users.all())
+			sum[e.id] += i.price / num_users_per_item * -1
+	
+	# who-owes-what array
+	for e in users:
+		bought_items = Item.objects.filter(buyer=e.id)
+		for b in bought_items:
+			sum[e.id] += b.price
+	# transactions
+	transactions = [] 
+	for (k,v) in sum.items():
+		sum[k] = float(v)
+
+	# while array is non zero
+	while abs(max(sum.iteritems(), key=operator.itemgetter(1))[1]) > .01:
+
+		owes = min(sum.iteritems(), key=operator.itemgetter(1))
+		expects = max(sum.iteritems(), key=operator.itemgetter(1))
+        
+
+		if (owes[1] + expects[1]) < 0:
+			amount = expects[1]
+		else:
+			amount = owes[1] * -1
+
+		transactions.append([owes[0], expects[0], amount])
+		sum[expects[0]] -= amount
+		sum[owes[0]] += amount
+
+	return HttpResponse('done')	
+
+
