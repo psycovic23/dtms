@@ -35,30 +35,46 @@ def add_item(request):
 		# should i record when things were edited? and where?
 
 		# if there's an edit_id attribute, then edit the record
-		if 'edit_id' in x:
-			p_d = datetime.date(int(x['purch_date'][0]), int(x['purch_date'][1]), int(x['purch_date'][2]))
-			i = Item_model.objects.get(id=x['edit_id'])
-			i.name = x['name']
-			i.purch_date = p_d
-			i.price = x['price']
-			i.users_yes = ",".join(map(str,[el for el in x['users_yes'] if el != None]))
-			i.users_maybe = ",".join(map(str,[el for el in x['users_maybe'] if el != None]))
-			i.comments = x['comments']
-			i.tags = x['tags']
-			i.save()
+        if 'edit_id' in x:
+            p_d = datetime.date(int(x['purch_date'][0]), int(x['purch_date'][1]), int(x['purch_date'][2]))
+            i = Item_model.objects.get(id=x['edit_id'])
+            i.users.clear()
+            i.name = x['name']
+            i.purch_date = p_d
+            i.price = x['price']
+            i.comments = x['comments']
+            i.tags = x['tags']
+            i.save()
 
-			return HttpResponse('edited item')
-		else:
+    # adding many-to-many db entry
+			# get list of all users involved w/ item
+            total_users = map(lambda a,b: a or b, x['users_yes'], x['users_maybe'])
+            total_users = [s for s in total_users if s != 0]
+
+			# for each user, create a link and whether they're buying or not 
+            for u in total_users:
+                person = User.objects.get(id=u)
+
+				#maybe.count(u) should always be 0 or 1
+                link = Item_status(user=person, item=i, maybe_buying=x['users_maybe'].count(u))
+                link.save()
+               
+            return HttpResponse('edited item')
+        else:
 			# add item to db
 
 			p_d = datetime.date(int(x['purch_date'][0]), int(x['purch_date'][1]), int(x['purch_date'][2]))
 
-			# get list of all users involved w/ item
-			total_users = map(lambda a,b: a or b, x['users_yes'], x['users_maybe'])
-			total_users = [s for s in total_users if s != 0]
 
 			i = Item_model(name=x['name'], purch_date=p_d, price=x['price'],buyer=x['buyer'], comments=x['comments'], tags=x['tags'], house_id=x['house_id'], archive_id=x['archive_id'])
 			i.save()
+
+
+
+    # adding many-to-many db entry
+			# get list of all users involved w/ item
+			total_users = map(lambda a,b: a or b, x['users_yes'], x['users_maybe'])
+			total_users = [s for s in total_users if s != 0]
 
 			# for each user, create a link and whether they're buying or not 
 			for u in total_users:
@@ -75,10 +91,14 @@ def add_item(request):
 def edit_item(request):
 	if request.POST:
 		i = Item_model.objects.get(id=request.POST.get('item_id'))
-		
-		info = {'name': i.name, 'price': str(i.price), 'purch_date': i.purch_date.isoformat().replace('-','/'), 'tags': i.tags, 'comments': i.comments} 
-
-		return HttpResponse(json.dumps(info))
+        users = i.item_status_set.all()
+        users_string = {}
+        for x in users:
+            users_string[x.user.id] = x.maybe_buying
+        info = {'name': i.name, 'price': str(i.price), 'purch_date':
+                i.purch_date.isoformat().replace('-','/'), 'tags': i.tags,
+                'comments': i.comments, 'users': users_string} 
+        return HttpResponse(json.dumps(info))
 
 
 def login(request):

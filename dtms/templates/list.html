@@ -54,6 +54,15 @@
 
 					// make sure purch_date is correct
 					// need buyer_id?
+					for (x in data['users']){
+						if (data['users'][x] == true){
+							console.log('true');
+							$('#' + x + 'option').addClass('selected_maybe').removeClass('unselected');
+						} else {
+							console.log('false');
+							$('#' + x + 'option').addClass('selected_yes').removeClass('unselected');
+						}
+					}
 
 					$('#dialog').jqmShow();
 					// reaching into the index.html code..
@@ -62,13 +71,6 @@
 					$('#purch_date').val(data['purch_date']);
 					$('#comments').val(data['comments']);
 					$('#tags').val(data['tabs']);
-					var yes = data['users_yes'].split(",");
-					for (t in yes){
-						if (yes[t] != -1){
-							console.log('yes' + yes[t]);
-							$('#' + yes[t] + 'option').removeClass('unselected').addClass('selected_yes');
-						}
-					}
 				}
 			});
 		});
