@@ -10,7 +10,7 @@ import pdb
 
 
 def list(request):
-	return render_to_response('list.html', {"items":Item.objects.all()})
+	return render_to_response('list.html', {"items":Item_model.objects.all()})
 
 
 
@@ -37,7 +37,7 @@ def add_item(request):
 		# if there's an edit_id attribute, then edit the record
 		if 'edit_id' in x:
 			p_d = datetime.date(int(x['purch_date'][0]), int(x['purch_date'][1]), int(x['purch_date'][2]))
-			i = Item.objects.get(id=x['edit_id'])
+			i = Item_model.objects.get(id=x['edit_id'])
 			i.name = x['name']
 			i.purch_date = p_d
 			i.price = x['price']
@@ -46,6 +46,7 @@ def add_item(request):
 			i.comments = x['comments']
 			i.tags = x['tags']
 			i.save()
+
 			return HttpResponse('edited item')
 		else:
 			# add item to db
@@ -56,7 +57,7 @@ def add_item(request):
 			total_users = map(lambda a,b: a or b, x['users_yes'], x['users_maybe'])
 			total_users = [s for s in total_users if s != 0]
 
-			i = Item(name=x['name'], purch_date=p_d, price=x['price'],buyer=x['buyer'], comments=x['comments'], tags=x['tags'], house_id=x['house_id'], archive_id=x['archive_id'])
+			i = Item_model(name=x['name'], purch_date=p_d, price=x['price'],buyer=x['buyer'], comments=x['comments'], tags=x['tags'], house_id=x['house_id'], archive_id=x['archive_id'])
 			i.save()
 
 			# for each user, create a link and whether they're buying or not 
@@ -73,9 +74,9 @@ def add_item(request):
 # sends item info to the add item page in order to fill it in
 def edit_item(request):
 	if request.POST:
-		i = Item.objects.get(id=request.POST.get('item_id'))
+		i = Item_model.objects.get(id=request.POST.get('item_id'))
 		
-		info = {'name': i.name, 'price': str(i.price), 'users_yes': i.users_yes, 'users_maybe': i.users_maybe, 'purch_date': i.purch_date.isoformat().replace('-','/'), 'tags': i.tags, 'comments': i.comments} 
+		info = {'name': i.name, 'price': str(i.price), 'purch_date': i.purch_date.isoformat().replace('-','/'), 'tags': i.tags, 'comments': i.comments} 
 
 		return HttpResponse(json.dumps(info))
 
@@ -113,7 +114,7 @@ def individual_bill(request):
 	
 	# who-owes-what array
 	for e in users:
-		bought_items = Item.objects.filter(buyer=e.id)
+		bought_items = Item_model.objects.filter(buyer=e.id)
 		for b in bought_items:
 			sum[e.id] += b.price
 	# transactions

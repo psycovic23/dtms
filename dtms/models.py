@@ -10,7 +10,7 @@ class User(models.Model):
 	def __unicode__(self):
 		return self.name
 
-class Item(models.Model):
+class Item_model(models.Model):
 	name = models.CharField(max_length=40)
 	purch_date = models.DateField(default=datetime.datetime.now())
 	date_edited = models.DateTimeField(auto_now_add=True)
@@ -27,7 +27,7 @@ class Item(models.Model):
 # defining many-to-many relationship between User and Item
 class Item_status(models.Model):
 	user = models.ForeignKey(User)
-	item = models.ForeignKey(Item)
+	item = models.ForeignKey(Item_model)
 	maybe_buying = models.BooleanField() # true means maybe buying, EXCLUDES BUYERS
 	date_added = models.DateTimeField(auto_now_add=True)
 
