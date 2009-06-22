@@ -41,7 +41,6 @@
 		$(".item:even").css({'background-color': '#ffe1b5'});
 		$(".item_description").hide();
 		$(".edit").click(function(){
-			console.log('aoeu');
 			$("#action").text('edit');
 			edit_id = parseInt($(this).parent().attr('id'));
 			d = {'item_id': parseInt($(this).parent().attr('id'))};
@@ -80,7 +79,7 @@
 <div id="list">
 	<div class="header"> test</div>
 	{% for x in items %}
-	<div class="item" id= "{{ x.id }}list">
+	<div class="item" id= "{{ x.node_id }}list">
 		<span class="item_name">{{ x.name }}</span>
 		<span class="dispute">!</span>
 		<span class="edit">e</span>

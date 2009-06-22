@@ -92,7 +92,6 @@ $(document).ready(function(){
 	// item submit buttong
 	$("#action").click(function(){
 
-
 		var str= $("#purch_date").val();
 		var d = str.split("/");
 		var data = {
@@ -108,7 +107,8 @@ $(document).ready(function(){
 			'archive_id': 0,
 		};
 
-		// edit_id is a global variable used in index.html. fix this.
+		// edit_id is a global variable used in list.html. fix this.
+		// make sure edit_id is pointing to item_node id, not item_model
 		
 		if ($("#action").html() == 'edit')
 			data = $.extend(data, {'edit_id': edit_id});
@@ -120,12 +120,12 @@ $(document).ready(function(){
 			type: "POST",
 			data: {'string': c},
 			success: function(data){
-				console.log(data);
+				$('body').html(data);
 				$('#dialog').jqmHide();
 				refresh();
 			},
 			error: function(xhr, ts, et){
-				console.log(xhr.responseText);
+				$('body').html(xhr.responseText);
 				$('#dialog').jqmHide();
 			}
 		});
