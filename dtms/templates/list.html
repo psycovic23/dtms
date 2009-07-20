@@ -69,7 +69,7 @@
 					$('#price').val(data['price']);
 					$('#purch_date').val(data['purch_date']);
 					$('#comments').val(data['comments']);
-					$('#tags').val(data['tabs']);
+					$('#tags').val(data['tags']);
 				}
 			});
 		});
@@ -87,6 +87,7 @@
 		<br>
 		<div class="item_description">
 			<div class="price">{{ x.price }}</div>
+			<div class="tags">{{ x.tags }}</div>
 		</div>
 	</div>
 	{% endfor %}

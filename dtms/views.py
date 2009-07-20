@@ -41,6 +41,8 @@ def add_item(request):
 
         if 'edit_id' in x:
             node = Item_node.objects.get(id=x['edit_id'])
+
+
         else:
             node = Item_node(archive_id=0)
             node.save()
@@ -62,11 +64,45 @@ def add_item(request):
 
         i = Item_model(name=x['name'], purch_date=p_d,
                        price=x['price'], buyer=x['buyer'],
-                       comments=x['comments'], tags=x['tags'],
-                       house_id=x['house_id'], node_id = node.id,
-                       item_head = node)
-        i.save()
+                       comments=x['comments'], house_id=x['house_id'], 
+                       node_id = node.id, item_head = node, tags=x['tags'])
 
+
+        # gotta make interface to create the tags
+        # get csv list of tags, retrieve them from Tag table
+        # create Tag_rel link between items
+
+        if x['tags']:
+
+            pdb.set_trace()
+            try:
+                node.latest_revision().tags
+            except:
+                old_tags = set([])
+            else:
+                if node.latest_revision().tags:
+                    old_tags = set([p.strip() for p in
+                                    node.latest_revision().tags.split(',')])
+                else:
+                    old_tags = set([])
+
+            new_tags = set([p.strip() for p in x['tags'].split(',')])
+            diff = old_tags.symmetric_difference(new_tags)
+
+            for k in diff:
+                try:
+                    t_name = Tag.objects.get(tag_name=k)
+                # if exists in the diff, test if it already exist, then delete
+                # the link. if doesn't exist, then create
+                except:
+                    t_name = Tag(tag_name=k)
+                    t_name.save()
+                    p = Tag_rel(tag=t_name, item=node)
+                    p.save()
+                else:
+                    c = Tag_rel.objects.get(tag=t_name)
+                    c.delete()
+        i.save()
 
         return HttpResponse('success')
 
@@ -74,7 +110,7 @@ def add_item(request):
 def edit_item(request):
     if request.POST:
         i_node = Item_node.objects.get(id=request.POST.get('item_id'))
-        users = i_node.item_status_group.all()
+        users = i_node.item_status_set.all()
         users_string = {}
         i = i_node.latest_revision()
         for x in users:
@@ -106,7 +142,7 @@ def individual_bill(request):
 
     for e in users:
         # item_stat is the intermediate object, so it's a list of Item_status 
-        item_stat = e.item_status_group.all()
+        item_stat = e.item_status_set.all()
 
         # get all items that match the archive_id through the intermediate object
         # change archive_id to request.post object

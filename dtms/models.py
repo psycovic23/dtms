@@ -13,8 +13,7 @@ class User(models.Model):
 class Item_node(models.Model):
     # for archiving purposes
     archive_id = models.IntegerField()
-    users = models.ManyToManyField(User, through='Item_status',
-                                   related_name='%(class)s_group')
+    users = models.ManyToManyField(User, through='Item_status')
 
     def latest_revision(self):
         return self.item_model_set.all()[0]
@@ -48,9 +47,9 @@ class Item_status(models.Model):
 # defining many-to-many relationship between Tag and Item_node
 class Tag(models.Model):
     tag_name = models.CharField(max_length=50)
-    items = models.ManyToManyField(Item_status, through='Tag_rel')
+    items = models.ManyToManyField(Item_node, through='Tag_rel')
 
 class Tag_rel(models.Model):
     tag = models.ForeignKey(Tag)
-    item = models.ForeignKey(Item_status)
+    item = models.ForeignKey(Item_node)
 
