@@ -13,8 +13,6 @@ def list(request):
     items = [ p.latest_revision() for p in Item_node.objects.all() ]
     return render_to_response('list.html', {"items": items})
 
-
-
 def adduser(request):
     if not request.POST:
         return render_to_response('adduser.html', {'success': False})
@@ -76,7 +74,7 @@ def add_item(request):
 def edit_item(request):
     if request.POST:
         i_node = Item_node.objects.get(id=request.POST.get('item_id'))
-        users = i_node.item_status_set.all()
+        users = i_node.item_status_group.all()
         users_string = {}
         i = i_node.latest_revision()
         for x in users:
@@ -108,7 +106,7 @@ def individual_bill(request):
 
     for e in users:
         # item_stat is the intermediate object, so it's a list of Item_status 
-        item_stat = e.item_status_set.all()
+        item_stat = e.item_status_group.all()
 
         # get all items that match the archive_id through the intermediate object
         # change archive_id to request.post object
