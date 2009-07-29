@@ -31,25 +31,21 @@ def index(request):
 def add_item(request):
     if request.POST:
         x = json.loads(request.POST['string'])
-        # should i record when things were edited? and where?
 
-        # if there's an edit_id attribute, then edit the record
-            # add item to db
 
+        # create datetime object
         p_d = datetime.date(int(x['purch_date'][0]), int(x['purch_date'][1]), int(x['purch_date'][2]))
 
 
+        # if edit_id exists, then find the item_node, else create another
+
         if 'edit_id' in x:
             node = Item_node.objects.get(id=x['edit_id'])
-
 
         else:
             node = Item_node(archive_id=0)
             node.save()
 
-
-
-    # ad many-to-many db entry
         # get list of all users involved w/ item
         total_users = map(lambda a,b: a or b, x['users_yes'], x['users_maybe'])
         total_users = [s for s in total_users if s != 0]
@@ -62,46 +58,18 @@ def add_item(request):
             link = Item_status(user=person, item=node, maybe_buying=x['users_maybe'].count(u))
             link.save()
 
+        # add edit tags
+        try:
+            t = Tag.objects.get(tag_name=x['tags'])
+        except:
+            t = Tag(tag_name=x['tags'])
+            t.save()
+
         i = Item_model(name=x['name'], purch_date=p_d,
                        price=x['price'], buyer=x['buyer'],
                        comments=x['comments'], house_id=x['house_id'], 
-                       node_id = node.id, item_head = node, tags=x['tags'])
-
-
-        # gotta make interface to create the tags
-        # get csv list of tags, retrieve them from Tag table
-        # create Tag_rel link between items
-
-        if x['tags']:
-
-            pdb.set_trace()
-            try:
-                node.latest_revision().tags
-            except:
-                old_tags = set([])
-            else:
-                if node.latest_revision().tags:
-                    old_tags = set([p.strip() for p in
-                                    node.latest_revision().tags.split(',')])
-                else:
-                    old_tags = set([])
-
-            new_tags = set([p.strip() for p in x['tags'].split(',')])
-            diff = old_tags.symmetric_difference(new_tags)
-
-            for k in diff:
-                try:
-                    t_name = Tag.objects.get(tag_name=k)
-                # if exists in the diff, test if it already exist, then delete
-                # the link. if doesn't exist, then create
-                except:
-                    t_name = Tag(tag_name=k)
-                    t_name.save()
-                    p = Tag_rel(tag=t_name, item=node)
-                    p.save()
-                else:
-                    c = Tag_rel.objects.get(tag=t_name)
-                    c.delete()
+                       node_id = node.id, item_head = node, tags=t,
+                       sub_tag=x['sub_tag'])
         i.save()
 
         return HttpResponse('success')
@@ -116,7 +84,7 @@ def edit_item(request):
         for x in users:
             users_string[x.user.id] = x.maybe_buying
         info = {'name': i.name, 'price': str(i.price), 'purch_date':
-                i.purch_date.isoformat().replace('-','/'), 'tags': i.tags,
+                i.purch_date.isoformat().replace('-','/'), 'tags': str(i.tags),
                 'comments': i.comments, 'users': users_string} 
         return HttpResponse(json.dumps(info))
 

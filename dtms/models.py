@@ -18,6 +18,15 @@ class Item_node(models.Model):
     def latest_revision(self):
         return self.item_model_set.all()[0]
 
+    def __unicode__(self):
+        return self.item_model_set.all()[0].name
+
+class Tag(models.Model):
+    tag_name = models.CharField(max_length=50)
+
+    def __unicode__(self):
+        return self.tag_name
+
 class Item_model(models.Model):
 
     name = models.CharField(max_length=40)
@@ -26,12 +35,18 @@ class Item_model(models.Model):
     price = models.DecimalField(max_digits=6, decimal_places=2)
     buyer = models.IntegerField()
     comments = models.CharField(default='',max_length=400)
-    tags = models.CharField(default='',max_length=100)
     house_id = models.IntegerField()
     node_id = models.IntegerField()
+    sub_tag = models.CharField(default='',max_length=40)
     
-    # for many-to-one relationship
+    # for many-to-one relationship (item revisions)
     item_head = models.ForeignKey(Item_node)
+
+    # for many to one relationship (tags)
+    tags = models.ForeignKey(Tag)
+
+    def __unicode__(self):
+        return self.name
 
     class Meta:
         ordering = ['-date_edited']
@@ -44,12 +59,4 @@ class Item_status(models.Model):
     maybe_buying = models.BooleanField() # true means maybe buying, EXCLUDES BUYERS
     date_added = models.DateTimeField(auto_now_add=True)
 
-# defining many-to-many relationship between Tag and Item_node
-class Tag(models.Model):
-    tag_name = models.CharField(max_length=50)
-    items = models.ManyToManyField(Item_node, through='Tag_rel')
-
-class Tag_rel(models.Model):
-    tag = models.ForeignKey(Tag)
-    item = models.ForeignKey(Item_node)
 

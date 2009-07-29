@@ -89,7 +89,7 @@ $(document).ready(function(){
 		$("#action").text('submit');
 	});
 
-	// item submit buttong
+	// item submit button
 	$("#action").click(function(){
 
 		var str= $("#purch_date").val();
@@ -103,6 +103,7 @@ $(document).ready(function(){
 			'users_maybe': users_maybe,
 			'comments': $("#comments").val(),
 			'tags': $("#tags").val(),
+			'sub_tag': $("#sub_tag").val(),
 			'house_id': 1,
 			'archive_id': 0,
 		};
@@ -120,7 +121,6 @@ $(document).ready(function(){
 			type: "POST",
 			data: {'string': c},
 			success: function(data){
-				$('body').html(data);
 				$('#dialog').jqmHide();
 				refresh();
 			},
