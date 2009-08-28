@@ -14,6 +14,9 @@
 		-moz-border-radius-topright: 10px 10px; 
 		background-color: #ff7070;
 	}
+	#list {
+		float:left;
+	}
 	.price {
 		margin-left:50px;
 	}
@@ -26,10 +29,32 @@
 		float:right;
 		margin-right:5px;
 	}
+
+	#graph {
+		float: right;
+		width: 400px;
+		height: 300px;
+		border: 1px dashed gainsboro;
+	}
 </style>
 
 <script type="text/javascript">
 	$().ready(function(){
+		var data = [];
+		var i = 0;
+
+		{% for x in tag_price %}
+			data[i] = { label: "{{ x.0 }}", data: {{x.1}} };
+			i++;
+		{% endfor %}
+
+		$.plot($("#graph"), data,
+			{ series: {
+				pie: { show: true }
+				}
+			});
+					
+
 		$(".item").toggle(
 			function(){
 				$(this).find('.item_description').slideDown('normal');
@@ -70,6 +95,7 @@
 					$('#purch_date').val(data['purch_date']);
 					$('#comments').val(data['comments']);
 					$('#tags').val(data['tags']);
+					$('#sub_tag').val(data['sub_tag']);
 				}
 			});
 		});
@@ -87,9 +113,11 @@
 		<br>
 		<div class="item_description">
 			<div class="price">{{ x.price }}</div>
-			<div class="tags">{{ x.tags }}</div>
-			<div class="sub_tag">{{ x.sub_tag }}</div>
+			<div class="tags">{{ x.tag_name }}</div>
+			<div class="sub_tag">{{ x.sub_tag_name }}</div>
 		</div>
 	</div>
 	{% endfor %}
+</div>
+<div id="graph">
 </div>

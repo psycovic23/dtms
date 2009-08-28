@@ -6,6 +6,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
+    (r'^tag_price$', 'mysite.dtms.views.tag_price'),
 	(r'^adduser$', 'mysite.dtms.views.adduser'),
 	(r'^adduser_run$', 'mysite.dtms.views.adduser_run'),
 	(r'^list_items$', 'mysite.dtms.views.list_items'),
