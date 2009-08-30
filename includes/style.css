@@ -85,3 +85,41 @@ h1 {
 	font-family:georgia;
 	font-size:12pt;
 }
+
+.item { 
+	width: 600px; 
+}
+.item_description {
+	width: 600px;
+	background-color: #eee;
+}
+
+#list .header { 
+	font-size:15pt;
+	width:600px; 
+	-moz-border-radius-topleft: 10px 10px; 
+	-moz-border-radius-topright: 10px 10px; 
+	background-color: #ff7070;
+}
+#list {
+	float:left;
+}
+.price {
+	margin-left:50px;
+}
+.item_name {
+	float: left;
+	margin-left:5px;
+}
+
+.purch_date, .dispute, .edit{
+	float:right;
+	margin-right:5px;
+}
+
+#graph {
+	float: right;
+	width: 400px;
+	height: 300px;
+	border: 1px dashed gainsboro;
+}

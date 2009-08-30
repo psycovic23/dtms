@@ -24,7 +24,6 @@ class Item_list():
         for a in users:
             sum[a.id] = 0
     
-        pdb.set_trace()
         for e in users:
         #    # item_stat is the intermediate object, so it's a list of Item_status 
         #    item_stat = e.item_status_set.all()
@@ -33,7 +32,7 @@ class Item_list():
         #    # change archive_id to request.post object
         #    it = [ s.item for s in item_stat if s.item.archive_id==0 ]
     
-        #    # now 'it' is a list of item_nodes the user is using that match the archive_id
+        #    # now 'it' is a list of item the user is using that match the archive_id
             for i in self.list:
                 num_users_per_item = len(i.users.all())
                 sum[e.id] += i.latest_revision().price / num_users_per_item * -1
@@ -66,7 +65,7 @@ class Item_list():
         return transactions
 
 def list(request):
-    items = [ p.latest_revision() for p in Item_node.objects.all() ]
+    items = Item.objects.all()
     return render_to_response('list.html', {"items": items, "tag_price":
                                             tag_price()})
 
@@ -82,15 +81,17 @@ def tag_price():
     x = Tag.objects.all()
     temp = []
     for t in x:
-        if len(t.item_node_set.all()) !=0:
+        if len(t.item_set.all()) !=0:
             temp.append(t.cat_price())
     return temp
 
 
 def index(request):
+    items = Item.objects.all()
     return render_to_response('index.html', {"names": User.objects.all(),
                                              "house_id":
-                                             request.session['house_id']})
+                                             request.session['house_id'],
+                                             "items": items})
                                              
 
 
@@ -112,17 +113,27 @@ def add_item(request):
             t = Tag(tag_name=x['tags'])
             t.save()
 
-        # if edit_id exists, then find the item_node, else create another
+        # if edit_id exists, then find the item, else create another
 
         if 'edit_id' in x:
-            node = Item_node.objects.get(id=x['edit_id'])
-            node.tag = t
-            node.sub_tag = x['sub_tag']
-            node.save()
+            ref_item            = Item.objects.get(id=x['edit_id'])
+            ref_item.tag        = t
+            ref_item.sub_tag    = x['sub_tag']
+
+            ref_item.name       = x['name']
+            ref_item.purch_date = p_d
+            ref_item.price      = x['price']
+            ref_item.buyer      = x['buyer']
+            ref_item.comments   = x['comments']
+
+            ref_item.save()
 
         else:
-            node = Item_node(archive_id=0, tag=t, sub_tag=x['sub_tag'])
-            node.save()
+            ref_item = Item(name=x['name'], purch_date=p_d,
+                           price=x['price'], buyer=x['buyer'],
+                           comments=x['comments'], house_id=x['house_id'], 
+                           archive_id=0, tag=t, sub_tag=x['sub_tag'])
+            ref_item.save()
 
         # get list of all users involved w/ item
         total_users = map(lambda a,b: a or b, x['users_yes'], x['users_maybe'])
@@ -133,25 +144,17 @@ def add_item(request):
             person = User.objects.get(id=u)
 
             #maybe.count(u) should always be 0 or 1
-            link = Item_status(user=person, item=node, maybe_buying=x['users_maybe'].count(u))
+            link = Item_status(user=person, item=ref_item, maybe_buying=x['users_maybe'].count(u))
             link.save()
-
-
-        i = Item_model(name=x['name'], purch_date=p_d,
-                       price=x['price'], buyer=x['buyer'],
-                       comments=x['comments'], house_id=x['house_id'], 
-                       node_id = node.id, item_head = node)
-        i.save()
 
         return HttpResponse('success')
 
 # sends item info to the add item page in order to fill it in
 def edit_item(request):
     if request.POST:
-        i_node = Item_node.objects.get(id=request.POST.get('item_id'))
-        users = i_node.item_status_set.all()
+        i = Item.objects.get(id=request.POST.get('item_id'))
+        users = i.item_status_set.all()
         users_string = {}
-        i = i_node.latest_revision()
         for x in users:
             users_string[x.user.id] = x.maybe_buying
         info = {'name': i.name, 'price': str(i.price), 'purch_date':
@@ -175,7 +178,7 @@ def login(request):
 
 
 def individual_bill(request):
-    x = Item_list(list=Item_node.objects.all(),
+    x = Item_list(list=Item.objects.all(),
                   house_id=request.session['house_id'])
     x.generate_transactions()
     #    users = User.objects.filter(house_id=request.session['house_id'])
@@ -191,7 +194,7 @@ def individual_bill(request):
     #        # change archive_id to request.post object
     #        it = [ s.item for s in item_stat if s.item.archive_id==0 ]
     #
-    #        # now 'it' is a list of item_nodes the user is using that match the archive_id
+    #        # now 'it' is a list of item the user is using that match the archive_id
     #        for i in it:
     #            num_users_per_item = len(i.users.all())
     #            sum[e.id] += i.latest_revision().price / num_users_per_item * -1

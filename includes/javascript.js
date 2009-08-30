@@ -1,3 +1,7 @@
+//--------------------------------------------------
+// This section is code for the user list in the add_item popup
+
+
 // toggles colors for list_users
 jQuery.fn.toggle_selected = function () {
 	return this.each( function() {
@@ -43,6 +47,7 @@ jQuery.fn.toggle_selected = function () {
 	});
 }
 
+// code for passing the selected user list information to backend
 $(document).ready(function() {
 
 	// initialize arrays for who is a 'yes' and who's a 'maybe'
@@ -53,7 +58,6 @@ $(document).ready(function() {
 		users_yes[i] = 0;
 		users_maybe[i] = 0;
 	}
-
 
 	$('.option_text').toggle_selected();
 
@@ -79,12 +83,29 @@ $(document).ready(function() {
 	});
 });
 
+
+//-----------------------------------------
+// this refreshes the item list. making it into a function so I can call it again when edits are made and we have to refresh on the fly
+function call_item_list(){
+	$.ajax({
+		url: '/list',
+		success: function(data){
+			$("#list").html(data)
+		}
+	});
+}
+
+// JS code for the add_item box (getting info from fields, sending it to django, and fade effect)
 $(document).ready(function(){
 
-	// coupling with list.html
-	//
+	// for pie graph
+	var data = [];
+	var i = 0;
 
-	$("#tabs").tabs();
+
+	call_item_list();
+
+
 	$("#add_item").click(function(){
 		$("#action").text('submit');
 	});
@@ -92,6 +113,7 @@ $(document).ready(function(){
 	// item submit button
 	$("#action").click(function(){
 
+		// gets all the information from the forms
 		var str= $("#purch_date").val();
 		var d = str.split("/");
 		var data = {
@@ -109,7 +131,7 @@ $(document).ready(function(){
 		};
 
 		// edit_id is a global variable used in list.html. fix this.
-		// make sure edit_id is pointing to item_node id, not item_model
+		// it's the id that's captured when you click on the item div and must be passed around
 		
 		if ($("#action").html() == 'edit')
 			data = $.extend(data, {'edit_id': edit_id});
@@ -122,7 +144,6 @@ $(document).ready(function(){
 			data: {'string': c},
 			success: function(data){
 				$('#dialog').jqmHide();
-				refresh();
 			},
 			error: function(xhr, ts, et){
 				$('body').html(xhr.responseText);
@@ -130,7 +151,12 @@ $(document).ready(function(){
 			}
 		});
 
+		// call the list again to reflect changes
+		call_item_list();
 	});
+
+
+	// fade in and out code for add_item pop up
 	var myOpen=function(hash){ hash.w.fadeIn('1600')}; 
 	$('#dialog').jqm({onShow: myOpen}).jqmAddTrigger('.openjqm');
 
@@ -144,8 +170,3 @@ $(document).ready(function(){
 	$('#purch_date').val(str);
 });
 
-
-function refresh(){
-	$('#tabs').tabs('load',0);
-	console.log('refresh');
-}

@@ -17,14 +17,14 @@ class Tag(models.Model):
         return self.tag_name
 
     def cat_price(self):
-        t = self.item_node_set.all()
+        t = self.item_set.all()
         total_price = 0
         for x in t:
-            total_price += x.latest_revision().price
+            total_price += x.price
         return [str(self.tag_name), float(total_price)]
 
 # all item_model revisions attach to this. this attaches to item_status
-class Item_node(models.Model):
+class Item(models.Model):
     # for archiving purposes
     archive_id = models.IntegerField()
     users = models.ManyToManyField(User, through='Item_status')
@@ -33,16 +33,6 @@ class Item_node(models.Model):
     tag = models.ForeignKey(Tag)
     sub_tag = models.CharField(default='',max_length=40)
 
-    def latest_revision(self):
-        return self.item_model_set.all()[0]
-
-    def __unicode__(self):
-        return self.item_model_set.all()[0].name
-
-
-
-class Item_model(models.Model):
-
     name = models.CharField(max_length=40)
     purch_date = models.DateField(default=datetime.datetime.now())
     date_edited = models.DateTimeField(auto_now_add=True)
@@ -50,29 +40,21 @@ class Item_model(models.Model):
     buyer = models.IntegerField()
     comments = models.CharField(default='',max_length=400)
     house_id = models.IntegerField()
-    node_id = models.IntegerField()
     
-    # for many-to-one relationship (item revisions)
-    item_head = models.ForeignKey(Item_node)
-
     def tag_name(self):
-        return self.item_head.tag
+        return self.tag
 
     def sub_tag_name(self):
-        return self.item_head.sub_tag
+        return self.sub_tag
 
     def __unicode__(self):
         return self.name
 
-    class Meta:
-        ordering = ['-date_edited']
 
-
-# defining many-to-many relationship between User and Item_node
+# defining many-to-many relationship between User and Item
 class Item_status(models.Model):
     user = models.ForeignKey(User)
-    item = models.ForeignKey(Item_node)
+    item = models.ForeignKey(Item)
     maybe_buying = models.BooleanField() # true means maybe buying, EXCLUDES BUYERS
     date_added = models.DateTimeField(auto_now_add=True)
-
 
