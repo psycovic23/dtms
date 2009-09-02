@@ -1,59 +1,12 @@
 <script type="text/javascript">
-	// js behavior for sliding items up and down
-	// also code to fill in information when you're editing a record 
-	$(".item").toggle(
-		function(){
-			$(this).find('.item_description').slideDown('normal');
-		}, function() {
-			$(this).find('.item_description').slideUp('normal');
-		}
-	);
-	$(".item:odd").css({'background-color': '#ffc97c'});
-	$(".item:even").css({'background-color': '#ffe1b5'});
-	$(".item_description").hide();
-	$(".edit").click(function(){
-		$("#action").text('edit');
-		edit_id = parseInt($(this).parent().attr('id'));
-		d = {'item_id': parseInt($(this).parent().attr('id'))};
-		$.ajax({
-			url: '/edit_item',
-			type: 'POST',
-			data: d,
-			dataType: 'json',
-			success: function(data){
-
-				// make sure purch_date is correct
-				// need buyer_id?
-				for (x in data['users']){
-					if (data['users'][x] == true){
-						$('#' + x + 'option').addClass('selected_maybe').removeClass('unselected');
-					} else {
-						$('#' + x + 'option').addClass('selected_yes').removeClass('unselected');
-					}
-				}
-
-				$('#dialog').jqmShow();
-				// reaching into the index.html code..
-				$('#name').val(data['name']);
-				$('#price').val(data['price']);
-				$('#purch_date').val(data['purch_date']);
-				$('#comments').val(data['comments']);
-				$('#tags').val(data['tags']);
-				$('#sub_tag').val(data['sub_tag']);
-			},
-			error: function(data, err_string, excep){
-				console.log(err_string);
-			}
-		});
-	});
 </script>
 
 <div class="header"> test</div>
 {% for x in items %}
 <div class="item" id= "{{ x.id }}list">
 	<span class="item_name">{{ x.name }}</span>
-	<span class="dispute">!</span>
-	<span class="edit">e</span>
+	<a class="delete">d</a>
+	<a class="edit">e</a>
 	<span class="purch_date">{{ x.purch_date }}</span>
 	<br>
 	<div class="item_description">

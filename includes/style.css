@@ -112,7 +112,7 @@ h1 {
 	margin-left:5px;
 }
 
-.purch_date, .dispute, .edit{
+.delete, .purch_date, .dispute, .edit{
 	float:right;
 	margin-right:5px;
 }
