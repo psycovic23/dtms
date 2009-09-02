@@ -5,15 +5,14 @@ from django.conf import settings
 from models import *
 from django.shortcuts import render_to_response
 from django.utils import simplejson as json
-import operator
+import operator, decimal
 import pdb
 
 
 
 def list(request):
     items = Item.objects.all()
-    return render_to_response('list.html', {"items": items, "tag_price":
-                                            tag_price()})
+    return render_to_response('list.html', {"items": items })
 
 def adduser(request):
     if not request.POST:
@@ -27,7 +26,7 @@ def tag_price():
     x = Tag.objects.all()
     temp = []
     for t in x:
-        if len(t.item_set.all()) !=0:
+        if len(t.user_set.all()) !=0:
             temp.append(t.cat_price())
     return temp
 
@@ -55,22 +54,25 @@ def add_item(request):
 
         # add edit tags
         try:
-            t = Tag.objects.get(tag_name=x['tags'])
+            t = Tag.objects.get(name=x['tags'])
         except:
-            t = Tag(tag_name=x['tags'])
+            t = Tag(name=x['tags'])
             t.save()
 
         # if edit_id exists, then find the item, else create another
 
         if 'edit_id' in x:
             ref_item            = Item.objects.get(id=x['edit_id'])
+
+            # get rid of existing links and just remake them below
+            ref_item.delete_m2m_links()
+
             ref_item.tag        = t
             ref_item.sub_tag    = x['sub_tag']
 
             ref_item.name       = x['name']
             ref_item.purch_date = p_d
             ref_item.price      = x['price']
-            ref_item.buyer      = x['buyer']
             ref_item.comments   = x['comments']
 
             ref_item.save()
@@ -80,7 +82,6 @@ def add_item(request):
                 name            = x['name'], 
                 purch_date      = p_d,
                 price           = x['price'], 
-                buyer           = x['buyer'],
                 comments        = x['comments'], 
                 house_id        = x['house_id'], 
                 archive_id      = 0, 
@@ -88,24 +89,57 @@ def add_item(request):
                 sub_tag         = x['sub_tag']
             )
 
+            pdb.set_trace()
+
             ref_item.save()
 
-        # get list of all users involved w/ item
-        total_users = map(lambda a,b: a or b, x['users_yes'], x['users_maybe'])
-        total_users = [s for s in total_users if s != 0]
-
-        # for each user, create a link and whether they're buying or not 
-        for u in total_users:
-            person = User.objects.get(id=u)
-
-            #maybe.count(u) should always be 0 or 1
-            link = Item_status(
-                user = person, 
-                item = ref_item, 
-                maybe_buying = x['users_maybe'].count(u)
+        if 'expanded' not in x:
+            # get list of all users involved w/ item
+            total_users = map(lambda a,b: a or b, x['users_yes'], x['users_maybe'])
+            total_users = [s for s in total_users if s != 0]
+    
+            b = User.objects.get(id=x['buyer'])
+            buyer_link = Buyer_item_rel(
+                buyer           = b,
+                item            = ref_item,
+                payment_amount  = ref_item.price
             )
+            buyer_link.save()
 
-            link.save()
+
+            # for each user, create a link and whether they're buying or not 
+            for u in total_users:
+                person = User.objects.get(id=u)
+    
+                #maybe.count(u) should always be 0 or 1
+                link = User_item_rel(
+                    user            = person, 
+                    item            = ref_item, 
+                    maybe_buying    = x['users_maybe'].count(u),
+                    payment_amount  = decimal.Decimal(ref_item.price) /
+                                        decimal.Decimal(len(total_users))
+                )
+    
+                link.save()
+        else:
+            for t in x['expanded_buyers']:
+                if decimal.Decimal(t[1]) != 0:
+                    b_link = Buyer_item_rel(
+                        buyer           = User.objects.get(id=t[0]),
+                        item            = ref_item,
+                        payment_amount  = t[1]
+                    )
+                    b_link.save()
+
+            for t in x['expanded_users']:
+                if decimal.Decimal(t[1]) != 0:
+                    u_link = User_item_rel(
+                        user            = User.objects.get(id=t[0]),
+                        item            = ref_item,
+                        maybe_buying    = 0,
+                        payment_amount  = t[1]
+                    )
+                    u_link.save()
 
         return HttpResponse('success')
 
@@ -113,7 +147,7 @@ def add_item(request):
 def edit_item(request):
     if request.POST:
         i = Item.objects.get(id=request.POST.get('item_id'))
-        users = i.item_status_set.all()
+        users = i.user_item_rel_set.all()
         users_string = {}
         for x in users:
             users_string[x.user.id] = x.maybe_buying

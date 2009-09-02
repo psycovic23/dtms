@@ -22,19 +22,45 @@
 		<input type="text" id="name">
 		<br><br>
 		<h1>how much was it?</h1>
+		<h3><a id="advanced">advanced selection</a></h3>
+		
 		<span style="font-family:georgia; font-size:16pt;">$</span><input type="text" id="price">
 		<br><br>
-		<h1>who's using it?</h1>
-		<div id="list_users">
-			<span id="all_name">All</span>
-			{% for x in names %}
-			<span class="option_text" id="{{x.id}}option">{{ x }}</span>
-			{% endfor %}
+		<div id="expanded_buyers">
+			<h1>how much did the buyers spend?</h1>
+			<table>
+				{% for x in names%}
+				<tr>
+					<td>{{ x }}: </td><td><input type="text" value="0" id="{{x.id}}expanded"></td>
+				</tr>
+				{% endfor %}
+			</table>
+		</div>
+
+		<div id="expanded_users">
+			<h1>how much will each person pay?</h1>
+			<table>
+				{% for x in names%}
+				<tr>
+					<td>{{ x }}: </td><td><input type="text" value="0" id="{{x.id}}expanded"></td>
+				</tr>
+				{% endfor %}
+			</table>
+		</div>
+
+		<div id="basic_users">
+			<h1>who's using it?</h1>
+			<div id="list_users">
+				<a id="all_name">All</a>
+				{% for x in names %}
+				<a class="option_text" id="{{x.id}}option">{{ x }}</a>
+				{% endfor %}
+			</div>
 		</div>
 		<br>
-		<span style="font-size:10pt">purchase date</span> <input type="text" id="purch_date" size="10">
-		<span style="font-size:10pt">tags</span> <input type="text" id="tags">
-		<span style="font-size:10pt">sub tags</span> <input type="text" id="sub_tag">
+		<h3>purchase date</h3> <input type="text" id="purch_date" size="10">
+		<h3>tags</h3> <input type="text" id="tags">
+		<h3>sub tags</h3> <input type="text" id="sub_tag">
 		<h1>any comments about it?</h1>
 		<span style="color:#eee">a</span><textarea id="comments" rows="6" cols="40"></textarea><br><br>
 		<span id="action">submit</span><span id="cancel" class="jqmClose">cancel</span>

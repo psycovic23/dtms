@@ -13,24 +13,25 @@ class User(models.Model):
         return self.name
 
 class Tag(models.Model):
-    tag_name    = models.CharField(max_length=50)
+    name    = models.CharField(max_length=50)
 
     def __unicode__(self):
-        return self.tag_name
+        return self.name
 
     def cat_price(self):
-        t = self.item_set.all()
+        t = self.user_set.all()
         total_price = 0
         for x in t:
             total_price += x.price
-        return [str(self.tag_name), float(total_price)]
+        return [str(self.name), float(total_price)]
 
 # all item_model revisions attach to this. this attaches to item_status
 class Item(models.Model):
 
     # for archiving purposes
     archive_id  = models.IntegerField()
-    users       = models.ManyToManyField(User, through='Item_status')
+    users       = models.ManyToManyField(User, through='User_item_rel',
+                                         related_name='users_set')
 
     # for many to one relationship (tags)
     tag         = models.ForeignKey(Tag)
@@ -40,10 +41,16 @@ class Item(models.Model):
     purch_date  = models.DateField(default=datetime.datetime.now())
     date_edited = models.DateTimeField(auto_now_add=True)
     price       = models.DecimalField(max_digits=6, decimal_places=2)
-    buyer       = models.IntegerField()
+    buyer       = models.ManyToManyField(User, through='Buyer_item_rel',
+                                         related_name='buyers_set')
     comments    = models.CharField(default='',max_length=400)
     house_id    = models.IntegerField()
     
+    # for editing
+    def delete_m2m_links(self):
+        self.user_item_rel_set.all().delete()
+        self.buyer_item_rel_set.all().delete()
+
     def tag_name(self):
         return self.tag
 
@@ -56,14 +63,24 @@ class Item(models.Model):
 
 
 # defining many-to-many relationship between User and Item
-class Item_status(models.Model):
+class User_item_rel(models.Model):
     user            = models.ForeignKey(User)
     item            = models.ForeignKey(Item)
     maybe_buying    = models.BooleanField() # true means maybe buying, EXCLUDES BUYERS
     payment_amount  = models.DecimalField(max_digits=6, decimal_places=2)
     date_added      = models.DateTimeField(auto_now_add=True)
 
+    def __unicode__(self):
+        return str([str(self.user), str(self.item)])
 
+class Buyer_item_rel(models.Model):
+    buyer           = models.ForeignKey(User)
+    item            = models.ForeignKey(Item)
+    payment_amount  = models.DecimalField(max_digits=6, decimal_places=2)
+    date_added      = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return str([str(self.buyer), str(self.item)])
 
 # database-independent models
 class Item_list():

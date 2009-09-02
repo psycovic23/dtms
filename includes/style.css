@@ -3,10 +3,7 @@
 /* to do: make nohighlight for safari */
 
 
-.ui-tabs .ui-tabs-hide {
-     display: none;
-}
-
+/*      adding item page styles */
 
 .jqmWindow {
 	display: none;
@@ -26,8 +23,12 @@
 
 .jqmOverlay { background-color: #000; }
 
+#expanded_buyers, #expanded_users {
+	display: none;
+}
 
-/*      adding item page styles */
+
+/* user list styles */
 
 .selected_blue {
 	background-color:#0267cd; 
@@ -81,11 +82,27 @@
 	cursor:pointer;
 }
 
+
+
+
+body {
+	font-family: georgia;
+}
 h1 {
-	font-family:georgia;
 	font-size:12pt;
 }
 
+h2 { 
+	font-size: 16pt;
+}
+
+h3 {
+	font-size: 10pt;
+}
+
+
+
+/* item list styles */
 .item { 
 	width: 600px; 
 }
@@ -101,6 +118,7 @@ h1 {
 	-moz-border-radius-topright: 10px 10px; 
 	background-color: #ff7070;
 }
+
 #list {
 	float:left;
 }

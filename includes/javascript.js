@@ -50,7 +50,7 @@ jQuery.fn.toggle_selected = function () {
 $(document).ready(function() {
 
 	// initialize arrays for who is a 'yes' and who's a 'maybe'
-	var num_users = $("#list_users span").length-1;
+	var num_users = $("#list_users a").length-1;
 
 	// global variables. fix this!
 	users_yes = new Array(num_users);
@@ -84,6 +84,9 @@ $(document).ready(function() {
 	});
 });
 
+
+// this sucks. fix this
+d = {}
 //-----------------------------------------
 // this refreshes the item list. making it into a function so I can call it again when edits are made and we have to refresh on the fly
 function loadItemList(){
@@ -110,13 +113,13 @@ function loadItemList(){
 		// delete button behavior
 		$(".delete").click(function(){
 			delete_id = parseInt($(this).parent().attr('id'));
-			console.log('running');
 			$.ajax({
 				url: '/dtms/delete_item',
 				data: {'delete_id': delete_id},
 				type: 'POST',
 				dataType: 'json',
 				success: function(data){ loadItemList(); },
+				error: function(data){ document.write(data.responseText); }
 			});
 		});
 	
@@ -157,6 +160,7 @@ function loadItemList(){
 					$('#tags').val(data['tags']);
 					$('#sub_tag').val(data['sub_tag']);
 				},
+				error: function(data){ document.write(data.responseText); }
 			});
 		});
 	}
@@ -166,7 +170,11 @@ function loadItemList(){
 		success: function(data){
 			$("#list").html(data)
 			onListUpdate();
+		},
+		error: function(data){
+			document.write(data.responseText);
 		}
+
 	});
 }
 
@@ -196,6 +204,12 @@ function submitForm(){
 	if ($("#action").html() == 'edit')
 		data = $.extend(data, {'edit_id': edit_id});
 
+	if ($("#expanded_buyers").css('display') == "inline"){
+		data = $.extend(data, {'expanded': 1});
+		data = $.extend(data, {'expanded_buyers': getArrayFromInputFields("expanded_buyers")});
+		data = $.extend(data, {'expanded_users': getArrayFromInputFields("expanded_users")});
+	}
+
 	var c = JSON.stringify(data);
 
 	$.ajax({
@@ -205,15 +219,22 @@ function submitForm(){
 		success: function(data){
 			$('#dialog').jqmHide();
 		},
-		error: function(xhr, ts, et){
-			$('body').html(xhr.responseText);
-			$('#dialog').jqmHide();
-		}
+		error: function(xhr){ document.write(xhr.responseText); }
 	});
 
 	// call the list again to reflect changes
 	loadItemList();
 }
+
+function getArrayFromInputFields(id){
+	var values = [];
+	var $d = $("#" + id + " input");
+	$d.each(function(){
+		values.push([parseInt($(this).attr('id')),$(this).val()]);
+	});
+	return values;
+}
+
 
 // JS code for the add_item box (getting info from fields, sending it to django, and fade effect)
 $(document).ready(function(){
@@ -221,6 +242,14 @@ $(document).ready(function(){
 	// load item list
 	loadItemList();
 
+
+	// add_item form JS
+	
+	$("#advanced").click(function(){
+		$("#expanded_buyers").css("display", "inline");
+		$("#expanded_users").css("display", "inline");
+		$("#basic_users").css("display", "none");
+	});
 
 	// make sure the submit button says the right thing. this gets changed when the user edits something
 	$("#add_item").click(function(){
