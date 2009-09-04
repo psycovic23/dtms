@@ -25,27 +25,31 @@
 		<h3><a id="advanced">advanced selection</a></h3>
 		
 		<span style="font-family:georgia; font-size:16pt;">$</span><input type="text" id="price">
+		<input id="user_id" type="text" value="{{ user_id }}" style="display: none">
+		
 		<br><br>
-		<div id="expanded_buyers">
-			<h1>how much did the buyers spend?</h1>
-			<table>
-				{% for x in names%}
-				<tr>
-					<td>{{ x }}: </td><td><input type="text" value="0" id="{{x.id}}expanded"></td>
-				</tr>
-				{% endfor %}
-			</table>
-		</div>
+		<div id="expanded_section">
+			<div id="expanded_buyers">
+				<h1>how much did the buyers spend?</h1>
+				<table>
+					{% for x in names%}
+					<tr>
+						<td>{{ x }}: </td><td><input type="text" value="0" id="{{x.id}}expanded_buyer"></td>
+					</tr>
+					{% endfor %}
+				</table>
+			</div>
 
-		<div id="expanded_users">
-			<h1>how much will each person pay?</h1>
-			<table>
-				{% for x in names%}
-				<tr>
-					<td>{{ x }}: </td><td><input type="text" value="0" id="{{x.id}}expanded"></td>
-				</tr>
-				{% endfor %}
-			</table>
+			<div id="expanded_users">
+				<h1>how much will each person pay?</h1>
+				<table>
+					{% for x in names%}
+					<tr>
+						<td>{{ x }}: </td><td><input type="text" value="0" id="{{x.id}}expanded_user"></td>
+					</tr>
+					{% endfor %}
+				</table>
+			</div>
 		</div>
 
 		<div id="basic_users">

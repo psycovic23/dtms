@@ -23,7 +23,7 @@
 
 .jqmOverlay { background-color: #000; }
 
-#expanded_buyers, #expanded_users {
+#expanded_section {
 	display: none;
 }
 

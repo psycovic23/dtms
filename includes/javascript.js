@@ -42,6 +42,7 @@ jQuery.fn.toggle_selected = function () {
 					$(this).removeClass("hover");
 				}); 
 			}
+			console.log(users_yes);
 		});
 	});
 }
@@ -142,6 +143,11 @@ function loadItemList(){
 				success: function(data){
 	
 					// set the user buttons to reflect who's using the item
+					for (x in users_maybe){
+						users_maybe[x] = 0;
+						users_yes[x]   = 0;
+					}
+					console.log(data['users']);
 					for (x in data['users']){
 						if (data['users'][x] == true){
 							$('#' + x + 'option').addClass('selected_maybe').removeClass('unselected');
@@ -159,6 +165,18 @@ function loadItemList(){
 					$('#comments').val(data['comments']);
 					$('#tags').val(data['tags']);
 					$('#sub_tag').val(data['sub_tag']);
+
+					if (data['ind_pay'] !== undefined){
+						for (x in data['ind_pay'])
+							$("#" + x + "expanded_user").val(data['ind_pay'][x]);
+						
+						for (x in data['buyer_pay'])
+							$("#" + x + "expanded_buyer").val(data['buyer_pay'][x]);
+
+						$("#expanded_section").css("display", "inline");
+					} else {
+						$("#expanded_section").css("display", "none");
+					}
 				},
 				error: function(data){ document.write(data.responseText); }
 			});
@@ -198,17 +216,23 @@ function submitForm(){
 		'archive_id': 0,
 	};
 
-	// edit_id is a global variable used in list.html. fix this.
-	// it's the id that's captured when you click on the item div and must be passed around
-	
+	// this only works for users_yes, not the maybe part	
+	if ($("#expanded_buyers").css('display') == "none"){
+		var uid = $("#user_id").val();
+		var p = $("#price").val();
+		var ind_p = p / $(".selected_yes").length;
+		$("#" + uid + "expanded_buyer").val(p);
+		for (t in users_yes){
+			$("#" + users_yes[t] + "expanded_user").val(ind_p);
+		}
+	}
+
+
 	if ($("#action").html() == 'edit')
 		data = $.extend(data, {'edit_id': edit_id});
 
-	if ($("#expanded_buyers").css('display') == "inline"){
-		data = $.extend(data, {'expanded': 1});
-		data = $.extend(data, {'expanded_buyers': getArrayFromInputFields("expanded_buyers")});
-		data = $.extend(data, {'expanded_users': getArrayFromInputFields("expanded_users")});
-	}
+	data = $.extend(data, {'expanded_buyers': getArrayFromInputFields("expanded_buyers")});
+	data = $.extend(data, {'expanded_users': getArrayFromInputFields("expanded_users")});
 
 	var c = JSON.stringify(data);
 
@@ -242,18 +266,20 @@ $(document).ready(function(){
 	// load item list
 	loadItemList();
 
+	$("#expanded_buyers input").val(0);
+	$("#expanded_users input").val(0);
 
 	// add_item form JS
 	
 	$("#advanced").click(function(){
-		$("#expanded_buyers").css("display", "inline");
-		$("#expanded_users").css("display", "inline");
+		$("#expanded_section").css("display", "inline");
 		$("#basic_users").css("display", "none");
 	});
 
 	// make sure the submit button says the right thing. this gets changed when the user edits something
 	$("#add_item").click(function(){
 		$("#action").text('submit');
+		$("#expanded_section").css("display", "none");
 	});
 
 	// item submit button
