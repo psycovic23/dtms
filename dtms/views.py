@@ -115,7 +115,7 @@ def edit_item(request):
         users_string = {}
         
         for x in users:
-            users_string[x.user.id] = x.maybe_buying
+            users_string[x.user.id] = float(x.payment_amount)
 
         info = {
             'name': i.name, 

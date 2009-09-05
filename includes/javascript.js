@@ -3,94 +3,108 @@
 
 
 // toggles colors for list_users
-jQuery.fn.toggle_selected = function () {
-	return this.each( function() {
-		
-		// initialize each to unselected and add mouseover/out event
-		if (!$(this).hasClass("unselected")){
-			$(this).addClass("unselected");
-			$(this).mouseover( function() {
-				$(this).addClass("hover");
+(function($) {
+	var selected_users = {};
+
+	// for state of all_button
+	var status = 0;
+
+	$.fn.toggle_selected = function () {
+		$all_button = $('<li class="option_text">All</a>');
+		$(this).prepend($all_button);
+
+		$list = this;
+		$list_elements = $('li', this);
+
+		// all button behaviors
+		if (!$all_button.hasClass("unselected")){
+			$all_button.addClass("unselected");
+			$all_button.mouseover( function() {
+				$all_button.addClass("hover");
 			});	
-			$(this).mouseout( function() {
-				$(this).removeClass("hover");
+			$all_button.mouseout( function() {
+				$all_button.removeClass("hover");
 			});
 		}
 
-		$(this).mousedown( function(){
-			var id = parseInt($(this).attr('id'));
+		$all_button.click(function(){
+			$list_elements.removeClass().addClass('option_text');
+			if (status == 0){
+				$all_button.addClass('selected_yes');
+				$list_elements.addClass('selected_yes');
+				status = 1;
+				$list_elements.each(function(){
+					selected_users[$(this).attr('id')] = 1;
+				});
+			}
+			else {
+				$all_button.removeClass('selected_yes');
+				$list_elements.addClass('unselected');
+				status = 0;
+				$list_elements.each(function(){
+					selected_users[$(this).attr('id')] = 0;
+				});
+			}
+		});
+		
+		// each element of list behavior
+		return $list_elements.each( function() {
+			
+			selected_users[parseInt($(this).attr('id'))] = 0;
 
-			// second evaluation is to control when color goes from maybe
-			// to unselected. in that case, you want it to be unselected
-			// rather than hover
-			if ($(this).hasClass("hover") || $(this).hasClass('unselected')){
-				$(this).removeClass("hover").removeClass('unselected').addClass("selected_yes").unbind('mouseover').unbind('mouseout'); 
-				users_yes[id] = id;
-
-			} else if ($(this).hasClass("selected_yes")){
-				users_maybe[id] = id;
-				users_yes[id] = 0;
-				$(this).removeClass("selected_yes").addClass("selected_maybe");
-
-			} else if ($(this).hasClass("selected_maybe")) {
-				$(this).removeClass("selected_maybe").addClass('unselected'); 
-				users_maybe[id] = 0;
+			// initialize each to unselected and add mouseover/out event
+			if (!$(this).hasClass("unselected")){
+				$(this).addClass("unselected");
 				$(this).mouseover( function() {
 					$(this).addClass("hover");
 				});	
 				$(this).mouseout( function() {
 					$(this).removeClass("hover");
-				}); 
+				});
 			}
-			console.log(users_yes);
+	
+			$(this).mousedown( function(){
+				var id = parseInt($(this).attr('id'));
+	
+				// flip between unselected and selected
+				if ($(this).hasClass("hover") || $(this).hasClass('unselected')){
+					$(this).removeClass("hover").removeClass('unselected').addClass("selected_yes").unbind('mouseover').unbind('mouseout'); 
+					selected_users[id] = 1;
+	
+				} else if ($(this).hasClass("selected_yes")){
+					selected_users[id] = 0;
+					$(this).removeClass("selected_yes").addClass("unselected");
+					$(this).mouseover( function() {
+						$(this).addClass("hover");
+					});	
+					$(this).mouseout( function() {
+						$(this).removeClass("hover");
+					}); 
+				}
+			});
 		});
-	});
-}
-
-// code for passing the selected user list information to backend
-$(document).ready(function() {
-
-	// initialize arrays for who is a 'yes' and who's a 'maybe'
-	var num_users = $("#list_users a").length-1;
-
-	// global variables. fix this!
-	users_yes = new Array(num_users);
-	users_maybe = new Array(num_users);
-	for (var i = 0; i < num_users; i++){
-		users_yes[i] = 0;
-		users_maybe[i] = 0;
 	}
 
-	$('.option_text').toggle_selected();
+	$.fn.clear_names = function(){
+		$(this).removeClass("selected_yes").addClass("unselected");
+	}
 
-	var status=0;
-	$('#all_name').click(function() {
-		$('.option_text').removeClass().addClass('option_text');
-		if (status == 0){
-			$('#all_name').addClass('selected_yes');
-			$('.option_text').addClass('selected_yes');
-			status = 1;
-			for (i = 0; i < ($('.option_text').length - 1); i++){
-				users_yes[i] = i;
-			}
-		}
-		else {
-			$('#all_name').removeClass('selected_yes');
-			$('.option_text').addClass('unselected');
-			status = 0;
-			for (i = 0; i < ($('.option_text').length - 1); i++){
-				users_yes[i] = 0;
-			}
-		}
-	});
-});
+	$.fn.return_users = function(){
+		return selected_users;
+	}
 
+})(jQuery);
+
+function setFieldsToZero(){
+	$("#expanded_buyers input").val(0);
+	$("#expanded_users input").val(0);
+}
 
 // this sucks. fix this
 d = {}
 //-----------------------------------------
 // this refreshes the item list. making it into a function so I can call it again when edits are made and we have to refresh on the fly
-function loadItemList(){
+function loadItemList(list_users){
 
 	// applies JS code to the item list that's dumped into the DOM
 	function onListUpdate(){
@@ -126,6 +140,8 @@ function loadItemList(){
 	
 		// edit button behavior
 		$(".edit").click(function(){
+			setFieldsToZero();
+			list_users.clear_names();
 	
 			// change the action button to say "edit"
 			$("#action").text('edit');
@@ -143,17 +159,9 @@ function loadItemList(){
 				success: function(data){
 	
 					// set the user buttons to reflect who's using the item
-					for (x in users_maybe){
-						users_maybe[x] = 0;
-						users_yes[x]   = 0;
-					}
 					console.log(data['users']);
 					for (x in data['users']){
-						if (data['users'][x] == true){
-							$('#' + x + 'option').addClass('selected_maybe').removeClass('unselected');
-						} else {
-							$('#' + x + 'option').addClass('selected_yes').removeClass('unselected');
-						}
+						$('#' + x + 'option').addClass('selected_yes').removeClass('unselected');
 					}
 	
 					$('#dialog').jqmShow();
@@ -198,7 +206,7 @@ function loadItemList(){
 
 
 // scrapes form and submits to /add_item
-function submitForm(){
+function submitForm(list_users){
 	// gets all the information from the forms
 	var str= $("#purch_date").val();
 	var d = str.split("/");
@@ -207,8 +215,6 @@ function submitForm(){
 		'purch_date': d,
 		'price': $("#price").val(),
 		'buyer': 1,
-		'users_yes': users_yes,
-		'users_maybe': users_maybe,
 		'comments': $("#comments").val(),
 		'tags': $("#tags").val(),
 		'sub_tag': $("#sub_tag").val(),
@@ -259,20 +265,21 @@ function getArrayFromInputFields(id){
 	return values;
 }
 
-
 // JS code for the add_item box (getting info from fields, sending it to django, and fade effect)
 $(document).ready(function(){
 
 	// load item list
-	loadItemList();
+	var $list_users = $('#list_users').toggle_selected();
+	loadItemList($list_users);
 
-	$("#expanded_buyers input").val(0);
-	$("#expanded_users input").val(0);
-
+	setFieldsToZero()
 	// add_item form JS
 	
 	$("#advanced").click(function(){
-		$("#expanded_section").css("display", "inline");
+		if ($("#expanded_section").css("display") == "none")
+			$("#expanded_section").css("display", "inline");
+		else
+			$("#expanded_section").css("display", "none");
 		$("#basic_users").css("display", "none");
 	});
 
@@ -280,11 +287,15 @@ $(document).ready(function(){
 	$("#add_item").click(function(){
 		$("#action").text('submit');
 		$("#expanded_section").css("display", "none");
+		$list_users.clear_names();
+		
+		setFieldsToZero();
 	});
 
 	// item submit button
 	$("#action").click(function(){
-		submitForm();
+		submitForm($list_users);
+		$list_users.clear_names();
 	});
 
 

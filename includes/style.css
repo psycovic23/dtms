@@ -101,6 +101,9 @@ h3 {
 }
 
 
+ul, li {
+	display:inline;
+}
 
 /* item list styles */
 .item { 

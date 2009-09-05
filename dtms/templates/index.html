@@ -54,12 +54,11 @@
 
 		<div id="basic_users">
 			<h1>who's using it?</h1>
-			<div id="list_users">
-				<a id="all_name">All</a>
+			<ul id="list_users">
 				{% for x in names %}
-				<a class="option_text" id="{{x.id}}option">{{ x }}</a>
+				<li class="option_text" id="{{x.id}}option">{{ x }}</li>
 				{% endfor %}
-			</div>
+			</ul>
 		</div>
 		<br>
 		<h3>purchase date</h3> <input type="text" id="purch_date" size="10">
