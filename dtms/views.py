@@ -2,11 +2,12 @@
 
 from django.http import HttpResponse
 from django.conf import settings
-from models import *
 from django.shortcuts import render_to_response
 from django.utils import simplejson as json
 import operator, decimal
 import pdb
+from models import *
+from item_list import *
 
 
 
@@ -55,7 +56,7 @@ def add_item(request):
         try:
             t = Tag.objects.get(name=x['tags'])
         except:
-            t = Tag(name=x['tags'])
+            t = Tag(name=x['tags'], house_id=request.session['house_id'])
             t.save()
 
         # if edit_id exists, save the id and delete original record
@@ -112,7 +113,11 @@ def edit_item(request):
     if request.POST:
         i = Item.objects.get(id=request.POST.get('item_id'))
         users = i.user_item_rel_set.all()
+
         users_string = {}
+
+        for x in User.objects.filter(house_id=request.session['house_id']):
+            users_string[x.id] = 0
         
         for x in users:
             users_string[x.user.id] = float(x.payment_amount)
@@ -160,8 +165,13 @@ def login(request):
         else:
             return HttpResponse('no')
 
+def tag_breakdown(request, id):
+    x = Item_list(list=Item.objects.all().filter(archive_id=0),
+                  house_id=request.session['house_id'])
+    return HttpResponse(x.ind_breakdown(uid=id))
+
 
 def individual_bill(request):
     x = Item_list(list=Item.objects.all().filter(archive_id=0),
                   house_id=request.session['house_id'])
-    return HttpResponse(x.gen_balancing_transactions())
+    return HttpResponse({'tag_breakdown': x.gen_balancing_transactions})

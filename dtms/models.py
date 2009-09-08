@@ -1,7 +1,9 @@
 from django.db import models
+from django.utils import simplejson as json
 import operator
 import pdb
 import datetime
+from item_list import Item_list
 
 class User(models.Model):
     name        = models.CharField(max_length=30)
@@ -14,6 +16,7 @@ class User(models.Model):
 
 class Tag(models.Model):
     name    = models.CharField(max_length=50)
+    house_id = models.PositiveIntegerField()
 
     def __unicode__(self):
         return self.name
@@ -83,52 +86,4 @@ class Buyer_item_rel(models.Model):
         return str([str(self.buyer), str(self.item)])
 
 # database-independent models
-class Item_list():
-
-    def __init__(self, list = None, house_id = None):
-        self.list = list
-        self.house_id = house_id
-
-    def ret_list(self):
-        return self.list 
-
-    def gen_balancing_transactions(self):
-        users = User.objects.filter(house_id=self.house_id)
-        sum = {}
-        for a in users:
-            sum[a.id] = 0
-    
-        for e in users:
-            # make sure we're only using a list of things the current person uses
-
-            for i in [p for p in self.list if
-                      p.users.filter(name__contains=e.name)]:
-                num_users_per_item = len(i.users.all())
-                sum[e.id] += i.price / num_users_per_item * -1
-        
-        # who-owes-what array
-        for e in users:
-            bought_items = self.ret_list().filter(buyer=e.id)
-            for b in bought_items:
-                sum[e.id] += b.price
-        # transactions
-        transactions = [] 
-        for (k,v) in sum.items():
-            sum[k] = float(v)
-    
-        # while array is non zero
-        while abs(max(sum.iteritems(), key=operator.itemgetter(1))[1]) > .01:
-    
-            owes = min(sum.iteritems(), key=operator.itemgetter(1))
-            expects = max(sum.iteritems(), key=operator.itemgetter(1))
-            
-            if (owes[1] + expects[1]) < 0:
-                amount = expects[1]
-            else:
-                amount = owes[1] * -1
-    
-            transactions.append([owes[0], expects[0], amount])
-            sum[expects[0]] -= amount
-            sum[owes[0]] += amount
-
-        return transactions
+# typeof(list) = [ Item ]

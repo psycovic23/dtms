@@ -20,7 +20,7 @@
 	                    			if(data=='yes'){
 	                        			$("#msgbox").fadeTo(200,0.1,function(){ //start fading the messagebox
 	                            				$(this).html('Logging in.....').addClass('messageboxok').fadeTo(900,1, function(){
-	                                					document.location='/';
+	                                					document.location='/dtms';
 	                            				});
 	                        			});
 	                    			} else {
@@ -29,7 +29,7 @@
 	                        			});
 	                    			} },
 					error: function(data){
-						console.log(data);
+						document.write(data.responseText);
 					}
 
 	               		});

@@ -10,11 +10,11 @@
 	var status = 0;
 
 	$.fn.toggle_selected = function () {
-		$all_button = $('<li class="option_text">All</a>');
-		$(this).prepend($all_button);
-
 		$list = this;
 		$list_elements = $('li', this);
+
+		$all_button = $('<li class="option_text">All</a>');
+		$(this).prepend($all_button);
 
 		// all button behaviors
 		if (!$all_button.hasClass("unselected")){
@@ -89,8 +89,12 @@
 		$(this).removeClass("selected_yes").addClass("unselected");
 	}
 
-	$.fn.return_users = function(){
+	$.fn.return_names = function(){
 		return selected_users;
+	}
+
+	$.fn.set_names = function(a){
+		selected_users = a;
 	}
 
 })(jQuery);
@@ -133,7 +137,7 @@ function loadItemList(list_users){
 				data: {'delete_id': delete_id},
 				type: 'POST',
 				dataType: 'json',
-				success: function(data){ loadItemList(); },
+				success: function(data){ pageRefresh(list_users); },
 				error: function(data){ document.write(data.responseText); }
 			});
 		});
@@ -159,10 +163,16 @@ function loadItemList(list_users){
 				success: function(data){
 	
 					// set the user buttons to reflect who's using the item
-					console.log(data['users']);
+					t = {};
 					for (x in data['users']){
-						$('#' + x + 'option').addClass('selected_yes').removeClass('unselected');
+						if (data['users'][x] != 0){
+							$('#' + x + 'option').addClass('selected_yes').removeClass('unselected');
+							t[x] = 1;	
+						} else {
+							t[x] = 0;
+						}
 					}
+					list_users.set_names(t);
 	
 					$('#dialog').jqmShow();
 	
@@ -210,26 +220,33 @@ function submitForm(list_users){
 	// gets all the information from the forms
 	var str= $("#purch_date").val();
 	var d = str.split("/");
+	var tag;
+	if ($("#tags").val() == '')
+		tag = "Uncategorized";
+
 	var data = {
 		'name': $("#name").val(),
 		'purch_date': d,
 		'price': $("#price").val(),
 		'buyer': 1,
 		'comments': $("#comments").val(),
-		'tags': $("#tags").val(),
+		'tags': tag,
 		'sub_tag': $("#sub_tag").val(),
 		'house_id': 1,
 		'archive_id': 0,
 	};
 
 	// this only works for users_yes, not the maybe part	
-	if ($("#expanded_buyers").css('display') == "none"){
+	if ($("#expanded_section").css('display') == "none"){
 		var uid = $("#user_id").val();
 		var p = $("#price").val();
 		var ind_p = p / $(".selected_yes").length;
 		$("#" + uid + "expanded_buyer").val(p);
-		for (t in users_yes){
-			$("#" + users_yes[t] + "expanded_user").val(ind_p);
+		var a = list_users.return_names();
+		console.log(a);
+		for (t in a){
+			if (a[t])
+				$("#" + t + "expanded_user").val(ind_p);
 		}
 	}
 
@@ -253,7 +270,7 @@ function submitForm(list_users){
 	});
 
 	// call the list again to reflect changes
-	loadItemList();
+	pageRefresh(list_users);
 }
 
 function getArrayFromInputFields(id){
@@ -265,16 +282,48 @@ function getArrayFromInputFields(id){
 	return values;
 }
 
+function drawGraphs(){
+	$.ajax({
+		url: '/dtms/tag_breakdown/' + $('#user_id').val() + '/',
+		dataType: 'json',
+		success: function(data){
+		var test = [
+			{ label: "Series1",  data: [[1,10]]},
+			{ label: "Series2",  data: [[1,30]]},
+			{ label: "Series3",  data: [[1,90]]},
+			{ label: "Series4",  data: [[1,70]]},
+			{ label: "Series5",  data: [[1,80]]},
+			{ label: "Series6",  data: [[1,0]]}
+		];
+			$.plot($("#graph"), data,
+			{
+			    series: {
+			        pie: {
+			            show: true
+			        }
+			    }
+			});
+		},
+		error: function(data){ document.write(data.responseText); }
+	});
+}
+
+function pageRefresh(list_users){
+	loadItemList(list_users);
+	drawGraphs();
+}
+
+
 // JS code for the add_item box (getting info from fields, sending it to django, and fade effect)
 $(document).ready(function(){
 
 	// load item list
 	var $list_users = $('#list_users').toggle_selected();
-	loadItemList($list_users);
+	pageRefresh($list_users);
 
-	setFieldsToZero()
-	// add_item form JS
-	
+	setFieldsToZero();
+
+
 	$("#advanced").click(function(){
 		if ($("#expanded_section").css("display") == "none")
 			$("#expanded_section").css("display", "inline");

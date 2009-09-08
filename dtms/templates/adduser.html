@@ -6,15 +6,24 @@
 
 	$(document).ready(function(){
 		$("#submit").click(function(){
-			var data = {};
-			data.name = $("#username").val();
-			data.email = $("#email").val();
-			data.password = $("#password").val();
-			data.house_id = $("#house_id").val();
+			var d = {};
+			d.name = $("#username").val();
+			d.email = $("#email").val();
+			d.password = $("#password").val();
+			d.house_id = $("#house_id").val();
 			
-			$.post("adduser", data, function(responseData){
-				$('#content').html(responseData);
-			}, "html");
+			$.ajax({
+				url: '/dtms/adduser',
+				type: 'POST',
+				data: d,
+				success: function(responseData){
+					console.log('success');
+				},
+				error: function(responseData){
+					console.log('fail');
+				}
+			});
+
 		});
 	});
 	</script>
