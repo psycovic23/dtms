@@ -13,7 +13,7 @@ class User(models.Model):
     def __unicode__(self):
         return self.name
 
-class Item_list():
+class Item_list:
 
     def __init__(self, list = None, house_id = None):
         self.list = list
