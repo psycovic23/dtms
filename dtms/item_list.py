@@ -1,6 +1,5 @@
-from dtms.models import *
 
-class Item_list:
+class Item_list():
 
     def __init__(self, list = None, house_id = None):
         self.list = list
@@ -19,7 +18,7 @@ class Item_list:
         ret_obj = []
         for k,v in x.iteritems():
             ret_obj.append({'label': k, 'data': v})
-        return json.dumps(ret_obj)
+        return mysite.dtms.models.json.dumps(ret_obj)
         
     def gen_balancing_transactions(self):
         users = User.objects.filter(house_id=self.house_id)

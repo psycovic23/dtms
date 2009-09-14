@@ -6,8 +6,8 @@ from django.shortcuts import render_to_response
 from django.utils import simplejson as json
 import operator, decimal
 import pdb
-from dtms.models import *
-from dtms.item_list import *
+from mysite.dtms.models import *
+#from mysite.dtms.item_list import *
 
 
 def list(request):
