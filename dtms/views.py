@@ -6,13 +6,12 @@ from django.shortcuts import render_to_response
 from django.utils import simplejson as json
 import operator, decimal
 import pdb
-from models import *
-from item_list import *
-
+from dtms.models import *
+from dtms.item_list import *
 
 
 def list(request):
-    items = Item.objects.all()
+    items = Item.objects.filter(house_id=request.session['house_id']).filter(archive_id=0)
     return render_to_response('list.html', {"items": items })
 
 def adduser(request):
@@ -33,12 +32,30 @@ def tag_price():
 
 
 def index(request):
-    items = Item.objects.all()
-    return render_to_response('index.html', {"names": User.objects.all(),
+    # retrieve archive_id groups and their ranges to display in the archive
+    # section
+    r = Item.objects.filter(house_id=request.session['house_id']).order_by('archive_id').reverse()
+    if len(r) != 0:
+        m = r[0].archive_id + 1
+    else:
+        m = 0
+
+    arch = {}
+    for i in range(1, m):
+        x = Item.objects.filter(archive_id=i).order_by('purch_date')
+        arch[i] = [x[0].purch_date, x[len(x)-1].purch_date]
+
+    return render_to_response('index.html', {"names":
+                                             User.objects.filter(house_id=request.session['house_id']),
                                              "house_id":
                                              request.session['house_id'],
-                                             "items": items, "user_id":
-                                             request.session['user_id']})
+                                             "user_id":
+                                             request.session['user_id'],
+                                             "archive_list": arch })
+
+def getTagList(request):
+    tags = Tag.objects.filter(house_id=request.session['house_id'])
+    return HttpResponse(json.dumps({'tags': [p.name for p in tags]}))
 
 # fix the bad naming of variables
 def add_item(request):
@@ -54,7 +71,8 @@ def add_item(request):
 
         # add edit tags
         try:
-            t = Tag.objects.get(name=x['tags'])
+            t = Tag.objects.get(name=x['tags'],
+                                house_id=request.session['house_id'])
         except:
             t = Tag(name=x['tags'], house_id=request.session['house_id'])
             t.save()
@@ -62,6 +80,11 @@ def add_item(request):
         # if edit_id exists, save the id and delete original record
         if 'edit_id' in x:
             ref_item            = Item.objects.get(id=x['edit_id'])
+            
+            # delete tag that has no items
+            if len(ref_item.tag.item_set.all()) == 1:
+                ref_item.tag.delete()
+
             ref_item.delete()
 
         ref_item = Item(
@@ -146,9 +169,24 @@ def edit_item(request):
 
         return HttpResponse(json.dumps(info))
 
+def clear_cycle(request):
+    i = Item.objects.filter(house_id=request.session['house_id']).filter(archive_id=0)
+    r = Item.objects.filter(house_id=request.session['house_id']).order_by('archive_id').reverse()
+    m = r[0].archive_id + 1
+
+    for t in i:
+        t.archive_id=m
+        t.save()
+
+    return HttpResponse('success');
+
 def delete_item(request):
     if request.POST:
         i = Item.objects.get(id=request.POST.get('delete_id'))
+
+        # delete tag that has no items
+        if len(i.tag.item_set.all()) == 1:
+            i.tag.delete()
         i.delete()
         return HttpResponse(json.dumps({'delete_message': 'deleted'}))
 
@@ -166,12 +204,12 @@ def login(request):
             return HttpResponse('no')
 
 def tag_breakdown(request, id):
-    x = Item_list(list=Item.objects.all().filter(archive_id=0),
+    x = Item_list(list=Item.objects.filter(archive_id=0),
                   house_id=request.session['house_id'])
     return HttpResponse(x.ind_breakdown(uid=id))
 
 
 def individual_bill(request):
-    x = Item_list(list=Item.objects.all().filter(archive_id=0),
+    x = Item_list(list=Item.objects.filter(archive_id=0),
                   house_id=request.session['house_id'])
     return HttpResponse({'tag_breakdown': x.gen_balancing_transactions})

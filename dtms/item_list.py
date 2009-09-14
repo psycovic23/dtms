@@ -1,6 +1,6 @@
 from dtms.models import *
 
-class Item_list():
+class Item_list:
 
     def __init__(self, list = None, house_id = None):
         self.list = list

@@ -7,16 +7,17 @@
 	<script type="text/javascript" src="jquery.flot.pie.js"></script>
 	<script type="text/javascript" src="jquery.autocomplete.js"></script>
 	<link type="text/css" href="style.css" rel="Stylesheet" />
+	<link type="text/css" href="jquery.autocomplete.css" rel="Stylesheet" />
 	
 
 </head>
 <body>
 	<div id="content">
-	<div id="list">
-	</div>
-	<div id="graph">
-	</div>
-	
+		<div id="list">
+		</div>
+		<div id="graph">
+		</div>
+		
 	</div>
 	<div id="dialog" class="jqmWindow">
 		<h1>what was it?</h1>
@@ -67,8 +68,10 @@
 		<h3>sub tags</h3> <input type="text" id="sub_tag">
 		<h1>any comments about it?</h1>
 		<span style="color:#eee">a</span><textarea id="comments" rows="6" cols="40"></textarea><br><br>
-		<span id="action">submit</span><span id="cancel" class="jqmClose">cancel</span>
+		<a id="action">submit</a><a id="cancel" class="jqmClose">cancel</a>
 	</div>
-	<input type="button" value="aoeu" class="openjqm" id="add_item">
+
+	<input type="button" value="start new billing cycle" id="new_cycle">
+	<input type="button" value="add item" class="openjqm" id="add_item">
 </body>
 </html>

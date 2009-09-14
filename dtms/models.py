@@ -3,7 +3,7 @@ from django.utils import simplejson as json
 import operator
 import pdb
 import datetime
-from item_list import Item_list
+from dtms.item_list import *
 
 class User(models.Model):
     name        = models.CharField(max_length=30)

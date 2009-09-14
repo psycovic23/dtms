@@ -221,8 +221,11 @@ function submitForm(list_users){
 	var str= $("#purch_date").val();
 	var d = str.split("/");
 	var tag;
+
 	if ($("#tags").val() == '')
 		tag = "Uncategorized";
+	else
+		tag = $("#tags").val();
 
 	var data = {
 		'name': $("#name").val(),
@@ -243,7 +246,6 @@ function submitForm(list_users){
 		var ind_p = p / $(".selected_yes").length;
 		$("#" + uid + "expanded_buyer").val(p);
 		var a = list_users.return_names();
-		console.log(a);
 		for (t in a){
 			if (a[t])
 				$("#" + t + "expanded_user").val(ind_p);
@@ -265,12 +267,12 @@ function submitForm(list_users){
 		data: {'string': c},
 		success: function(data){
 			$('#dialog').jqmHide();
+			// call the list again to reflect changes
+			pageRefresh(list_users);
 		},
 		error: function(xhr){ document.write(xhr.responseText); }
 	});
 
-	// call the list again to reflect changes
-	pageRefresh(list_users);
 }
 
 function getArrayFromInputFields(id){
@@ -287,14 +289,6 @@ function drawGraphs(){
 		url: '/dtms/tag_breakdown/' + $('#user_id').val() + '/',
 		dataType: 'json',
 		success: function(data){
-		var test = [
-			{ label: "Series1",  data: [[1,10]]},
-			{ label: "Series2",  data: [[1,30]]},
-			{ label: "Series3",  data: [[1,90]]},
-			{ label: "Series4",  data: [[1,70]]},
-			{ label: "Series5",  data: [[1,80]]},
-			{ label: "Series6",  data: [[1,0]]}
-		];
 			$.plot($("#graph"), data,
 			{
 			    series: {
@@ -314,16 +308,41 @@ function pageRefresh(list_users){
 }
 
 
-// JS code for the add_item box (getting info from fields, sending it to django, and fade effect)
 $(document).ready(function(){
 
+//---------------- JS code for index page -------------------
 	// load item list
 	var $list_users = $('#list_users').toggle_selected();
 	pageRefresh($list_users);
 
+	// new billing cycle call
+	$("#new_cycle").click(function(){
+		$.ajax({
+			url: '/dtms/clear_cycle',
+			success: function(){
+				pageRefresh($list_users);
+			},
+			error: function(xhr){ document.write(xhr.responseText); }
+		});
+	});
+
+
+
+// -------------- JS code for add_item box -----------------
 	setFieldsToZero();
+	// get tag list for autocomplete
+	$.ajax({
+		url: '/dtms/getTagList',
+		dataType: 'json',
+		success: function(data){
+			$("#tags").autocomplete(data['tags']);
+		},
+		error: function(xhr){
+			document.write(xhr.responseText);
+		}
+	});
 
-
+	// make the advanced selection button
 	$("#advanced").click(function(){
 		if ($("#expanded_section").css("display") == "none")
 			$("#expanded_section").css("display", "inline");
