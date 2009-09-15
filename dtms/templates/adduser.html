@@ -1,6 +1,11 @@
 <html>
 <head>
+	{% ifequal MEDIA_URL "localhost" %}
 	<script type="text/javascript" src="jquery.js"></script>
+	{% endifequal %}
+	{% ifnotequal MEDIA_URL "localhost" %}
+	<script type="text/javascript" src="{{ MEDIA_URL }}/jquery.js"></script>
+	{% endifnotequal %}
 
 	<script type="text/javascript">
 

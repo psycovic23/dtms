@@ -3,6 +3,7 @@
 from django.http import HttpResponse
 from django.conf import settings
 from django.shortcuts import render_to_response
+from django.template import RequestContext
 from django.utils import simplejson as json
 import operator, decimal
 import pdb
@@ -51,7 +52,8 @@ def index(request):
                                              request.session['house_id'],
                                              "user_id":
                                              request.session['user_id'],
-                                             "archive_list": arch })
+                                             "archive_list": arch },
+                              context_instance = RequestContext(request))
 
 def getTagList(request):
     tags = Tag.objects.filter(house_id=request.session['house_id'])
@@ -193,7 +195,8 @@ def delete_item(request):
 def login(request):
     # add in recovery from failed attempt
     if not request.POST:
-        return render_to_response('login.html')
+        return render_to_response('login.html', {}, 
+                              context_instance = RequestContext(request))
     else:
         m = User.objects.get(name=request.POST.get('user_name'))        
         if m.password == request.POST['password']:
