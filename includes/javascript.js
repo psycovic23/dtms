@@ -97,6 +97,19 @@
 		selected_users = a;
 	}
 
+	$.fn.number_of_selected = function(){
+		function nnz(x){
+			var num = 0;
+			for (t in x){
+				if (x[t] != 0)
+					num++;
+			}
+			return num;
+		}
+
+		return nnz(selected_users);
+	}
+
 })(jQuery);
 
 function setFieldsToZero(){
@@ -243,7 +256,7 @@ function submitForm(list_users){
 	if ($("#expanded_section").css('display') == "none"){
 		var uid = $("#user_id").val();
 		var p = $("#price").val();
-		var ind_p = p / $(".selected_yes").length;
+		var ind_p = p / list_users.number_of_selected();
 		$("#" + uid + "expanded_buyer").val(p);
 		var a = list_users.return_names();
 		for (t in a){

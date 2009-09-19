@@ -41,10 +41,11 @@ def index(request):
     else:
         m = 0
 
-    arch = {}
+    
+    arch = []
     for i in range(1, m):
         x = Item.objects.filter(archive_id=i).order_by('purch_date')
-        arch[i] = [x[0].purch_date, x[len(x)-1].purch_date]
+        arch.append([i, str(x[0].purch_date), str(x[len(x)-1].purch_date)])
 
     return render_to_response('index.html', {"names":
                                              User.objects.filter(house_id=request.session['house_id']),
@@ -84,7 +85,8 @@ def add_item(request):
             ref_item            = Item.objects.get(id=x['edit_id'])
             
             # delete tag that has no items
-            if len(ref_item.tag.item_set.all()) == 1:
+            if (len(ref_item.tag.item_set.all()) == 1) and (ref_item.tag !=
+                                                            t):
                 ref_item.tag.delete()
 
             ref_item.delete()
