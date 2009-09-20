@@ -122,7 +122,7 @@ d = {}
 
 //-----------------------------------------
 // this refreshes the item list. making it into a function so I can call it again when edits are made and we have to refresh on the fly
-function loadItemList(){
+function loadItemList(archive_id){
 
 	// applies JS code to the item list that's dumped into the DOM
 	function onListUpdate(){
@@ -161,16 +161,16 @@ function loadItemList(){
 
 			// this id corresponds to the unique id in the django db
 			edit_id = parseInt($(this).parent().attr('id'));
-
 			loadAddItem(edit_id);
-	
-	
-	
 		});
 	}
 
+	var url_str = '/dtms/list';
+	if (archive_id !== undefined)
+		url_str += '/' + archive_id + '/'
+
 	$.ajax({
-		url: '/dtms/list',
+		url: url_str,
 		success: function(data){
 			$("#rightPanel").html(data)
 			onListUpdate();
@@ -397,6 +397,25 @@ function loadClearCycle(){
 	});
 }
 
+function loadArchives(){
+	$.ajax({
+		url: '/dtms/showArchives',
+		success: function(data){
+			$("#rightPanel").html(data);
+
+			// give fancy js behavior DUPLICATE CODE
+			$(".item:odd").css({'background-color': '#ffc97c'});
+			$(".item:even").css({'background-color': '#ffe1b5'});
+
+			$(".item").click(function(){
+				var archive_id = parseInt($(this).attr('id'));
+				loadItemList(archive_id);
+			});
+		},
+		error: function(data){ document.write(data.responseText); }
+	});
+}
+
 
 $(document).ready(function(){
 
@@ -414,6 +433,10 @@ $(document).ready(function(){
 
 	$("#loadItemList").click(function(){
 		loadItemList();
+	});
+
+	$("#showArchives").click(function(){
+		loadArchives();
 	});
 
 });

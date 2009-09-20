@@ -10,39 +10,38 @@
 	<script type="text/javascript">
 		$(document).ready(function(){
 			$("#login_form").submit(function(){
-                	//remove all the class add the messagebox classes and start fading
+            	//remove all the class add the messagebox classes and start fading
 				$("#msgbox").removeClass().addClass('messagebox').text('Validating....').fadeIn(1000);
-	
 				//check the username exists or not from ajax
-	                	$.ajax({
-	        			url: '/dtms/login',
-	                		type: 'POST',
-					data: { login: 1, 
-						edit: 0, 
-						user_name:$('#username').val(),
+	            $.ajax({
+	        		url: '/dtms/login',
+	                type: 'POST',
+					data: {  
+						username:$('#username').val(),
 						password:$('#password').val(),
-						rand:Math.random() },
-	                		success: function(data) {
-	                    			if(data=='yes'){
-	                        			$("#msgbox").fadeTo(200,0.1,function(){ //start fading the messagebox
-	                            				$(this).html('Logging in.....').addClass('messageboxok').fadeTo(900,1, function(){
-	                                					document.location='/dtms';
-	                            				});
-	                        			});
-	                    			} else {
-	                        			$("#msgbox").fadeTo(200,0.1,function(){ 
-	                        	      			$(this).html('Your login detail sucks...').addClass('messageboxerror').fadeTo(900,1);
-	                        			});
-	                    			} },
-					error: function(data){
-						document.write(data.responseText);
-					}
-
-	               		});
-               			return false;//not to post the  form physically
-        		});
-    
-
+					},
+	            	success: function(data) {
+	                	if(data=='yes'){
+	                        $("#msgbox").fadeTo(200,0.1,function(){
+								$(this).html('Logging in.....')
+								.addClass('messageboxok')
+								.fadeTo(900,1, function(){
+	                                document.location='/dtms';
+	                            });
+	                    	});
+	                    } else {
+	                        $("#msgbox").fadeTo(200,0.1,function(){ 
+								$(this)
+								.html('Your login detail sucks...')
+								.addClass('messageboxerror')
+								.fadeTo(900,1);
+	                        });
+						}
+					}, 
+					error: function(data){ document.write('broken'); }
+	            });
+			return false;//not to post the  form physically
+		});
     });
     
     </script>

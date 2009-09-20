@@ -11,8 +11,8 @@ from mysite.dtms.models import *
 #from mysite.dtms.item_list import *
 
 
-def list(request):
-    items = Item.objects.filter(house_id=request.session['house_id']).filter(archive_id=0)
+def list(request, a_num=0):
+    items = Item.objects.filter(house_id=request.session['house_id']).filter(archive_id=a_num)
     return render_to_response('list.html', {"items": items })
 
 def adduser(request):
@@ -37,7 +37,7 @@ def addItem(request):
                                                User.objects.filter(house_id=request.session['house_id']),
                                                "user_id":
                                                request.session['user_id']})
-def index(request):
+def showArchives(request):
     # retrieve archive_id groups and their ranges to display in the archive
     # section
     r = Item.objects.filter(house_id=request.session['house_id']).order_by('archive_id').reverse()
@@ -52,13 +52,16 @@ def index(request):
         x = Item.objects.filter(archive_id=i).order_by('purch_date')
         arch.append([i, str(x[0].purch_date), str(x[len(x)-1].purch_date)])
 
+    return render_to_response('showArchives.html', {"archive_list": arch})
+
+def index(request):
+
     return render_to_response('index.html', {"names":
                                              User.objects.filter(house_id=request.session['house_id']),
                                              "house_id":
                                              request.session['house_id'],
                                              "user_id":
-                                             request.session['user_id'],
-                                             "archive_list": arch },
+                                             request.session['user_id']},
                               context_instance = RequestContext(request))
 
 def getTagList(request):
@@ -214,7 +217,8 @@ def login(request):
         return render_to_response('login.html', {}, 
                               context_instance = RequestContext(request))
     else:
-        m = User.objects.get(name=request.POST.get('user_name'))        
+        pdb.set_trace()
+        m = User.objects.get(name=request.POST.get('username'))        
         if m.password == request.POST['password']:
             request.session['house_id'] = m.house_id
             request.session['user_id'] = m.id
