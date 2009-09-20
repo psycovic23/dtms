@@ -1,9 +1,34 @@
 
 
+body {
+	font-family: georgia;
+}
+h1 {
+	font-size:12pt;
+}
+
+h2 { 
+	font-size: 16pt;
+}
+
+h3 {
+	font-size: 10pt;
+}
+
+/* left side menu styles */
+#leftMenu {
+	width:160px;
+	top: 100px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border: 1px solid #999;
+	padding: 10px;
+}
+
 /* to do: make nohighlight for safari */
 
 
-/*      adding item page styles */
+/* #addItemBox style */
 
 .jqmWindow {
 	display: none;
@@ -28,7 +53,7 @@
 }
 
 
-/* user list styles */
+/* Styles for the toggle_selected plugin used in the addItemBox window*/
 
 .selected_blue {
 	background-color:#0267cd; 
@@ -82,30 +107,13 @@
 	cursor:pointer;
 }
 
-
-
-
-body {
-	font-family: georgia;
-}
-h1 {
-	font-size:12pt;
-}
-
-h2 { 
-	font-size: 16pt;
-}
-
-h3 {
-	font-size: 10pt;
-}
-
-
-ul, li {
+#rightPanel ul, #rightPanel li {
 	display:inline;
 }
 
-/* item list styles */
+
+
+/* styles for the list of items that comes from /list */
 .item { 
 	width: 600px; 
 }

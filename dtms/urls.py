@@ -8,6 +8,7 @@ from views import *
 urlpatterns = patterns('',
     (r'^tag_price$', tag_price),
 	(r'^adduser$', adduser),
+    (r'^addItem$', addItem),
 	(r'^list$', list),
 	(r'^$', index),
 	(r'^ind_calc$', individual_bill),

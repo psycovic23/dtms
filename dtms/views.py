@@ -32,6 +32,11 @@ def tag_price():
     return temp
 
 
+def addItem(request):
+    return render_to_response('addItem.html', {"names":
+                                               User.objects.filter(house_id=request.session['house_id']),
+                                               "user_id":
+                                               request.session['user_id']})
 def index(request):
     # retrieve archive_id groups and their ranges to display in the archive
     # section
@@ -130,8 +135,12 @@ def add_item(request):
         return HttpResponse('success')
 
 def is_equal_values(list):
-    for i in range(0, len(list)-1):
-        if list[i] != list[i+1]:
+    t = []
+    for (k,v) in list.items():
+        t.append(v)
+        
+    for i in range(0, len(t)-1):
+        if t[i] != t[i+1]:
             return False
     return True
 
@@ -160,15 +169,20 @@ def edit_item(request):
 
         ind_pay = {}
         buyer_pay = {}
-        if (is_equal_values([p.payment_amount for p in
-                            i.user_item_rel_set.all()]) == False) or ( len(i.buyer_item_rel_set.all()) != 1 ):
-            for t in i.user_item_rel_set.all():
-                ind_pay[t.user.id] = float(t.payment_amount)
+        #if (is_equal_values([p.payment_amount for p in
+        #                    i.user_item_rel_set.all()]) == False) or ( len(i.buyer_item_rel_set.all()) != 1 ):
+        for t in i.user_item_rel_set.all():
+            ind_pay[t.user.id] = float(t.payment_amount)
 
-            for t in i.buyer_item_rel_set.all():
-                buyer_pay[t.buyer.id] = float(t.payment_amount)
-            info['ind_pay'] = ind_pay
-            info['buyer_pay'] = buyer_pay
+        for t in i.buyer_item_rel_set.all():
+            buyer_pay[t.buyer.id] = float(t.payment_amount)
+        info['ind_pay'] = ind_pay
+        info['buyer_pay'] = buyer_pay
+        if (is_equal_values(buyer_pay) == True) and (is_equal_values(ind_pay) ==
+                                                    True):
+            info['equalArray'] = 1
+        else:
+            info['equalArray'] = 0
 
 
         return HttpResponse(json.dumps(info))

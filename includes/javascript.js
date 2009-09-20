@@ -121,7 +121,7 @@ function setFieldsToZero(){
 d = {}
 //-----------------------------------------
 // this refreshes the item list. making it into a function so I can call it again when edits are made and we have to refresh on the fly
-function loadItemList(list_users){
+function loadItemList(){
 
 	// applies JS code to the item list that's dumped into the DOM
 	function onListUpdate(){
@@ -150,74 +150,28 @@ function loadItemList(list_users){
 				data: {'delete_id': delete_id},
 				type: 'POST',
 				dataType: 'json',
-				success: function(data){ pageRefresh(list_users); },
+				success: function(data){ loadItemList(); },
 				error: function(data){ document.write(data.responseText); }
 			});
 		});
 	
 		// edit button behavior
 		$(".edit").click(function(){
-			setFieldsToZero();
-			list_users.clear_names();
-	
-			// change the action button to say "edit"
-			$("#action").text('edit');
-	
+
 			// this id corresponds to the unique id in the django db
 			edit_id = parseInt($(this).parent().attr('id'));
-	
-			// this still needs to be fixed. a bad global variable
-			d = {'item_id': edit_id};
-			$.ajax({
-				url: '/dtms/edit_item',
-				type: 'POST',
-				data: d,
-				dataType: 'json',
-				success: function(data){
-	
-					// set the user buttons to reflect who's using the item
-					t = {};
-					for (x in data['users']){
-						if (data['users'][x] != 0){
-							$('#' + x + 'option').addClass('selected_yes').removeClass('unselected');
-							t[x] = 1;	
-						} else {
-							t[x] = 0;
-						}
-					}
-					list_users.set_names(t);
-	
-					$('#dialog').jqmShow();
-	
-					// editing add_item form data
-					$('#name').val(data['name']);
-					$('#price').val(data['price']);
-					$('#purch_date').val(data['purch_date']);
-					$('#comments').val(data['comments']);
-					$('#tags').val(data['tags']);
-					$('#sub_tag').val(data['sub_tag']);
 
-					if (data['ind_pay'] !== undefined){
-						for (x in data['ind_pay'])
-							$("#" + x + "expanded_user").val(data['ind_pay'][x]);
-						
-						for (x in data['buyer_pay'])
-							$("#" + x + "expanded_buyer").val(data['buyer_pay'][x]);
-
-						$("#expanded_section").css("display", "inline");
-					} else {
-						$("#expanded_section").css("display", "none");
-					}
-				},
-				error: function(data){ document.write(data.responseText); }
-			});
+			loadAddItem(edit_id);
+	
+	
+	
 		});
 	}
 
 	$.ajax({
 		url: '/dtms/list',
 		success: function(data){
-			$("#list").html(data)
+			$("#rightPanel").html(data)
 			onListUpdate();
 		},
 		error: function(data){
@@ -269,6 +223,7 @@ function submitForm(list_users){
 	if ($("#action").html() == 'edit')
 		data = $.extend(data, {'edit_id': edit_id});
 
+	console.log(getArrayFromInputFields("expanded_buyers"));
 	data = $.extend(data, {'expanded_buyers': getArrayFromInputFields("expanded_buyers")});
 	data = $.extend(data, {'expanded_users': getArrayFromInputFields("expanded_users")});
 
@@ -279,9 +234,7 @@ function submitForm(list_users){
 		type: "POST",
 		data: {'string': c},
 		success: function(data){
-			$('#dialog').jqmHide();
-			// call the list again to reflect changes
-			pageRefresh(list_users);
+			loadItemList();
 		},
 		error: function(xhr){ document.write(xhr.responseText); }
 	});
@@ -315,33 +268,80 @@ function drawGraphs(){
 	});
 }
 
-function pageRefresh(list_users){
-	loadItemList(list_users);
-	drawGraphs();
+function loadAddItem(edit_id){
+	var $list_users;
+	$.ajax({
+		url: '/dtms/addItem',
+		success: function(data){
+			$("#rightPanel").html(data);
+			$list_users = addItemConfigure();
+
+			if (edit_id !== undefined){
+				setFieldsToZero();
+				$list_users.clear_names();
+
+				// change the action button to say "edit"
+				$("#action").text('edit');
+
+				d = {'item_id': edit_id};
+				$.ajax({
+					url: '/dtms/edit_item',
+					type: 'POST',
+					data: d,
+					dataType: 'json',
+					success: function(data){
+	
+						// set the user buttons to reflect who's using the item
+						t = {};
+						for (x in data['users']){
+							if (data['users'][x] != 0){
+								$('#' + x + 'option').addClass('selected_yes').removeClass('unselected');
+								t[x] = 1;	
+							} else {
+								t[x] = 0;
+							}
+						}
+						$list_users.set_names(t);
+	
+	
+						// editing add_item form data
+						$('#name').val(data['name']);
+						$('#price').val(data['price']);
+						$('#purch_date').val(data['purch_date']);
+						$('#comments').val(data['comments']);
+						$('#tags').val(data['tags']);
+						$('#sub_tag').val(data['sub_tag']);
+						for (x in data['ind_pay'])
+							$("#" + x + "expanded_user").val(data['ind_pay'][x]);
+						
+						for (x in data['buyer_pay'])
+							$("#" + x + "expanded_buyer").val(data['buyer_pay'][x]);
+
+
+						if (data['equalArray'] != 1){
+							$("#expanded_section").css("display", "inline");
+						} else {
+							$("#expanded_section").css("display", "none");
+						}
+					},
+					error: function(data){ document.write(data.responseText); }
+				});
+			}
+
+
+		},
+		error: function(xhr){
+			document.write(xhr.responseText);
+		}
+	});
+	$list_users.clear_names();
 }
 
-
-$(document).ready(function(){
-
-//---------------- JS code for index page -------------------
+function addItemConfigure(){
 	// load item list
 	var $list_users = $('#list_users').toggle_selected();
-	pageRefresh($list_users);
-
-	// new billing cycle call
-	$("#new_cycle").click(function(){
-		$.ajax({
-			url: '/dtms/clear_cycle',
-			success: function(){
-				pageRefresh($list_users);
-			},
-			error: function(xhr){ document.write(xhr.responseText); }
-		});
-	});
 
 
-
-// -------------- JS code for add_item box -----------------
 	setFieldsToZero();
 	// get tag list for autocomplete
 	$.ajax({
@@ -364,26 +364,12 @@ $(document).ready(function(){
 		$("#basic_users").css("display", "none");
 	});
 
-	// make sure the submit button says the right thing. this gets changed when the user edits something
-	$("#add_item").click(function(){
-		$("#action").text('submit');
-		$("#expanded_section").css("display", "none");
-		$list_users.clear_names();
-		
-		setFieldsToZero();
-	});
 
 	// item submit button
 	$("#action").click(function(){
 		submitForm($list_users);
-		$list_users.clear_names();
 	});
-
-
-	// fade in and out code for add_item form
-	var myOpen=function(hash){ hash.w.fadeIn('1600')}; 
-	$('#dialog').jqm({onShow: myOpen}).jqmAddTrigger('.openjqm');
-
+	
 	// fill in today's date for purchase field
 	var currentTime = new Date()
 	var month = currentTime.getMonth() + 1;
@@ -392,6 +378,36 @@ $(document).ready(function(){
 	var str = year + "/" + month + "/" + day;
 
 	$('#purch_date').val(str);
+	return $list_users;
+}
+
+$(document).ready(function(){
+
+//---------------- JS code for index page -------------------
+
+	// new billing cycle call
+	$("#new_cycle").click(function(){
+		loadItemList();
+	});
+
+
+
+// -------------- JS code for add_item box -----------------
+
+	// make sure the submit button says the right thing. this gets changed when the user edits something
+	$("#add_item").click(function(){
+		loadAddItem();
+		$("#action").text('submit');
+		$("#expanded_section").css("display", "none");
+		//$list_users.clear_names();
+		
+		setFieldsToZero();
+	});
+
+	$("#loadItemList").click(function(){
+		loadItemList();
+	});
+
 });
 
 
