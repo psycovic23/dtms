@@ -217,7 +217,6 @@ def login(request):
         return render_to_response('login.html', {}, 
                               context_instance = RequestContext(request))
     else:
-        pdb.set_trace()
         m = User.objects.get(name=request.POST.get('username'))        
         if m.password == request.POST['password']:
             request.session['house_id'] = m.house_id
