@@ -2,8 +2,8 @@
 // This section is code for the user list in the add_item popup
 
 
-// toggles colors for list_users
-(function($) {
+// toggle_selected plugin - toggles colors for list_users
+(function($) {		
 	var selected_users = {};
 
 	// for state of all_button
@@ -119,6 +119,7 @@ function setFieldsToZero(){
 
 // this sucks. fix this
 d = {}
+
 //-----------------------------------------
 // this refreshes the item list. making it into a function so I can call it again when edits are made and we have to refresh on the fly
 function loadItemList(){
@@ -184,6 +185,14 @@ function loadItemList(){
 
 // scrapes form and submits to /add_item
 function submitForm(list_users){
+	function getArrayFromInputFields(id){
+		var values = [];
+		var $d = $("#" + id + " input");
+		$d.each(function(){
+			values.push([parseInt($(this).attr('id')),$(this).val()]);
+		});
+		return values;
+	}
 	// gets all the information from the forms
 	var str= $("#purch_date").val();
 	var d = str.split("/");
@@ -223,7 +232,6 @@ function submitForm(list_users){
 	if ($("#action").html() == 'edit')
 		data = $.extend(data, {'edit_id': edit_id});
 
-	console.log(getArrayFromInputFields("expanded_buyers"));
 	data = $.extend(data, {'expanded_buyers': getArrayFromInputFields("expanded_buyers")});
 	data = $.extend(data, {'expanded_users': getArrayFromInputFields("expanded_users")});
 
@@ -239,15 +247,6 @@ function submitForm(list_users){
 		error: function(xhr){ document.write(xhr.responseText); }
 	});
 
-}
-
-function getArrayFromInputFields(id){
-	var values = [];
-	var $d = $("#" + id + " input");
-	$d.each(function(){
-		values.push([parseInt($(this).attr('id')),$(this).val()]);
-	});
-	return values;
 }
 
 function drawGraphs(){
@@ -269,12 +268,64 @@ function drawGraphs(){
 }
 
 function loadAddItem(edit_id){
+	function addItemConfigure(){
+		// load item list
+		var $list_users = $('#list_users').toggle_selected();
+	
+	
+		setFieldsToZero();
+		// get tag list for autocomplete
+		$.ajax({
+			url: '/dtms/getTagList',
+			dataType: 'json',
+			success: function(data){
+				$("#tags").autocomplete(data['tags']);
+			},
+			error: function(xhr){
+				document.write(xhr.responseText);
+			}
+		});
+	
+		// make the advanced selection button
+		$("#advanced").click(function(){
+			if ($("#expanded_section").css("display") == "none"){
+				$("#expanded_section").css("display", "inline");
+				$("#basic_users").css("display", "none");
+			} else {
+				$("#expanded_section").css("display", "none");
+				$("#basic_users").css("display", "inline");
+			}
+		});
+	
+	
+		// item submit button
+		$("#action").click(function(){
+			submitForm($list_users);
+		});
+		
+		// fill in today's date for purchase field
+		var currentTime = new Date()
+		var month = currentTime.getMonth() + 1;
+		var day = currentTime.getDate();
+		var year = currentTime.getFullYear();
+		var str = year + "/" + month + "/" + day;
+	
+		$('#purch_date').val(str);
+		return $list_users;
+	}
 	var $list_users;
+
+	// initialization steps
+	$("#action").text('submit');
+	$("#expanded_section").css("display", "none");
+	setFieldsToZero();
+
 	$.ajax({
 		url: '/dtms/addItem',
 		success: function(data){
 			$("#rightPanel").html(data);
 			$list_users = addItemConfigure();
+			$list_users.clear_names();
 
 			if (edit_id !== undefined){
 				setFieldsToZero();
@@ -327,8 +378,6 @@ function loadAddItem(edit_id){
 					error: function(data){ document.write(data.responseText); }
 				});
 			}
-
-
 		},
 		error: function(xhr){
 			document.write(xhr.responseText);
@@ -337,71 +386,30 @@ function loadAddItem(edit_id){
 	$list_users.clear_names();
 }
 
-function addItemConfigure(){
-	// load item list
-	var $list_users = $('#list_users').toggle_selected();
-
-
-	setFieldsToZero();
-	// get tag list for autocomplete
+function loadClearCycle(){
 	$.ajax({
-		url: '/dtms/getTagList',
-		dataType: 'json',
-		success: function(data){
-			$("#tags").autocomplete(data['tags']);
+		url: '/dtms/clear_cycle',
+		success: function(){
+			console.log('success');
+			loadItemList();
 		},
-		error: function(xhr){
-			document.write(xhr.responseText);
-		}
+		error: function(data){ document.write(xhr.responseText); }
 	});
-
-	// make the advanced selection button
-	$("#advanced").click(function(){
-		if ($("#expanded_section").css("display") == "none")
-			$("#expanded_section").css("display", "inline");
-		else
-			$("#expanded_section").css("display", "none");
-		$("#basic_users").css("display", "none");
-	});
-
-
-	// item submit button
-	$("#action").click(function(){
-		submitForm($list_users);
-	});
-	
-	// fill in today's date for purchase field
-	var currentTime = new Date()
-	var month = currentTime.getMonth() + 1;
-	var day = currentTime.getDate();
-	var year = currentTime.getFullYear();
-	var str = year + "/" + month + "/" + day;
-
-	$('#purch_date').val(str);
-	return $list_users;
 }
+
 
 $(document).ready(function(){
 
 //---------------- JS code for index page -------------------
 
-	// new billing cycle call
+	// button calls
+
 	$("#new_cycle").click(function(){
-		loadItemList();
+		loadClearCycle();
 	});
 
-
-
-// -------------- JS code for add_item box -----------------
-
-	// make sure the submit button says the right thing. this gets changed when the user edits something
 	$("#add_item").click(function(){
 		loadAddItem();
-		$("#action").text('submit');
-		$("#expanded_section").css("display", "none");
-		//$list_users.clear_names();
-		
-		setFieldsToZero();
 	});
 
 	$("#loadItemList").click(function(){
