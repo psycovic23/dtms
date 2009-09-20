@@ -1,0 +1,7 @@
+<div class="header">header</div>
+
+{% for x in archive_list %}
+<div class="item" id="{{x.0 }}archive">
+	<span class="item_name">{{ x.1 }} {{ x.2 }}</span><br>
+</div>
+{% endfor %}
