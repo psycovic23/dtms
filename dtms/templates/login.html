@@ -38,7 +38,7 @@
 	                        });
 						}
 					}, 
-					error: function(data){ document.write('broken'); }
+					error: function(data){ document.write(data.responseText); }
 	            });
 			return false;//not to post the  form physically
 		});
