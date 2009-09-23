@@ -120,9 +120,34 @@ function setFieldsToZero(){
 // this sucks. fix this
 d = {}
 
+function drawGraphs(){
+	$.ajax({
+		url: '/dtms/tag_breakdown/' + $('#user_id').val() + '/',
+		dataType: 'json',
+		success: function(data){
+			$.plot($("#graph"), data,
+			{
+			    series: {
+			        pie: {
+			            show: true
+			        }
+			    }
+			});
+		},
+		error: function(data){ document.write(data.responseText); }
+	});
+
+}
 //-----------------------------------------
 // this refreshes the item list. making it into a function so I can call it again when edits are made and we have to refresh on the fly
-function loadItemList(archive_id){
+function loadItemList(args){
+	var default_args = {
+		'archive_id':	0,
+		'tagFilter':	'None'
+	}
+
+	options = {};
+	$.extend(options, default_args, args);
 
 	// applies JS code to the item list that's dumped into the DOM
 	function onListUpdate(){
@@ -163,22 +188,30 @@ function loadItemList(archive_id){
 			edit_id = parseInt($(this).parent().attr('id'));
 			loadAddItem(edit_id);
 		});
+
 	}
 
-	var url_str = '/dtms/list';
-	if (archive_id !== undefined)
-		url_str += '/' + archive_id + '/'
 
-	$.ajax({
-		url: url_str,
-		success: function(data){
-			$("#rightPanel").html(data)
-			onListUpdate();
-		},
-		error: function(data){
-			document.write(data.responseText);
-		}
+	// call to run Config function
 
+	$("#rightPanel").fadeOut("fast", function(){
+
+		var url_str = '/dtms/list';
+		url_str += '/' + options['archive_id'] + '/';
+
+		if (options['tagFilter'] != 'None')
+			url_str += tagFilter + '/';
+
+		$.ajax({
+			url: url_str,
+			success: function(data){
+				$("#rightPanel").html(data).fadeIn("fast");
+				onListUpdate();
+			},
+			error: function(data){
+				document.write(data.responseText);
+			}
+		});
 	});
 }
 
@@ -249,23 +282,6 @@ function submitForm(list_users){
 
 }
 
-function drawGraphs(){
-	$.ajax({
-		url: '/dtms/tag_breakdown/' + $('#user_id').val() + '/',
-		dataType: 'json',
-		success: function(data){
-			$.plot($("#graph"), data,
-			{
-			    series: {
-			        pie: {
-			            show: true
-			        }
-			    }
-			});
-		},
-		error: function(data){ document.write(data.responseText); }
-	});
-}
 
 function loadAddItem(edit_id){
 	function addItemConfigure(){
@@ -315,82 +331,81 @@ function loadAddItem(edit_id){
 	}
 	var $list_users;
 
-	// initialization steps
-	$("#action").text('submit');
-	$("#expanded_section").css("display", "none");
-	setFieldsToZero();
-
-	$.ajax({
-		url: '/dtms/addItem',
-		success: function(data){
-			$("#rightPanel").html(data);
-			$list_users = addItemConfigure();
-			$list_users.clear_names();
-
-			if (edit_id !== undefined){
+	$("#rightPanel").fadeOut("fast", function(){
+		$.ajax({
+			url: '/dtms/addItem',
+			success: function(data){
+				$("#rightPanel").html(data).fadeIn("fast");
+				// initialization steps
+				$("#action").text('submit');
+				$("#expanded_section").css("display", "none");
 				setFieldsToZero();
+				$list_users = addItemConfigure();
 				$list_users.clear_names();
-
-				// change the action button to say "edit"
-				$("#action").text('edit');
-
-				d = {'item_id': edit_id};
-				$.ajax({
-					url: '/dtms/edit_item',
-					type: 'POST',
-					data: d,
-					dataType: 'json',
-					success: function(data){
 	
-						// set the user buttons to reflect who's using the item
-						t = {};
-						for (x in data['users']){
-							if (data['users'][x] != 0){
-								$('#' + x + 'option').addClass('selected_yes').removeClass('unselected');
-								t[x] = 1;	
-							} else {
-								t[x] = 0;
+				if (edit_id !== undefined){
+					setFieldsToZero();
+					$list_users.clear_names();
+	
+					// change the action button to say "edit"
+					$("#action").text('edit');
+	
+					d = {'item_id': edit_id};
+					$.ajax({
+						url: '/dtms/edit_item',
+						type: 'POST',
+						data: d,
+						dataType: 'json',
+						success: function(data){
+		
+							// set the user buttons to reflect who's using the item
+							t = {};
+							for (x in data['users']){
+								if (data['users'][x] != 0){
+									$('#' + x + 'option').addClass('selected_yes').removeClass('unselected');
+									t[x] = 1;	
+								} else {
+									t[x] = 0;
+								}
 							}
-						}
-						$list_users.set_names(t);
+							$list_users.set_names(t);
+		
+		
+							// editing add_item form data
+							$('#name').val(data['name']);
+							$('#price').val(data['price']);
+							$('#purch_date').val(data['purch_date']);
+							$('#comments').val(data['comments']);
+							$('#tags').val(data['tags']);
+							$('#sub_tag').val(data['sub_tag']);
+							for (x in data['ind_pay'])
+								$("#" + x + "expanded_user").val(data['ind_pay'][x]);
+							
+							for (x in data['buyer_pay'])
+								$("#" + x + "expanded_buyer").val(data['buyer_pay'][x]);
 	
 	
-						// editing add_item form data
-						$('#name').val(data['name']);
-						$('#price').val(data['price']);
-						$('#purch_date').val(data['purch_date']);
-						$('#comments').val(data['comments']);
-						$('#tags').val(data['tags']);
-						$('#sub_tag').val(data['sub_tag']);
-						for (x in data['ind_pay'])
-							$("#" + x + "expanded_user").val(data['ind_pay'][x]);
-						
-						for (x in data['buyer_pay'])
-							$("#" + x + "expanded_buyer").val(data['buyer_pay'][x]);
-
-
-						if (data['equalArray'] != 1){
-							$("#expanded_section").css("display", "inline");
-						} else {
-							$("#expanded_section").css("display", "none");
-						}
-					},
-					error: function(data){ document.write(data.responseText); }
-				});
+							if (data['equalArray'] != 1){
+								$("#expanded_section").css("display", "inline");
+							} else {
+								$("#expanded_section").css("display", "none");
+							}
+						},
+						error: function(data){ document.write(data.responseText); }
+					});
+				}
+			},
+			error: function(xhr){
+				document.write(xhr.responseText);
 			}
-		},
-		error: function(xhr){
-			document.write(xhr.responseText);
-		}
+		});
 	});
-	$list_users.clear_names();
 }
 
 function loadClearCycle(){
 	$.ajax({
 		url: '/dtms/clear_cycle',
 		success: function(){
-			console.log('success');
 			loadItemList();
 		},
 		error: function(data){ document.write(xhr.responseText); }
@@ -398,21 +413,67 @@ function loadClearCycle(){
 }
 
 function loadArchives(){
-	$.ajax({
-		url: '/dtms/showArchives',
-		success: function(data){
-			$("#rightPanel").html(data);
+	$("#rightPanel").fadeOut("fast", function(){
+		$.ajax({
+			url: '/dtms/showArchives',
+			success: function(data){
+				$("#rightPanel").html(data).fadeIn("fast");
+	
+				// give fancy js behavior DUPLICATE CODE
+				$(".item:odd").css({'background-color': '#ffc97c'});
+				$(".item:even").css({'background-color': '#ffe1b5'});
+	
+				$(".item").click(function(){
+					var archive_id = parseInt($(this).attr('id'));
+					loadItemList({'archive_id': archive_id});
+				});
+			},
+			error: function(data){ document.write(data.responseText); }
+		});
+	});
+}
 
-			// give fancy js behavior DUPLICATE CODE
-			$(".item:odd").css({'background-color': '#ffc97c'});
-			$(".item:even").css({'background-color': '#ffe1b5'});
+function loadAnalysis(options){
+	$("#rightPanel").fadeOut("fast", function(){
+		$.ajax({
+			url: '/dtms/analysis/' + options['archive_id'] + '/' + $("#user_id").val() + '/',
+			dataType: 'json',
+			success: function(data){
+				$("#rightPanel").html(data['html']).fadeIn("fast");
+				var graphdata = [
+					{ label: "Series1",  data: 10},
+					{ label: "Series2",  data: 30},
+					{ label: "Series3",  data: 90},
+					{ label: "Series4",  data: 70},
+					{ label: "Series5",  data: 80},
+					{ label: "Series6",  data: 110}
+				];
+    			var d2 = [ { label: "Foo", data: [ [10, 1], [17, -14], [30, 5] ] }, { label: "Bar", data: [ [11, 13], [19, 11], [30, -7] ] } ]
 
-			$(".item").click(function(){
-				var archive_id = parseInt($(this).attr('id'));
-				loadItemList(archive_id);
-			});
-		},
-		error: function(data){ document.write(data.responseText); }
+				$.plot($("#graph"), d2, {bars: {show: true} }); 
+			},
+			error: function(data){ document.write(data.responseText); }
+		});
+	});
+}
+function loadAnalysisList(){
+	$("#rightPanel").fadeOut("fast", function(){
+		$.ajax({
+			url: '/dtms/showArchives/current/',
+			success: function(data){
+				$("#rightPanel").html(data).fadeIn("fast");
+	
+				// give fancy js behavior
+				$(".item:odd").css({'background-color': '#ffc97c'});
+				$(".item:even").css({'background-color': '#ffe1b5'});
+	
+				$(".item").click(function(){
+					var archive_id = parseInt($(this).attr('id'));
+					loadAnalysis({'archive_id': archive_id});
+				});
+			},
+			error: function(data){ document.write(data.responseText); }
+		});
 	});
 }
 
@@ -420,6 +481,9 @@ function loadArchives(){
 $(document).ready(function(){
 
 //---------------- JS code for index page -------------------
+
+	// load item list on page load
+	loadItemList();
 
 	// button calls
 
@@ -439,6 +503,8 @@ $(document).ready(function(){
 		loadArchives();
 	});
 
+	$("#showAnalysis").click(function(){
+		loadAnalysisList();
+	});
+
 });
-
-

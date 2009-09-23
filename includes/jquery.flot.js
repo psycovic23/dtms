@@ -523,7 +523,6 @@
                 placeholder.css("position", "relative"); // for positioning labels and overlay
 
             if (canvasWidth <= 0 || canvasHeight <= 0){
-				console.log(placeholder);
                 throw "Invalid dimensions for plot, width = " + canvasWidth + ", height = " + canvasHeight;
 			}
 

@@ -1,9 +1,28 @@
-<div class="header">test</div>
+
+<div class="header">from {{ category.0 }} to {{ category.1 }}</div>
+
+<div id="moneyStatus">
+	<div class="ind_balance">{{ list.ind_balance }}</div>
+	|
+	{% for x in list.will_pay %}
+	<span class="payText">you owe {{ x.4 }} {{ x.2 }} | </span>
+	{% endfor %}
+
+	{% for x in list.expects %}
+	<span class="payText">{{x.3}} will pay you {{ x.2 }} | </span>
+	{% endfor %}
+</div>
+<br><br>
+<div id="graphs">
+</div>
+
 {% for x in items %}
 <div class="item" id= "{{ x.id }}list">
 	<span class="item_name">{{ x.name }}</span>
+	{% ifequal category.1 "current" %}
 	<a class="delete">d</a>
 	<a class="edit">e</a>
+	{% endifequal %}
 	<span class="purch_date">{{ x.purch_date }}</span>
 	<br>
 	<div class="item_description">

@@ -3,7 +3,8 @@
 from django.http import HttpResponse
 from django.conf import settings
 from django.shortcuts import render_to_response
-from django.template import RequestContext
+from django.template import RequestContext, Template, Context
+from django.template.loader import get_template
 from django.utils import simplejson as json
 import operator, decimal
 import pdb
@@ -11,9 +12,24 @@ from mysite.dtms.models import *
 #from mysite.dtms.item_list import *
 
 
-def list(request, a_num=0):
+def list(request, a_num=0, tag=None):
     items = Item.objects.filter(house_id=request.session['house_id']).filter(archive_id=a_num)
-    return render_to_response('list.html', {"items": items })
+    x = Item_list(list=items,
+                  house_id=request.session['house_id'],
+                  user_id=request.session['user_id'])
+    tags = Tag.objects.filter(house_id=request.session['house_id'])
+
+    # show what archive category we're in
+    arch = Item.objects.filter(archive_id=a_num).order_by('purch_date')
+    if a_num == '0':
+        category = ([str(arch[0].purch_date.strftime('%b %d, %Y')), "current"])
+    else:
+        category = ([str(arch[0].purch_date.strftime('%b %d, %Y')),
+                     str(arch[len(arch)-1].purch_date.strftime('%b %d, %Y'))])
+
+    return render_to_response('list.html', {"uid": request.session['user_id'],
+                                            "items": items, "list": x, "tags":
+                                            tags, "category": category })
 
 def adduser(request):
     if not request.POST:
@@ -37,7 +53,7 @@ def addItem(request):
                                                User.objects.filter(house_id=request.session['house_id']),
                                                "user_id":
                                                request.session['user_id']})
-def showArchives(request):
+def showArchives(request, show_current=None):
     # retrieve archive_id groups and their ranges to display in the archive
     # section
     r = Item.objects.filter(house_id=request.session['house_id']).order_by('archive_id').reverse()
@@ -48,7 +64,12 @@ def showArchives(request):
 
     
     arch = []
-    for i in range(1, m):
+    if show_current == None:
+        v = 1
+    else:
+        v = 0
+
+    for i in range(v, m):
         x = Item.objects.filter(archive_id=i).order_by('purch_date')
         arch.append([i, str(x[0].purch_date), str(x[len(x)-1].purch_date)])
 
@@ -225,10 +246,12 @@ def login(request):
         else:
             return HttpResponse('no')
 
-def tag_breakdown(request, id):
+def analysis(request, archive_id, id):
     x = Item_list(list=Item.objects.filter(archive_id=0),
-                  house_id=request.session['house_id'])
-    return HttpResponse(x.ind_breakdown(uid=id))
+                  house_id=request.session['house_id'], user_id=id)
+    t = get_template('analysis.html')
+    html = t.render(Context({}))
+    return HttpResponse(json.dumps({'html': html, 'data': x.ind_breakdown()}))
 
 
 def individual_bill(request):

@@ -15,15 +15,17 @@ class User(models.Model):
 
 class Item_list:
 
-    def __init__(self, list = None, house_id = None):
+    def __init__(self, list = None, house_id = None, user_id = None):
         self.list = list
         self.house_id = house_id
+        self.uid = int(user_id)
+        self.gen_balancing_transactions()
 
     def ret_list(self):
         return self.list 
 
-    def ind_breakdown(self, uid):
-        u = User.objects.get(id=uid)
+    def ind_breakdown(self):
+        u = User.objects.get(id=self.uid)
         x = {}
         for i in u.user_item_rel_set.all():
             if str(i.item.tag) not in x:
@@ -54,10 +56,13 @@ class Item_list:
         transactions = [] 
         for (k,v) in sum.items():
             sum[k] = float(v)
+
+        self.ind_balance = sum[self.uid]
     
         # while array is non zero
         while abs(max(sum.iteritems(), key=operator.itemgetter(1))[1]) > .01:
     
+            # owes = [key, amount]
             owes = min(sum.iteritems(), key=operator.itemgetter(1))
             expects = max(sum.iteritems(), key=operator.itemgetter(1))
             
@@ -66,11 +71,15 @@ class Item_list:
             else:
                 amount = owes[1] * -1
    
-            transactions.append([owes[0], expects[0], amount])
+            transactions.append([owes[0], expects[0], amount,
+                                 User.objects.get(id=owes[0]).name,
+                                 User.objects.get(id=expects[0]).name])
             sum[expects[0]] -= amount
             sum[owes[0]] += amount
 
-        return transactions
+        self.will_pay = [p for p in transactions if p[0] == self.uid]
+        self.expects = [p for p in transactions if p[1] == self.uid]
+
 
 class Tag(models.Model):
     name    = models.CharField(max_length=50)
