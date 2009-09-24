@@ -24,16 +24,18 @@ class Item_list:
     def ret_list(self):
         return self.list 
 
-    def ind_breakdown(self):
-        u = User.objects.get(id=self.uid)
+    def barGraphData(self):
         x = {}
-        for i in u.user_item_rel_set.all():
-            if str(i.item.tag) not in x:
-                x[str(i.item.tag)] = 0
-            x[str(i.item.tag)] += float(i.payment_amount)
+        for i in self.list.filter(users__id__exact=self.uid):
+            if str(i.tag) not in x:
+                x[str(i.tag)] = 0
+            x[str(i.tag)] += float(i.user_item_rel_set.get(user__id__exact=self.uid).payment_amount)
+
         ret_obj = []
+        counter = 1
         for k,v in x.iteritems():
-            ret_obj.append({'label': k, 'data': v})
+            ret_obj.append({'data': [ [counter, v ] ],'label': k })
+            counter = counter + 1
         return json.dumps(ret_obj)
         
     def gen_balancing_transactions(self):

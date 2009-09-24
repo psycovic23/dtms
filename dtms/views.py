@@ -13,13 +13,18 @@ from mysite.dtms.models import *
 
 
 def list(request, a_num=0, tag=None):
+
     items = Item.objects.filter(house_id=request.session['house_id']).filter(archive_id=a_num)
-    x = Item_list(list=items,
+
+    # throw items into Item_list for all the methods in the class Item_list
+    itemlist = Item_list(list=items,
                   house_id=request.session['house_id'],
                   user_id=request.session['user_id'])
+
+    # get a list of tags
     tags = Tag.objects.filter(house_id=request.session['house_id'])
 
-    # show what archive category we're in
+    # generate strings to show what time period/archive category we're in
     arch = Item.objects.filter(archive_id=a_num).order_by('purch_date')
     if a_num == '0':
         category = ([str(arch[0].purch_date.strftime('%b %d, %Y')), "current"])
@@ -27,9 +32,12 @@ def list(request, a_num=0, tag=None):
         category = ([str(arch[0].purch_date.strftime('%b %d, %Y')),
                      str(arch[len(arch)-1].purch_date.strftime('%b %d, %Y'))])
 
-    return render_to_response('list.html', {"uid": request.session['user_id'],
-                                            "items": items, "list": x, "tags":
-                                            tags, "category": category })
+    t = get_template('list.html')
+    html = t.render(Context({"uid": request.session['user_id'], "items": items,
+                            "list": itemlist, "tags": tags, "category": category}))
+
+    return HttpResponse(json.dumps({'html': html, 'graphData':
+                                    itemlist.barGraphData()}))
 
 def adduser(request):
     if not request.POST:
@@ -251,10 +259,5 @@ def analysis(request, archive_id, id):
                   house_id=request.session['house_id'], user_id=id)
     t = get_template('analysis.html')
     html = t.render(Context({}))
-    return HttpResponse(json.dumps({'html': html, 'data': x.ind_breakdown()}))
+    return HttpResponse(json.dumps({'html': html, 'data': x.barGraphData()}))
 
-
-def individual_bill(request):
-    x = Item_list(list=Item.objects.filter(archive_id=0),
-                  house_id=request.session['house_id'])
-    return HttpResponse({'tag_breakdown': x.gen_balancing_transactions})

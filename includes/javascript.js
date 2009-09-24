@@ -189,6 +189,15 @@ function loadItemList(args){
 			loadAddItem(edit_id);
 		});
 
+		// load analysis button
+		$("#showAnalysis").toggle(function(){
+			$("#graph").slideDown('slow');
+			$(this).val('hide analysis')
+		}, function(){
+			$("#graph").slideUp('slow');
+			$(this).val('show analysis');
+		});
+
 	}
 
 
@@ -204,8 +213,14 @@ function loadItemList(args){
 
 		$.ajax({
 			url: url_str,
+			dataType: 'json',
 			success: function(data){
-				$("#rightPanel").html(data).fadeIn("fast");
+				// maybe throw these back into the config function
+				$("#rightPanel").html(data['html']).fadeIn("fast");
+				var graphdata = eval(data['graphData']);
+
+				$.plot($("#graph"), graphdata,  {bars: {show: true} }); 
+				$("#graph").hide();
 				onListUpdate();
 			},
 			error: function(data){
@@ -440,17 +455,9 @@ function loadAnalysis(options){
 			dataType: 'json',
 			success: function(data){
 				$("#rightPanel").html(data['html']).fadeIn("fast");
-				var graphdata = [
-					{ label: "Series1",  data: 10},
-					{ label: "Series2",  data: 30},
-					{ label: "Series3",  data: 90},
-					{ label: "Series4",  data: 70},
-					{ label: "Series5",  data: 80},
-					{ label: "Series6",  data: 110}
-				];
-    			var d2 = [ { label: "Foo", data: [ [10, 1], [17, -14], [30, 5] ] }, { label: "Bar", data: [ [11, 13], [19, 11], [30, -7] ] } ]
+				var graphdata = eval(data['data']);
 
-				$.plot($("#graph"), d2, {bars: {show: true} }); 
+				$.plot($("#graph"), graphdata,  {bars: {show: true} }); 
 			},
 			error: function(data){ document.write(data.responseText); }
 		});
