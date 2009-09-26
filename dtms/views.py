@@ -28,15 +28,18 @@ def list(request, a_num=0, tag=None):
 
     # generate strings to show what time period/archive category we're in
     arch = Item.objects.filter(archive_id=a_num).order_by('purch_date')
-    if a_num == '0':
-        category = ([str(arch[0].purch_date.strftime('%b %d, %Y')), "current"])
-    else:
-        category = ([str(arch[0].purch_date.strftime('%b %d, %Y')),
-                     str(arch[len(arch)-1].purch_date.strftime('%b %d, %Y'))])
+    if len(arch) != 0:
+        if a_num == '0':
+            category = ([str(arch[0].purch_date.strftime('%b %d, %Y')), "current"])
+        else:
+            category = ([str(arch[0].purch_date.strftime('%b %d, %Y')),
+                         str(arch[len(arch)-1].purch_date.strftime('%b %d, %Y'))])
 
+    else:
+        category = [' ', 'no items!']
     t = get_template('list.html')
     html = t.render(Context({"uid": request.session['user_id'], "items": items,
-                            "list": itemlist, "tags": tags, "category": category}))
+                           "list": itemlist, "tags": tags, "category": category}))
 
     return HttpResponse(json.dumps({'html': html, 'graphData':
                                     itemlist.barGraphData()}))
