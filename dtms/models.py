@@ -67,12 +67,15 @@ class Item_list:
             self.sign = 'n'
     
         # while array is non zero
-        pdb.set_trace()
-        while sum([balance_sum[p] for p in balance_sum]) > .01:
+        while len([p for p in balance_sum if balance_sum[p] != 0]) > .01:
     
             # owes = [key, amount]
-            owes = min(balance_sum.iteritems(), key=operator.itemgetter(1))
-            expects = max(balance_sum.iteritems(), key=operator.itemgetter(1))
+            owes = min([(val, key) for (key, val) in balance_sum.items()])
+            expects = max([(val, key) for (key, val) in balance_sum.items()])
+            owes = list(owes)
+            owes.reverse()
+            expects = list(expects)
+            expects.reverse()
             
             if (owes[1] + expects[1]) < 0:
                 amount = expects[1]
