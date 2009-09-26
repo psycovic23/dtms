@@ -15,6 +15,10 @@ h3 {
 	font-size: 10pt;
 }
 
+#leftMenu li {
+	list-style-type: none;
+}
+
 #rightPanel {
 	border: 1px solid #999;
 	-moz-border-radius: 5px;
@@ -32,6 +36,15 @@ h3 {
 	-webkit-border-radius: 5px;
 	border: 1px solid #999;
 	padding: 10px;
+}
+
+#leftMenu li {
+	padding: 2px 5px;
+}
+
+#leftMenu li:hover {
+	background-color: #39c;
+	cursor: default;
 }
 
 /* to do: make nohighlight for safari */
@@ -70,16 +83,18 @@ h3 {
 	border: 1px #000 solid;
 }	
 
-.unselected {
+#basic_users .unselected {
 	background-color: #eee; 
 	color: #000; 
 	border: 1px #eee solid
 }
 
-.selected_yes, .hover {
+#basic_users .selected_yes, #basic_users .hover {
 	background-color: #e61a1a; 
 	color: #fff;
-	border: 1px #000 solid}
+	border: 1px #000 solid
+}
+
 #all_name::-moz-selection {
 	background:transparent;
 }
@@ -117,11 +132,32 @@ h3 {
 
 
 /* styles for the list of items that comes from /list */
+.tagNames {
+	cursor: default;
+	padding:2px 5px;
+}
+
+#showAnalysis {
+	float:right;
+}
+
 #moneyStatus {
 	text-align: center;
 }
 .ind_balance {
 	font-size: 35pt;
+}
+
+.pos {
+	color: green;
+}
+
+.neg {
+	color: red;
+}
+
+.bar {
+	font-size: 15pt;
 }
 
 .header {
@@ -131,22 +167,12 @@ h3 {
 .item { 
 	width: 600px; 
 }
+
 .item_description {
 	width: 600px;
 	background-color: #eee;
 }
 
-#list { 
-	font-size:15pt;
-	width:600px; 
-	-moz-border-radius-topleft: 10px 10px; 
-	-moz-border-radius-topright: 10px 10px; 
-	background-color: #ff7070;
-}
-
-#list {
-	float:left;
-}
 .price {
 	margin-left:50px;
 }
@@ -163,7 +189,6 @@ h3 {
 #graph {
 	width: 400px;
 	height: 200px;
-	border: 1px dashed gainsboro;
 	margin-left: auto;
 	margin-right: auto;
 }

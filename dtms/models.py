@@ -60,6 +60,11 @@ class Item_list:
             sum[k] = float(v)
 
         self.ind_balance = sum[self.uid]
+
+        if self.ind_balance >= 0:
+            self.sign = 'p'
+        else:
+            self.sign = 'n'
     
         # while array is non zero
         while abs(max(sum.iteritems(), key=operator.itemgetter(1))[1]) > .01:

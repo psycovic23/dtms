@@ -6,17 +6,13 @@ from views import *
     #admin.autodiscover()
 
 urlpatterns = patterns('',
-    (r'^tag_price$', tag_price),
 	(r'^adduser$', adduser),
-    (r'^addItem$', addItem),
+    (r'^addItem$', addItemPage),
     (r'^list$', list),
 	(r'^list/(?P<a_num>\d+)/$', list),
 	(r'^list/(?P<a_num>\d+)/(?P<tag>\w+)/$', list),
     (r'^showArchives$', showArchives),
-    (r'^showArchives/(?P<show_current>\w+)/$', showArchives),
 	(r'^$', index),
-    (r'^getTagList$', getTagList),
-    (r'^analysis/(\d+)/(\d+)/$', analysis),
     (r'^clear_cycle$', clear_cycle),
 	(r'^login$', login),
 	(r'^add_item$', add_item),

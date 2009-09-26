@@ -120,24 +120,6 @@ function setFieldsToZero(){
 // this sucks. fix this
 d = {}
 
-function drawGraphs(){
-	$.ajax({
-		url: '/dtms/tag_breakdown/' + $('#user_id').val() + '/',
-		dataType: 'json',
-		success: function(data){
-			$.plot($("#graph"), data,
-			{
-			    series: {
-			        pie: {
-			            show: true
-			        }
-			    }
-			});
-		},
-		error: function(data){ document.write(data.responseText); }
-	});
-
-}
 //-----------------------------------------
 // this refreshes the item list. making it into a function so I can call it again when edits are made and we have to refresh on the fly
 function loadItemList(args){
@@ -150,11 +132,11 @@ function loadItemList(args){
 	$.extend(options, default_args, args);
 
 	// applies JS code to the item list that's dumped into the DOM
-	function onListUpdate(){
-		// js behavior for sliding items up and down
-		// also code to fill in information when you're editing a record 
+	function onListUpdate(data){
 		
-	
+		// load the data into rightPanel	
+		$("#rightPanel").html(data['html']).fadeIn("fast");
+
 		// give fancy js behavior
 		$(".item").toggle(
 			function(){
@@ -163,9 +145,19 @@ function loadItemList(args){
 				$(this).find('.item_description').slideUp('normal');
 			}
 		);
+
+		// item hover actions
 		$(".item:odd").css({'background-color': '#ffc97c'});
 		$(".item:even").css({'background-color': '#ffe1b5'});
 		$(".item_description").hide();
+		$(".item:odd").hover(
+			function(){ $(this).css({'background-color': '#39c'}); }, 
+			function(){ $(this).css({'background-color': '#ffc97c'});}
+		);
+		$(".item:even").hover(
+			function(){ $(this).css({'background-color': '#39c'}); }, 
+			function(){ $(this).css({'background-color': '#ffe1b5'});}
+		);
 	
 	
 		// delete button behavior
@@ -189,11 +181,41 @@ function loadItemList(args){
 			loadAddItem(edit_id);
 		});
 
+		// load graph data and hide the div
+		var graphdata = JSON.parse(data['graphData']);
+		$.plot($("#graph"), graphdata,  {xaxis: {autoscaleMargin: .5, ticks: 0}, yaxis: {autoscaleMargin: .5}, grid: {hoverable: true, clickable: true}, bars: {show: true} }); 
+
+		// potential bug - if tags have overlapping text, it filters incorrectly
+		$("#graph").bind("plotclick", function(event, pos, item){
+			if ($("div.tag:contains('" + item.series.label + "')").length != 0){
+				$("div.tag:contains('" + item.series.label + "')").parent().parent().slideDown();
+				$("div.tag:not(:contains('" + item.series.label + "'))").parent().parent().slideUp();
+			}
+		});
+
+		$("#graph").hide();
+
+		// taglist behavior
+		$(".tagNames").click(function(){
+			if ($(this).html() == "all"){
+				$("div.item").slideDown();
+			} else {
+				if ($("div.tag:contains('" + $(this).html() + "')").length != 0){
+					$("div.tag:contains('" + $(this).html() + "')").parent().parent().slideDown();
+					$("div.tag:not(:contains('" + $(this).html() + "'))").parent().parent().slideUp();
+				}
+			}
+		}).hover(function(){ $(this).css({ 'background-color': '#39c'});}, function(){ $(this).css({ 'background-color': '#fff'})});
+
+
+
 		// load analysis button
 		$("#showAnalysis").toggle(function(){
 			$("#graph").slideDown('slow');
+			$("#tagList").slideUp();
 			$(this).val('hide analysis')
 		}, function(){
+			$("#tagList").slideDown();
 			$("#graph").slideUp('slow');
 			$(this).val('show analysis');
 		});
@@ -205,6 +227,9 @@ function loadItemList(args){
 
 	$("#rightPanel").fadeOut("fast", function(){
 
+		// determine what archive list to load, based on arguments from options
+		// also there is tagFiltering, which isn't done yet
+		
 		var url_str = '/dtms/list';
 		url_str += '/' + options['archive_id'] + '/';
 
@@ -216,12 +241,7 @@ function loadItemList(args){
 			dataType: 'json',
 			success: function(data){
 				// maybe throw these back into the config function
-				$("#rightPanel").html(data['html']).fadeIn("fast");
-				var graphdata = eval(data['graphData']);
-
-				$.plot($("#graph"), graphdata,  {bars: {show: true} }); 
-				$("#graph").hide();
-				onListUpdate();
+				onListUpdate(data);
 			},
 			error: function(data){
 				document.write(data.responseText);
@@ -299,23 +319,12 @@ function submitForm(list_users){
 
 
 function loadAddItem(edit_id){
-	function addItemConfigure(){
+	function addItemConfigure(data){
 		// load item list
 		var $list_users = $('#list_users').toggle_selected();
-	
-	
 		setFieldsToZero();
-		// get tag list for autocomplete
-		$.ajax({
-			url: '/dtms/getTagList',
-			dataType: 'json',
-			success: function(data){
-				$("#tags").autocomplete(data['tags']);
-			},
-			error: function(xhr){
-				document.write(xhr.responseText);
-			}
-		});
+
+		$("#tags").autocomplete(data['tags']);
 	
 		// make the advanced selection button
 		$("#advanced").click(function(){
@@ -344,18 +353,22 @@ function loadAddItem(edit_id){
 		$('#purch_date').val(str);
 		return $list_users;
 	}
+
 	var $list_users;
 
 	$("#rightPanel").fadeOut("fast", function(){
 		$.ajax({
 			url: '/dtms/addItem',
+			dataType: 'json',
 			success: function(data){
-				$("#rightPanel").html(data).fadeIn("fast");
+				$("#rightPanel").html(data['html']).fadeIn("fast");
+
 				// initialization steps
 				$("#action").text('submit');
 				$("#expanded_section").css("display", "none");
 				setFieldsToZero();
-				$list_users = addItemConfigure();
+
+				$list_users = addItemConfigure(data);
 				$list_users.clear_names();
 	
 				if (edit_id !== undefined){
@@ -448,43 +461,6 @@ function loadArchives(){
 	});
 }
 
-function loadAnalysis(options){
-	$("#rightPanel").fadeOut("fast", function(){
-		$.ajax({
-			url: '/dtms/analysis/' + options['archive_id'] + '/' + $("#user_id").val() + '/',
-			dataType: 'json',
-			success: function(data){
-				$("#rightPanel").html(data['html']).fadeIn("fast");
-				var graphdata = eval(data['data']);
-
-				$.plot($("#graph"), graphdata,  {bars: {show: true} }); 
-			},
-			error: function(data){ document.write(data.responseText); }
-		});
-	});
-}
-function loadAnalysisList(){
-	$("#rightPanel").fadeOut("fast", function(){
-		$.ajax({
-			url: '/dtms/showArchives/current/',
-			success: function(data){
-				$("#rightPanel").html(data).fadeIn("fast");
-	
-				// give fancy js behavior
-				$(".item:odd").css({'background-color': '#ffc97c'});
-				$(".item:even").css({'background-color': '#ffe1b5'});
-	
-				$(".item").click(function(){
-					var archive_id = parseInt($(this).attr('id'));
-					loadAnalysis({'archive_id': archive_id});
-				});
-			},
-			error: function(data){ document.write(data.responseText); }
-		});
-	});
-}
-
-
 $(document).ready(function(){
 
 //---------------- JS code for index page -------------------
@@ -508,10 +484,6 @@ $(document).ready(function(){
 
 	$("#showArchives").click(function(){
 		loadArchives();
-	});
-
-	$("#showAnalysis").click(function(){
-		loadAnalysisList();
 	});
 
 });

@@ -22,7 +22,9 @@ def list(request, a_num=0, tag=None):
                   user_id=request.session['user_id'])
 
     # get a list of tags
-    tags = Tag.objects.filter(house_id=request.session['house_id'])
+    tags = set([])
+    for t in items:
+        tags.add(Tag.objects.get(item__exact=t))
 
     # generate strings to show what time period/archive category we're in
     arch = Item.objects.filter(archive_id=a_num).order_by('purch_date')
@@ -47,21 +49,18 @@ def adduser(request):
         u.save()
         return HttpResponse('success')
 
-def tag_price():
-    x = Tag.objects.all()
-    temp = []
-    for t in x:
-        if len(t.user_set.all()) !=0:
-            temp.append(t.cat_price())
-    return temp
+def addItemPage(request):
+    t = get_template('addItem.html')
+    html = t.render(Context({"names":
+                             User.objects.filter(house_id=request.session['house_id']),
+                             "user_id": request.session['user_id']}))
+    tags = Tag.objects.filter(house_id=request.session['house_id'])
+    return HttpResponse(json.dumps({'html': html, 'tags': [p.name for p in
+                                                           tags]}))
 
 
-def addItem(request):
-    return render_to_response('addItem.html', {"names":
-                                               User.objects.filter(house_id=request.session['house_id']),
-                                               "user_id":
-                                               request.session['user_id']})
-def showArchives(request, show_current=None):
+
+def showArchives(request):
     # retrieve archive_id groups and their ranges to display in the archive
     # section
     r = Item.objects.filter(house_id=request.session['house_id']).order_by('archive_id').reverse()
@@ -72,19 +71,14 @@ def showArchives(request, show_current=None):
 
     
     arch = []
-    if show_current == None:
-        v = 1
-    else:
-        v = 0
 
-    for i in range(v, m):
+    for i in range(1, m):
         x = Item.objects.filter(archive_id=i).order_by('purch_date')
         arch.append([i, str(x[0].purch_date), str(x[len(x)-1].purch_date)])
 
     return render_to_response('showArchives.html', {"archive_list": arch})
 
 def index(request):
-
     return render_to_response('index.html', {"names":
                                              User.objects.filter(house_id=request.session['house_id']),
                                              "house_id":
@@ -92,10 +86,6 @@ def index(request):
                                              "user_id":
                                              request.session['user_id']},
                               context_instance = RequestContext(request))
-
-def getTagList(request):
-    tags = Tag.objects.filter(house_id=request.session['house_id'])
-    return HttpResponse(json.dumps({'tags': [p.name for p in tags]}))
 
 # fix the bad naming of variables
 def add_item(request):
@@ -253,11 +243,3 @@ def login(request):
             return HttpResponse('yes')
         else:
             return HttpResponse('no')
-
-def analysis(request, archive_id, id):
-    x = Item_list(list=Item.objects.filter(archive_id=0),
-                  house_id=request.session['house_id'], user_id=id)
-    t = get_template('analysis.html')
-    html = t.render(Context({}))
-    return HttpResponse(json.dumps({'html': html, 'data': x.barGraphData()}))
-
