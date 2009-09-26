@@ -40,26 +40,26 @@ class Item_list:
         
     def gen_balancing_transactions(self):
         users = User.objects.filter(house_id=self.house_id)
-        sum = {}
+        balance_sum = {}
         for a in users:
-            sum[a.id] = 0
+            balance_sum[a.id] = 0
     
         # add in how much users owe
         for i in self.list:
             for e in i.user_item_rel_set.all():
-                sum[e.user.id] += e.payment_amount * -1
+                balance_sum[e.user.id] += e.payment_amount * -1
 
         # subtract out how much buyers paid
         for i in self.list:
             for e in i.buyer_item_rel_set.all():
-                sum[e.buyer.id] += e.payment_amount
+                balance_sum[e.buyer.id] += e.payment_amount
 
         # transactions
         transactions = [] 
-        for (k,v) in sum.items():
-            sum[k] = float(v)
+        for (k,v) in balance_sum.items():
+            balance_sum[k] = float(v)
 
-        self.ind_balance = sum[self.uid]
+        self.ind_balance = balance_sum[self.uid]
 
         if self.ind_balance >= 0:
             self.sign = 'p'
@@ -67,11 +67,12 @@ class Item_list:
             self.sign = 'n'
     
         # while array is non zero
-        while abs(max(sum.iteritems(), key=operator.itemgetter(1))[1]) > .01:
+        pdb.set_trace()
+        while sum([balance_sum[p] for p in balance_sum]) > .01:
     
             # owes = [key, amount]
-            owes = min(sum.iteritems(), key=operator.itemgetter(1))
-            expects = max(sum.iteritems(), key=operator.itemgetter(1))
+            owes = min(balance_sum.iteritems(), key=operator.itemgetter(1))
+            expects = max(balance_sum.iteritems(), key=operator.itemgetter(1))
             
             if (owes[1] + expects[1]) < 0:
                 amount = expects[1]
@@ -81,8 +82,8 @@ class Item_list:
             transactions.append([owes[0], expects[0], amount,
                                  User.objects.get(id=owes[0]).name,
                                  User.objects.get(id=expects[0]).name])
-            sum[expects[0]] -= amount
-            sum[owes[0]] += amount
+            balance_sum[expects[0]] -= amount
+            balance_sum[owes[0]] += amount
 
         self.will_pay = [p for p in transactions if p[0] == self.uid]
         self.expects = [p for p in transactions if p[1] == self.uid]
