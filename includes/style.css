@@ -181,7 +181,7 @@ h3 {
 	margin-left:5px;
 }
 
-.delete, .purch_date, .dispute, .edit{
+.buyers, .delete, .purch_date, .edit{
 	float:right;
 	margin-right:5px;
 }

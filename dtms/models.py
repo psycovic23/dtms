@@ -24,12 +24,21 @@ class Item_list:
     def ret_list(self):
         return self.list 
 
-    def barGraphData(self):
+    def barGraphData(self, houseMode=0):
         x = {}
-        for i in self.list.filter(users__id__exact=self.uid):
+        if houseMode == 0:
+            new_list = self.list.filter(users__id__exact=self.uid)
+        else:
+            new_list = self.list
+
+        for i in new_list:
             if str(i.tag) not in x:
                 x[str(i.tag)] = 0
-            x[str(i.tag)] += float(i.user_item_rel_set.get(user__id__exact=self.uid).payment_amount)
+
+            if houseMode == 0:
+                x[str(i.tag)] += float(i.user_item_rel_set.get(user__id__exact=self.uid).payment_amount)
+            else:
+                x[str(i.tag)] += float(i.price)
 
         ret_obj = []
         counter = 1
@@ -39,6 +48,11 @@ class Item_list:
         return json.dumps(ret_obj)
         
     def gen_balancing_transactions(self):
+        self.balances = {}
+        self.will_pay = {}
+        self.expects = {}
+        self.sign = {}
+
         users = User.objects.filter(house_id=self.house_id)
         balance_sum = {}
         for a in users:
@@ -59,12 +73,19 @@ class Item_list:
         for (k,v) in balance_sum.items():
             balance_sum[k] = float(v)
 
+        self.balances = balance_sum.copy().items()
         self.ind_balance = balance_sum[self.uid]
 
+        for k,v in balance_sum.iteritems():
+            if v >= 0:
+                self.sign[k] = 'p'
+            else:
+                self.sign[k] = 'n'
+
         if self.ind_balance >= 0:
-            self.sign = 'p'
+            self.ind_sign = 'p'
         else:
-            self.sign = 'n'
+            self.ind_sign = 'n'
     
         # while array is non zero
         while len([p for p in balance_sum if balance_sum[p] != 0]) > .01:
@@ -88,8 +109,37 @@ class Item_list:
             balance_sum[expects[0]] -= amount
             balance_sum[owes[0]] += amount
 
-        self.will_pay = [p for p in transactions if p[0] == self.uid]
-        self.expects = [p for p in transactions if p[1] == self.uid]
+        
+        pay_trans = []
+        for x in users:
+            if [p for p in transactions if p[0] == x.id]:
+                pay_trans.append([ "0", [p for p in transactions if p[0] ==
+                                       x.id]])
+            else:
+                pay_trans.append([ "1", [p for p in transactions if p[1] ==
+                                       x.id]])
+                # self.will_pay[x.id] = [p for p in transactions if p[0] == x.id]
+                #self.expects[x.id] = [p for p in transactions if p[1] == x.id]
+            
+
+        self.ind_will_pay = [p for p in transactions if p[0] == self.uid]
+        self.ind_expects = [p for p in transactions if p[1] == self.uid]
+
+        test = {}
+        budget_list = []
+        nameList = []
+        for k,v in self.balances:
+            budget_list.append(v)
+        for x in users:
+            nameList.append(x.name)
+
+        return_var = []
+        for name, budget, trans in zip(nameList, budget_list, pay_trans):
+            return_var.append([ name, budget, trans ])
+
+        self.return_var = return_var
+
+        
 
 
 class Tag(models.Model):
@@ -127,10 +177,17 @@ class Item(models.Model):
     comments    = models.CharField(default='',max_length=400)
     house_id    = models.IntegerField()
     
-    # for editing
-    def delete_m2m_links(self):
-        self.user_item_rel_set.all().delete()
-        self.buyer_item_rel_set.all().delete()
+
+    def shortDisplayBuyers(self):
+        if len(self.buyer_item_rel_set.all()) != 1:
+            return "multiple buyers"
+        else:
+            return self.buyer_item_rel_set.all()[0].buyer.name
+    def listBuyers(self):
+        return self.buyer_item_rel_set.all()
+    
+    def listUsers(self):
+        return self.user_item_rel_set.all()
 
     def tag_name(self):
         return self.tag

@@ -1,27 +1,48 @@
 
 <span class="header">from {{ category.0 }} to {{ category.1 }}</span>
 <a id="showAnalysis">show analysis</a>
+<a id="houseMode">switch to house mode</a>
 
+{% ifequal houseMode "0" %}
 <div id="moneyStatus">
 	<div class="ind_balance">
-		{% ifequal list.sign 'p' %}
+		{% ifequal list.ind_sign 'p' %}
 		<span class="pos">+{{ list.ind_balance }}</span>
 		{% endifequal %}
-		{% ifnotequal list.sign 'p' %}
+		{% ifnotequal list.ind_sign 'p' %}
 		<span class="neg">{{ list.ind_balance }}</span>
 		{% endifnotequal %}
 	</div>
 
 
 	<span class="bar">|</span>
-	{% for x in list.will_pay %}
+	{% for x in list.ind_will_pay %}
 	<span class="payText">you owe {{ x.4 }} {{ x.2 }}</span> <span class="bar">|</span>
 	{% endfor %}
 
-	{% for x in list.expects %}
-	<span class="payText">{{x.3}} will pay you {{ x.2 }}</span> <span class="bar">|</span>
+	{% for x in list.ind_expects %}
+	<span class="payText">{{x.3}} will pay you {{ x.2 }}</span> 	<span class="bar">|</span>
 	{% endfor %}
 </div>
+{% endifequal %}
+{% ifequal houseMode "1" %}
+	{% for x in list.return_var %}
+	<br>
+		{{ x.0 }}
+		{{ x.1 }}
+		{% ifequal x.2.0 "0" %}
+			{% for t in x.2.1 %}
+				{{ t.3 }} will pay {{ t.4 }} {{t.2}}<br>
+			{% endfor %}
+		{% endifequal %}
+		{% ifequal x.2.0 "1" %}
+			{% for t in x.2.1 %}
+				{{ t.3 }} owes {{ t.4 }} {{t.2}}<br>
+			{% endfor %}
+		{% endifequal %}
+	{% endfor %}
+{% endifequal %}
+
 <br><br>
 <div id="tagList">
 	{% for t in tags %}
@@ -38,14 +59,24 @@
 <div id="list">
 	{% for x in items %}
 	<div class="item" id= "{{ x.id }}list">
-		<span class="item_name">{{ x.name }} ({{x.tag}})</span>
+		<span class="item_name">{{ x.name }} ({{x.tag}}) </span>
 		{% ifequal category.1 "current" %}
 		<a class="delete">d</a>
 		<a class="edit">e</a>
 		{% endifequal %}
 		<span class="purch_date">{{ x.purch_date }}</span>
+		<span class="buyers">{{x.shortDisplayBuyers}}</span>
 		<br>
 		<div class="item_description">
+			buyers:
+			{% for t in x.listBuyers %}
+			<div class="people">{{ t.buyer.name }}</div>
+			{% endfor %}
+			<br>
+			users:
+			{% for t in x.listUsers %}
+			<div class="people">{{ t.user.name }}</div>
+			{% endfor %}
 			<div class="price">{{ x.price }}</div>
 			<div class="tag">{{ x.tag }}</div>
 			<div class="sub_tag">{{ x.sub_tag_name }}</div>

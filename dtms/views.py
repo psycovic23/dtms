@@ -12,9 +12,17 @@ from mysite.dtms.models import *
 #from mysite.dtms.item_list import *
 
 
-def list(request, a_num=0, tag=None):
+def list(request, a_num=0, houseMode=0):
 
     items = Item.objects.filter(house_id=request.session['house_id']).filter(archive_id=a_num)
+
+    # for self mode
+    if houseMode == "0":
+        # find anything that you bought or used
+        t = items.filter(user_item_rel__user__exact=User.objects.get(id=request.session['user_id']))
+        y = items.filter(buyer_item_rel__buyer__exact=User.objects.get(id=request.session['user_id']))
+        items = t | y
+        items = items.distinct()
 
     # throw items into Item_list for all the methods in the class Item_list
     itemlist = Item_list(list=items,
@@ -34,15 +42,20 @@ def list(request, a_num=0, tag=None):
         else:
             category = ([str(arch[0].purch_date.strftime('%b %d, %Y')),
                          str(arch[len(arch)-1].purch_date.strftime('%b %d, %Y'))])
-
     else:
         category = [' ', 'no items!']
+
     t = get_template('list.html')
     html = t.render(Context({"uid": request.session['user_id'], "items": items,
-                           "list": itemlist, "tags": tags, "category": category}))
+                           "list": itemlist, "tags": tags, "category": category,
+                             "houseMode": houseMode}))
 
+    if houseMode == "1":
+        graphData = itemlist.barGraphData(1)
+    else:
+        graphData = itemlist.barGraphData()
     return HttpResponse(json.dumps({'html': html, 'graphData':
-                                    itemlist.barGraphData()}))
+                                    graphData}))
 
 def adduser(request):
     if not request.POST:

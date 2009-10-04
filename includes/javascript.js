@@ -125,14 +125,15 @@ d = {}
 function loadItemList(args){
 	var default_args = {
 		'archive_id':	0,
-		'tagFilter':	'None'
+		'houseMode':	'0'
+		
 	}
 
 	options = {};
 	$.extend(options, default_args, args);
 
 	// applies JS code to the item list that's dumped into the DOM
-	function onListUpdate(data){
+	function onListUpdate(data, options){
 		
 		// load the data into rightPanel	
 		$("#rightPanel").html(data['html']).fadeIn("fast");
@@ -183,6 +184,7 @@ function loadItemList(args){
 
 		// load graph data and hide the div
 		var graphdata = JSON.parse(data['graphData']);
+		console.log(graphdata);
 		$.plot($("#graph"), graphdata,  {xaxis: {autoscaleMargin: .5, ticks: 0}, yaxis: {autoscaleMargin: .5}, grid: {hoverable: true, clickable: true}, bars: {show: true} }); 
 
 		// potential bug - if tags have overlapping text, it filters incorrectly
@@ -220,6 +222,14 @@ function loadItemList(args){
 			$(this).val('show analysis');
 		});
 
+		// show house mode button
+		if (options['houseMode'] == 1)
+			$("#houseMode").html('switch to you mode');
+		else
+			$("#houseMode").html('switch to house mode');
+		$("#houseMode").click(function(){
+			loadItemList({'houseMode': (options['houseMode'] + 1) % 2});
+		});
 	}
 
 
@@ -228,20 +238,16 @@ function loadItemList(args){
 	$("#rightPanel").fadeOut("fast", function(){
 
 		// determine what archive list to load, based on arguments from options
-		// also there is tagFiltering, which isn't done yet
 		
 		var url_str = '/dtms/list';
-		url_str += '/' + options['archive_id'] + '/';
-
-		if (options['tagFilter'] != 'None')
-			url_str += tagFilter + '/';
+		url_str += '/' + options['archive_id'] + '/' + options['houseMode'] + '/';
 
 		$.ajax({
 			url: url_str,
 			dataType: 'json',
 			success: function(data){
 				// maybe throw these back into the config function
-				onListUpdate(data);
+				onListUpdate(data, options);
 			},
 			error: function(data){
 				document.write(data.responseText);
