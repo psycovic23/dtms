@@ -100,13 +100,16 @@ def showArchives(request):
     return render_to_response('showArchives.html', {"archive_list": arch})
 
 def index(request):
-    return render_to_response('index.html', {"names":
+    if request.session['user_id']:
+        return render_to_response('index.html', {"names":
                                              User.objects.filter(house_id=request.session['house_id']),
                                              "house_id":
                                              request.session['house_id'],
                                              "user_id":
                                              request.session['user_id']},
                               context_instance = RequestContext(request))
+    else:
+        return login(request)
 
 # fix the bad naming of variables
 def add_item(request):
@@ -253,11 +256,17 @@ def delete_item(request):
 
 def login(request):
     # add in recovery from failed attempt
+    request.session['house_id'] = ''
+    request.session['user_id'] = ''
     if not request.POST:
         return render_to_response('login.html', {}, 
                               context_instance = RequestContext(request))
     else:
-        m = User.objects.get(name=request.POST.get('username'))        
+        try:
+            m = User.objects.get(name=request.POST.get('username'))        
+        except:
+            return HttpResponse('no')
+
         if m.password == request.POST['password']:
             request.session['house_id'] = m.house_id
             request.session['user_id'] = m.id
