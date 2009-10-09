@@ -7,7 +7,7 @@
 	var selected_users = {};
 
 	// for state of all_button
-	var status = 0;
+	var allbutton_status = 0;
 
 	$.fn.toggle_selected = function () {
 		$list = this;
@@ -29,20 +29,20 @@
 
 		$all_button.click(function(){
 			$list_elements.removeClass().addClass('option_text');
-			if (status == 0){
+			if (allbutton_status == 0){
 				$all_button.addClass('selected_yes');
 				$list_elements.addClass('selected_yes');
-				status = 1;
+				allbutton_status = 1;
 				$list_elements.each(function(){
-					selected_users[$(this).attr('id')] = 1;
+					selected_users[parseInt($(this).attr('id'))] = 1;
 				});
 			}
 			else {
 				$all_button.removeClass('selected_yes');
 				$list_elements.addClass('unselected');
-				status = 0;
+				allbutton_status = 0;
 				$list_elements.each(function(){
-					selected_users[$(this).attr('id')] = 0;
+					selected_users[parseInt($(this).attr('id'))] = 0;
 				});
 			}
 		});
@@ -87,6 +87,7 @@
 
 	$.fn.clear_names = function(){
 		$(this).removeClass("selected_yes").addClass("unselected");
+		allbutton_status = 0;
 	}
 
 	$.fn.return_names = function(){
