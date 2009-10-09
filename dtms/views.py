@@ -46,7 +46,12 @@ def list(request, a_num=0, houseMode=0):
         category = [' ', 'no items!']
 
     t = get_template('list.html')
-    html = t.render(Context({"uid": request.session['user_id'], "items": items,
+    if len(items) == 0:
+        empty = "1"
+    else:
+        empty = "0"
+
+    html = t.render(Context({"empty": empty, "uid": request.session['user_id'], "items": items,
                            "list": itemlist, "tags": tags, "category": category,
                              "houseMode": houseMode}))
 

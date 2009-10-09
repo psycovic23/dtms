@@ -1,10 +1,16 @@
 
-
 body {
 	font-family: georgia;
+	background-color: #181818;
 }
+
 h1 {
 	font-size:12pt;
+}
+
+.banner {
+	font-size: 36pt;
+	color: #ccc;
 }
 
 h2 { 
@@ -26,6 +32,17 @@ h3 {
 	width: 600px;
 	padding:10px;
 	display: none;
+	background-color: #fff;
+}
+
+#titlebar {
+	width:400px;
+	margin-left: auto;
+	margin-right: auto;
+	border-bottom: 1px #000 dashed;
+	padding-left: 40px;
+	padding-right: 40px;
+	text-align: center;
 }
 
 /* left side menu styles */
@@ -36,39 +53,24 @@ h3 {
 	-webkit-border-radius: 5px;
 	border: 1px solid #999;
 	padding: 10px;
+	background-color: #fff;
 }
 
 #leftMenu li {
-	padding: 2px 5px;
+	padding: 3px 5px;
+	border: 1px #fff solid;
+	display: block;
 }
 
 #leftMenu li:hover {
-	background-color: #39c;
-	cursor: default;
+	border:1px #000 solid;
+	color: #fff;
+	background-color: #181818;
+	cursor: pointer;
 }
 
 /* to do: make nohighlight for safari */
 
-
-/* #addItemBox style */
-
-.jqmWindow {
-	display: none;
-	position:absolute; 
-	top: 17%;
-	left: 50%;
-    
-	margin-left: -300px;
-	width: 600px;
-	background-color: #EEE;
-	color: #333;
-	border: 1px solid black;
-	padding: 12px;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-}
-
-.jqmOverlay { background-color: #000; }
 
 #expanded_section {
 	display: none;
@@ -77,6 +79,10 @@ h3 {
 
 /* Styles for the toggle_selected plugin used in the addItemBox window*/
 
+#advanced {
+	color: #000;
+	font-size:6pt;
+}
 .selected_maybe {
 	background-color: #e8e781;
 	color: #000;
@@ -84,15 +90,17 @@ h3 {
 }	
 
 #basic_users .unselected {
-	background-color: #eee; 
+	background-color: #fff; 
+	border: 1px #fff solid;
 	color: #000; 
-	border: 1px #eee solid
+	padding: 3px 5px;
 }
 
 #basic_users .selected_yes, #basic_users .hover {
-	background-color: #e61a1a; 
+	background-color: #181818; 
 	color: #fff;
-	border: 1px #000 solid
+	border: 1px #000 solid;
+	padding: 3px 5px;
 }
 
 #all_name::-moz-selection {
@@ -100,14 +108,14 @@ h3 {
 }
 
 #all_name {
-	cursor: default;
+	cursor: pointer;
 }
 
 .option_text::-moz-selection {
 	background:transparent;
 }
 .option_text {
-	cursor: default;
+	cursor: pointer;
 }
 #list_users::-moz-selection {
 	background:transparent;
@@ -133,19 +141,38 @@ h3 {
 
 /* styles for the list of items that comes from /list */
 .tagNames {
-	cursor: default;
+	cursor: pointer;
 	padding:2px 5px;
 }
 
-#showAnalysis {
+#showAnalysis, #houseMode {
 	float:right;
 }
 
-#moneyStatus {
-	text-align: center;
+#houseModeInfo {
+	width: 400px;
+	margin: auto;
+	clear: both;
 }
+
+
+#moneyStatus {
+	margin-left: auto;
+	margin-right: auto;
+	width: 400px;
+}
+
+#tagList {
+	width: 400px;
+	clear: both;
+}
+.payText {
+	float:right;
+}
+
 .ind_balance {
 	font-size: 35pt;
+	float:left;
 }
 
 .pos {
@@ -161,11 +188,19 @@ h3 {
 }
 
 .header {
+	color: #999;
 	font-size: 15pt;
+}
+.gray {
+	color: #999;
+	font-size:10pt;
 }
 
 .item { 
+	padding-top:3px;
+	padding-bottom: 3px;
 	width: 600px; 
+	cursor: pointer;
 }
 
 .item_description {
@@ -173,17 +208,18 @@ h3 {
 	background-color: #eee;
 }
 
-.price {
-	margin-left:50px;
-}
 .item_name {
 	float: left;
 	margin-left:5px;
 }
 
-.buyers, .delete, .purch_date, .edit{
+.tag, .buyers, .delete, .purch_date, .edit{
 	float:right;
 	margin-right:5px;
+}
+
+.purch_date, .buyers, .edit, .delete {
+	color: #999;
 }
 
 #graph {
@@ -191,5 +227,15 @@ h3 {
 	height: 200px;
 	margin-left: auto;
 	margin-right: auto;
+	clear: both;
 }
 
+td {
+	padding: 5px 5px;
+}
+table {
+	border: 1px #000 solid;
+}
+#houseModeInfo table, #moneyStatus table {
+	float:right;
+}

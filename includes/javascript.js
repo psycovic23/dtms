@@ -126,7 +126,6 @@ function loadItemList(args){
 	var default_args = {
 		'archive_id':	0,
 		'houseMode':	'0'
-		
 	}
 
 	options = {};
@@ -145,20 +144,25 @@ function loadItemList(args){
 			}, function() {
 				$(this).find('.item_description').slideUp('normal');
 			}
+		).hover(
+			function(){
+				$(this).css({'background-color': '#ffc97c'});},
+			function(){
+				$(this).css({'background-color': '#fff'});}
 		);
 
 		// item hover actions
-		$(".item:odd").css({'background-color': '#ffc97c'});
-		$(".item:even").css({'background-color': '#ffe1b5'});
+	//	$(".item:odd").css({'background-color': '#fff'});
+	//	$(".item:even").css({'background-color': '#fff'});
 		$(".item_description").hide();
-		$(".item:odd").hover(
-			function(){ $(this).css({'background-color': '#39c'}); }, 
-			function(){ $(this).css({'background-color': '#ffc97c'});}
-		);
-		$(".item:even").hover(
-			function(){ $(this).css({'background-color': '#39c'}); }, 
-			function(){ $(this).css({'background-color': '#ffe1b5'});}
-		);
+	//	$(".item:odd").hover(
+	//		function(){ $(this).css({'background-color': '#ffc97c'}); }, 
+	//		function(){ $(this).css({'background-color': '#ffc97c'});}
+	//	);
+	//	$(".item:even").hover(
+	//		function(){ $(this).css({'background-color': '#39c'}); }, 
+	//		function(){ $(this).css({'background-color': '#ffe1b5'});}
+	//	);
 	
 	
 		// delete button behavior
@@ -184,14 +188,13 @@ function loadItemList(args){
 
 		// load graph data and hide the div
 		var graphdata = JSON.parse(data['graphData']);
-		console.log(graphdata);
 		$.plot($("#graph"), graphdata,  {xaxis: {autoscaleMargin: .5, ticks: 0}, yaxis: {autoscaleMargin: .5}, grid: {hoverable: true, clickable: true}, bars: {show: true} }); 
 
 		// potential bug - if tags have overlapping text, it filters incorrectly
 		$("#graph").bind("plotclick", function(event, pos, item){
-			if ($("div.tag:contains('" + item.series.label + "')").length != 0){
-				$("div.tag:contains('" + item.series.label + "')").parent().parent().slideDown();
-				$("div.tag:not(:contains('" + item.series.label + "'))").parent().parent().slideUp();
+			if ($("span.tag:contains('" + item.series.label + "')").length != 0){
+				$("span.tag:contains('" + item.series.label + "')").parent().slideDown();
+				$("span.tag:not(:contains('" + item.series.label + "'))").parent().slideUp();
 			}
 		});
 
@@ -202,12 +205,12 @@ function loadItemList(args){
 			if ($(this).html() == "all"){
 				$("div.item").slideDown();
 			} else {
-				if ($("div.tag:contains('" + $(this).html() + "')").length != 0){
-					$("div.tag:contains('" + $(this).html() + "')").parent().parent().slideDown();
-					$("div.tag:not(:contains('" + $(this).html() + "'))").parent().parent().slideUp();
+				if ($("span.tag:contains('" + $(this).html() + "')").length != 0){
+					$("span.tag:contains('" + $(this).html() + "')").parent().slideDown();
+					$("span.tag:not(:contains('" + $(this).html() + "'))").parent().slideUp();
 				}
 			}
-		}).hover(function(){ $(this).css({ 'background-color': '#39c'});}, function(){ $(this).css({ 'background-color': '#fff'})});
+		}).hover(function(){ $(this).css({ 'background-color': '#181818', 'color': '#fff'});}, function(){ $(this).css({ 'color': '#000','background-color': '#fff'})});
 
 
 
@@ -224,12 +227,28 @@ function loadItemList(args){
 
 		// show house mode button
 		if (options['houseMode'] == 1)
-			$("#houseMode").html('switch to you mode');
+			$("#houseMode").html('y');
 		else
-			$("#houseMode").html('switch to house mode');
+			$("#houseMode").html('h');
 		$("#houseMode").click(function(){
 			loadItemList({'houseMode': (options['houseMode'] + 1) % 2});
 		});
+
+
+		$("td.hoverable").click(function(){
+			if (options['houseMode'] == 1){
+				if ($(".item:contains('" + $(this).html() + "')").length != 0){
+					$(".item:contains('" + $(this).html() + "')").slideDown();
+					$(".item:not(:contains('" + $(this).html() + "'))").slideUp();
+				}
+			}
+		}).hover(
+			function(){
+				$(this).css({'cursor': 'pointer','background-color': '#ffc97c'});},
+			function(){
+				$(this).css({'background-color': '#fff'});}
+		);
+
 	}
 
 
@@ -267,6 +286,15 @@ function submitForm(list_users){
 		});
 		return values;
 	}
+
+	function sum(a){
+		var sum = 0;
+		for (x in a){
+			sum += parseFloat(a[x][1]);
+		}
+		return sum;
+	}
+
 	// gets all the information from the forms
 	var str= $("#purch_date").val();
 	var d = str.split("/");
@@ -298,8 +326,10 @@ function submitForm(list_users){
 		var a = list_users.return_names();
 		for (t in a){
 			if (a[t])
-				$("#" + t + "expanded_user").val(ind_p);
+				$("#" + parseInt(t) + "expanded_user").val(ind_p);
 		}
+	} else {
+		data['price'] = (sum(getArrayFromInputFields("expanded_buyers")));
 	}
 
 
@@ -309,17 +339,21 @@ function submitForm(list_users){
 	data = $.extend(data, {'expanded_buyers': getArrayFromInputFields("expanded_buyers")});
 	data = $.extend(data, {'expanded_users': getArrayFromInputFields("expanded_users")});
 
-	var c = JSON.stringify(data);
-
-	$.ajax({
-		url: '/dtms/add_item', 
-		type: "POST",
-		data: {'string': c},
-		success: function(data){
-			loadItemList();
-		},
-		error: function(xhr){ document.write(xhr.responseText); }
-	});
+	if (sum(getArrayFromInputFields("expanded_buyers")) == sum(getArrayFromInputFields("expanded_users"))){
+		var c = JSON.stringify(data);
+	
+		$.ajax({
+			url: '/dtms/add_item', 
+			type: "POST",
+			data: {'string': c},
+			success: function(data){
+				loadItemList();
+			},
+			error: function(xhr){ document.write(xhr.responseText); }
+		});
+	} else {
+		alert('your math sucks. try again.');
+	}
 
 }
 
@@ -337,12 +371,13 @@ function loadAddItem(edit_id){
 			if ($("#expanded_section").css("display") == "none"){
 				$("#expanded_section").css("display", "inline");
 				$("#basic_users").css("display", "none");
+				$("#hideable").css("display", "none");
 			} else {
 				$("#expanded_section").css("display", "none");
 				$("#basic_users").css("display", "inline");
+				$("#hideable").css("display", "inline");
 			}
 		});
-	
 	
 		// item submit button
 		$("#action").click(function(){

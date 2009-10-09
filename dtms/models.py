@@ -48,7 +48,7 @@ class Item_list:
         return json.dumps(ret_obj)
         
     def gen_balancing_transactions(self):
-        self.balances = {}
+        balances = {}
         self.will_pay = {}
         self.expects = {}
         self.sign = {}
@@ -70,17 +70,15 @@ class Item_list:
 
         # transactions
         transactions = [] 
-        for (k,v) in balance_sum.items():
-            balance_sum[k] = float(v)
+        self.ind_balance = float(balance_sum[self.uid])
 
-        self.balances = balance_sum.copy().items()
-        self.ind_balance = balance_sum[self.uid]
+        balances = balance_sum.copy()
 
-        for k,v in balance_sum.iteritems():
-            if v >= 0:
-                self.sign[k] = 'p'
-            else:
-                self.sign[k] = 'n'
+       # for v in balance_sum.iteritems():
+       #     if v >= 0:
+       #         self.sign[k] = 'p'
+       #     else:
+       #         self.sign[k] = 'n'
 
         if self.ind_balance >= 0:
             self.ind_sign = 'p'
@@ -110,37 +108,17 @@ class Item_list:
             balance_sum[owes[0]] += amount
 
         
-        pay_trans = []
-        for x in users:
-            if [p for p in transactions if p[0] == x.id]:
-                pay_trans.append([ "0", [p for p in transactions if p[0] ==
-                                       x.id]])
-            else:
-                pay_trans.append([ "1", [p for p in transactions if p[1] ==
-                                       x.id]])
-                # self.will_pay[x.id] = [p for p in transactions if p[0] == x.id]
-                #self.expects[x.id] = [p for p in transactions if p[1] == x.id]
-            
 
         self.ind_will_pay = [p for p in transactions if p[0] == self.uid]
         self.ind_expects = [p for p in transactions if p[1] == self.uid]
 
-        test = {}
-        budget_list = []
-        nameList = []
-        for k,v in self.balances:
-            budget_list.append(v)
-        for x in users:
-            nameList.append(x.name)
-
-        return_var = []
-        for name, budget, trans in zip(nameList, budget_list, pay_trans):
-            return_var.append([ name, budget, trans ])
-
-        self.return_var = return_var
-
         
+        self.names_and_balances = {}
+        for u, v in zip(users, balances.items()):
+            self.names_and_balances[u.name] = float(v[1])
 
+        self.names_and_balances = self.names_and_balances.items()
+        self.transactions = transactions
 
 class Tag(models.Model):
     name    = models.CharField(max_length=50)
