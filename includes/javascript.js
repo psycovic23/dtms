@@ -141,29 +141,22 @@ function loadItemList(args){
 		$(".item").toggle(
 			function(){
 				$(this).find('.item_description').slideDown('normal');
+				$(this).unbind('mouseover').unbind('mouseout').css({'background-color': '#fff'});
 			}, function() {
 				$(this).find('.item_description').slideUp('normal');
-			}
-		).hover(
-			function(){
-				$(this).css({'background-color': '#ffc97c'});},
-			function(){
-				$(this).css({'background-color': '#fff'});}
-		);
+				$(this).bind('mouseover', function(){
+					$(this).css({'background-color': '#ffc97c'});})
+				.bind('mouseout', function(){
+					$(this).css({'background-color': '#fff'});
+				});
+			}).hover(
+				function(){
+					$(this).css({'background-color': '#ffc97c'});},
+				function(){
+					$(this).css({'background-color': '#fff'});}
+			);
 
-		// item hover actions
-	//	$(".item:odd").css({'background-color': '#fff'});
-	//	$(".item:even").css({'background-color': '#fff'});
 		$(".item_description").hide();
-	//	$(".item:odd").hover(
-	//		function(){ $(this).css({'background-color': '#ffc97c'}); }, 
-	//		function(){ $(this).css({'background-color': '#ffc97c'});}
-	//	);
-	//	$(".item:even").hover(
-	//		function(){ $(this).css({'background-color': '#39c'}); }, 
-	//		function(){ $(this).css({'background-color': '#ffe1b5'});}
-	//	);
-	
 	
 		// delete button behavior
 		$(".delete").click(function(){
@@ -383,6 +376,10 @@ function loadAddItem(edit_id){
 		$("#action").click(function(){
 			submitForm($list_users);
 		});
+
+		$("#cancel").click(function(){
+			loadItemList();
+		});	
 		
 		// fill in today's date for purchase field
 		var currentTime = new Date()

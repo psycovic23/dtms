@@ -1,50 +1,52 @@
-<h1>what was it?</h1>
-<input type="text" id="name">
-<br><br>
-<div id="hideable">
-<h1>how much was it?</h1>
-
-<span style="font-family:georgia; font-size:16pt;">$</span><input type="text" id="price">
-</div>
-<a id="advanced">advanced selection</a>
-
-<br><br>
-<div id="expanded_section">
-	<div id="expanded_buyers">
-		<h1>how much did the buyers spend?</h1>
-		<table>
-			{% for x in names%}
-			<tr>
-				<td>{{ x }}: </td><td><input type="text" value="0" id="{{x.id}}expanded_buyer"></td>
-			</tr>
-			{% endfor %}
-		</table>
+<div id="genericWrapper">
+	<h1>what was it?</h1>
+	<input type="text" id="name">
+	<br><br>
+	<div id="hideable">
+	<h1>how much was it?</h1>
+	
+	<span style="font-family:georgia; font-size:16pt;">$</span><input type="text" id="price">
 	</div>
-
-	<div id="expanded_users">
-		<h1>how much will each person pay?</h1>
-		<table>
-			{% for x in names%}
-			<tr>
-				<td>{{ x }}: </td><td><input type="text" value="0" id="{{x.id}}expanded_user"></td>
-			</tr>
-			{% endfor %}
-		</table>
+	<a id="advanced">advanced selection</a>
+	
+	<br><br>
+	<div id="expanded_section">
+		<div id="expanded_buyers">
+			<h1>how much did the buyers spend?</h1>
+			<table>
+				{% for x in names%}
+				<tr>
+					<td>{{ x }}: </td><td><input type="text" value="0" id="{{x.id}}expanded_buyer"></td>
+				</tr>
+				{% endfor %}
+			</table>
+		</div>
+	
+		<div id="expanded_users">
+			<h1>how much will each person pay?</h1>
+			<table>
+				{% for x in names%}
+				<tr>
+					<td>{{ x }}: </td><td><input type="text" value="0" id="{{x.id}}expanded_user"></td>
+				</tr>
+				{% endfor %}
+			</table>
+		</div>
 	</div>
+	
+	<div id="basic_users">
+		<h1>who's using it?</h1>
+		<ul id="list_users">
+			{% for x in names %}
+			<li class="option_text" id="{{x.id}}option">{{ x }}</li>
+			{% endfor %}
+		</ul>
+	</div>
+	<br>
+	<h3>purchase date</h3> <input type="text" id="purch_date" size="10">
+	<h3>tag</h3> <input type="text" id="tags">
+	<input style="display:none" type="text" id="sub_tag">
+	<h1>any comments about it?</h1>
+	<span style="color:#eee">a</span><textarea id="comments" rows="6" cols="40"></textarea><br><br>
+	<a id="action">submit</a><a id="cancel" class="jqmClose">cancel</a>
 </div>
-
-<div id="basic_users">
-	<h1>who's using it?</h1>
-	<ul id="list_users">
-		{% for x in names %}
-		<li class="option_text" id="{{x.id}}option">{{ x }}</li>
-		{% endfor %}
-	</ul>
-</div>
-<br>
-<h3>purchase date</h3> <input type="text" id="purch_date" size="10">
-<h3>tag</h3> <input type="text" id="tags">
-<input style="display:none" type="text" id="sub_tag">
-<h1>any comments about it?</h1>
-<span style="color:#eee">a</span><textarea id="comments" rows="6" cols="40"></textarea><br><br>
-<a id="action">submit</a><a id="cancel" class="jqmClose">cancel</a>

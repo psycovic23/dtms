@@ -1,101 +1,117 @@
-{% ifequal empty "0" %}
-<div id="titlebar">
-	<span class="header">{{ category.0 }} to {{ category.1 }}</span>
-	<a id="showAnalysis">&nbsp a</a>
-	<a id="houseMode">house</a>
-</div>
-<br>
-
-{% ifequal houseMode "0" %}
-<div id="moneyStatus">
-	<div class="ind_balance">
-		{% ifequal list.ind_sign 'p' %}
-		<span class="pos">+{{ list.ind_balance|floatformat:2 }}</span>
-		{% endifequal %}
-		{% ifnotequal list.ind_sign 'p' %}
-		<span class="neg">{{ list.ind_balance|floatformat:2 }}</span>
-		{% endifnotequal %}
-	</div>
-
-	<table>
-
-	{% for x in list.ind_will_pay %}
-	<tr><td>you owe {{ x.4 }}</td><td> {{ x.2|floatformat:2 }}</td></tr>
-	{% endfor %}
-
-	{% for x in list.ind_expects %}
-	<tr><td>{{x.3}} pays </td><td>{{ x.2|floatformat:2 }}</td></tr>
-	{% endfor %}
-	</table>
-</div>
-{% endifequal %}
-
-
-
-{% ifequal houseMode "1" %}
-<div id="houseModeInfo">
-	<div style="float:left">
-		<table>
-	{% for x in list.names_and_balances %}
-	<tr><td class="hoverable">{{ x.0 }}</td><td> {{ x.1|floatformat:2 }}</td></tr>
-	{% endfor %}
-		</table>
-	</div>
-	<div style="float:right">
-		<table>
-		{% for x in list.transactions %}
-		<tr><td>{{ x.3 }} owes {{ x.4 }}</td><td> {{ x.2|floatformat:2 }}</td></tr>
-		{% endfor %}
-		</table>
-	</div>
-	<br>
-</div>
-
-{% endifequal %}
-
-<div id="tagList">
-<span class="gray">tags: &nbsp</span>
-	{% for t in tags %}
-	<a class="tagNames">{{ t.name }}</a>
-	{% endfor %}
-	<a class="tagNames">all</a>
-</div>
-
-<br>
-
-<div id="graph">
-</div>
-{% endifequal %}
-
-{% ifequal empty "1" %}
-<h1> no items!</h1>
-{% endifequal %}
-
-<div id="list">
-	{% for x in items %}
-	<div class="item" id= "{{ x.id }}list">
-		<span class="item_name">{{ x.name }}&nbsp;</span><span class="price"> | ${{x.price|floatformat:2}} </span>
-		{% ifequal category.1 "current" %}
-		<a class="delete">d</a>
-		<a class="edit">e</a>
-		{% endifequal %}
-		<span class="purch_date">{{ x.purch_date|date:"m/d" }}</span>
-		<span class="buyers">{{x.shortDisplayBuyers}}</span>
-		<span class="tag">{{ x.tag }}</span>
-		<br>
-		<div class="item_description">
-			buyers:
-			{% for t in x.listBuyers %}
-			<span class="people">{{ t.buyer.name }} (${{ t.payment_amount }})</span>
-			{% endfor %}
-			<br>
-			users:
-			{% for t in x.listUsers %}
-			<span class="people">{{ t.user.name }} (${{ t.payment_amount }})</span>
-			{% endfor %}
-			<br>
-			<span class="comments">{{ x.comments }}</span>
+<div id="topblock">
+	{% ifequal empty "0" %}
+		<div id="titlebar">
+			<span class="header">{{ category.0 }} to {{ category.1 }}</span>
+			<a id="showAnalysis">&nbsp a</a>
+			<a id="houseMode">house</a>
 		</div>
+		<br>
+		
+		{% ifequal houseMode "0" %}
+		<div id="moneyStatus">
+			<div class="ind_balance">
+				{% ifequal list.ind_sign 'p' %}
+					<span class="pos">+{{ list.ind_balance|floatformat:2 }}</span>
+				{% endifequal %}
+				{% ifnotequal list.ind_sign 'p' %}
+					<span class="neg">{{ list.ind_balance|floatformat:2 }}</span>
+				{% endifnotequal %}
+			</div>
+		
+			<table>
+		
+				{% for x in list.ind_will_pay %}
+				<tr><td>you owe {{ x.4 }}</td><td> {{ x.2|floatformat:2 }}</td></tr>
+				{% endfor %}
+		
+				{% for x in list.ind_expects %}
+				<tr><td>{{x.3}} pays </td><td>{{ x.2|floatformat:2 }}</td></tr>
+				{% endfor %}
+			</table>
+			<div id="graph">
+			</div>
+			<div style="clear:both"></div>
+		</div>
+		{% endifequal %}
+		
+		
+		
+		{% ifequal houseMode "1" %}
+		<div id="moneyStatus">
+			<div style="float:left">
+				<table>
+					{% for x in list.names_and_balances %}
+					<tr><td class="hoverable">{{ x.0 }}</td><td> {{ x.1|floatformat:2 }}</td></tr>
+					{% endfor %}
+				</table>
+			</div>
+			<div style="float:right">
+				<table>
+					{% for x in list.transactions %}
+					<tr><td>{{ x.3 }} owes {{ x.4 }}</td><td> {{ x.2|floatformat:2 }}</td></tr>
+					{% endfor %}
+				</table>
+			</div>
+			<div style="clear:both"></div>
+			<div id="graph">
+			</div>
+			<br>
+		</div>
+		{% endifequal %}
+	{% endifequal %}
+
+	{% ifequal empty "1" %}
+		<h1> no items!</h1>
+	{% endifequal %}
+
+</div>
+
+<div id="bottomblock">
+	<div id="tagList">
+		<span class="gray">tags: &nbsp</span>
+		{% for t in tags %}
+			<a class="tagNames">{{ t.name }}</a>
+		{% endfor %}
+		<a class="tagNames">all</a>
+	</div>
+	
+	<br>
+	
+	
+
+	<div id="list">
+		{% for x in items %}
+		<div class="item" id= "{{ x.id }}list">
+			<span class="item_name">{{ x.name }}&nbsp;</span><span class="price"> | ${{x.price|floatformat:2}} </span>
+			{% ifequal category.1 "current" %}
+			<a class="delete">d</a>
+			<a class="edit">e</a>
+			{% endifequal %}
+			<span class="purch_date">{{ x.purch_date|date:"m/d" }}</span>
+			<span class="buyers">{{x.shortDisplayBuyers}}</span>
+			<span class="tag">{{ x.tag }}</span>
+			<br>
+			<div class="item_description">
+				<div style="float:left;">
+					buyers:
+					<table>
+						{% for t in x.listBuyers %}
+						<tr><td>{{ t.buyer.name }}</td><td>${{ t.payment_amount }}</td></tr>
+						{% endfor %}
+					</table>
+				</div>
+				<div style="float:right;">
+					users:
+					<table>
+						{% for t in x.listUsers %}
+						<tr><td>{{ t.user.name }}</td><td>${{ t.payment_amount }}</td></tr>
+						{% endfor %}
+					</table>
+				</div>
+				<span class="comments">{{ x.comments }}</span>
+				<div style="clear:both;"></div>
+			</div>
+		</div>
+		{% endfor %}
 	</div>
 </div>
-{% endfor %}

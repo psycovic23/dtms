@@ -26,13 +26,18 @@ h3 {
 }
 
 #rightPanel {
+	display: none;
+}
+#topblock, #bottomblock, #genericWrapper{
 	border: 1px solid #999;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	width: 600px;
 	padding:10px;
-	display: none;
 	background-color: #fff;
+}
+#bottomblock {
+	margin-top: 20px;
 }
 
 #titlebar {
@@ -140,6 +145,7 @@ h3 {
 
 
 /* styles for the list of items that comes from /list */
+
 .tagNames {
 	cursor: pointer;
 	padding:2px 5px;
@@ -149,30 +155,22 @@ h3 {
 	float:right;
 }
 
-#houseModeInfo {
+#moneyStatus {
 	width: 400px;
 	margin: auto;
 	clear: both;
 }
 
 
-#moneyStatus {
-	margin-left: auto;
-	margin-right: auto;
-	width: 400px;
-}
-
 #tagList {
 	width: 400px;
 	clear: both;
-}
-.payText {
-	float:right;
 }
 
 .ind_balance {
 	font-size: 35pt;
 	float:left;
+	clear:both;
 }
 
 .pos {
@@ -197,15 +195,15 @@ h3 {
 }
 
 .item { 
-	padding-top:3px;
-	padding-bottom: 3px;
+	padding: 3px;
+	margin: 7px 0px;
 	width: 600px; 
 	cursor: pointer;
 }
 
 .item_description {
-	width: 600px;
-	background-color: #eee;
+	margin: auto;
+	width: 400px;
 }
 
 .item_name {
@@ -236,6 +234,6 @@ td {
 table {
 	border: 1px #000 solid;
 }
-#houseModeInfo table, #moneyStatus table {
-	float:right;
+#moneyStatus table {
+	float: right;
 }
