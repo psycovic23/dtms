@@ -101,9 +101,10 @@ def showArchives(request):
 
 def index(request):
     try:
+        request.session['user_id']
+    except:
         return login(request)
     else:
-        request.session['user_id']
         return render_to_response('index.html', {"names":
                                              User.objects.filter(house_id=request.session['house_id']),
                                              "house_id":
