@@ -92,11 +92,12 @@
 			<span class="tag">{{ x.tag }}</span>
 			<br>
 			<div class="item_description">
+				<br>
 				<div style="float:left;">
 					buyers:
 					<table>
 						{% for t in x.listBuyers %}
-						<tr><td>{{ t.buyer.name }}</td><td>${{ t.payment_amount }}</td></tr>
+						<tr><td>{{ t.buyer.name }}</td><td>${{ t.payment_amount|floatformat:2 }}</td></tr>
 						{% endfor %}
 					</table>
 				</div>
@@ -104,12 +105,12 @@
 					users:
 					<table>
 						{% for t in x.listUsers %}
-						<tr><td>{{ t.user.name }}</td><td>${{ t.payment_amount }}</td></tr>
+						<tr><td>{{ t.user.name }}</td><td>${{ t.payment_amount|floatformat:2 }}</td></tr>
 						{% endfor %}
 					</table>
 				</div>
-				<span class="comments">{{ x.comments }}</span>
 				<div style="clear:both;"></div>
+				<span class="comments">{{ x.comments }}</span>
 			</div>
 		</div>
 		{% endfor %}

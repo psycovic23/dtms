@@ -204,6 +204,8 @@ h3 {
 .item_description {
 	margin: auto;
 	width: 400px;
+	border-bottom: 1px #181818 dashed;
+	padding: 5px 10px;
 }
 
 .item_name {
