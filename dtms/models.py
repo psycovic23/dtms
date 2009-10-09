@@ -86,7 +86,8 @@ class Item_list:
             self.ind_sign = 'n'
     
         # while array is non zero
-        while len([p for p in balance_sum if balance_sum[p] != 0]) > .01:
+        pdb.set_trace()
+        while len([p for p in balance_sum if balance_sum[p] < .01]) != 0:
     
             # owes = [key, amount]
             owes = min([(val, key) for (key, val) in balance_sum.items()])
