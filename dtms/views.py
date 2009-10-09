@@ -258,9 +258,12 @@ def delete_item(request):
 
 def login(request):
     # add in recovery from failed attempt
-    request.session['house_id'] = ''
-    request.session['user_id'] = ''
     if not request.POST:
+        try:
+            del request.session['house_id']
+            del request.session['user_id']
+        except:
+            pass
         return render_to_response('login.html', {}, 
                               context_instance = RequestContext(request))
     else:
