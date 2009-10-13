@@ -211,10 +211,8 @@ function loadItemList(args){
 		// load analysis button
 		$("#showAnalysis").toggle(function(){
 			$("#graph").slideDown('slow');
-			$("#tagList").slideUp();
 			$(this).val('hide analysis')
 		}, function(){
-			$("#tagList").slideDown();
 			$("#graph").slideUp('slow');
 			$(this).val('show analysis');
 		});
@@ -293,6 +291,8 @@ function submitForm(list_users){
 	var str= $("#purch_date").val();
 	var d = str.split("/");
 	var tag;
+	$('#action').unbind('click');
+
 
 	if ($("#tags").val() == '')
 		tag = "Uncategorized";
@@ -333,7 +333,7 @@ function submitForm(list_users){
 	data = $.extend(data, {'expanded_buyers': getArrayFromInputFields("expanded_buyers")});
 	data = $.extend(data, {'expanded_users': getArrayFromInputFields("expanded_users")});
 
-	if (sum(getArrayFromInputFields("expanded_buyers")) == sum(getArrayFromInputFields("expanded_users"))){
+	if (sum(getArrayFromInputFields("expanded_buyers")) == Math.round(sum(getArrayFromInputFields("expanded_users"))*100)/100){
 		var c = JSON.stringify(data);
 	
 		$.ajax({

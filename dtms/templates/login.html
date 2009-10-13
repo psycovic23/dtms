@@ -47,8 +47,9 @@
     </script>
     <style type="text/css">
     body {
-        font-family: georgia;
+        font-family: Georgia, Serif;
         font-size: 20pt;
+		background-color: #181818;
     }
     
     .messagebox {
@@ -81,24 +82,27 @@
     }
 
     #container {
-        margin:100px auto;
-        height:500px;
-        width:500px;
-        background:#eee;
-        border:1px #000 solid;
-        text-align:center;
-    }
+		border: 1px solid #999;
+		-moz-border-radius: 5px;
+		-webkit-border-radius: 5px;
+		width: 400px;
+		padding:10px;
+		margin: 200px auto;
+		background-color: #fff;
+}
     </style>
 </head>
 
 <body>
-    <div id="container"><br><br><br><br>
-    <form method="post" action="" id="login_form" />
-        house name<br>
-    <input name="username" type="text" id="username" value="" maxlength="20" /><br><br>
-        password<br>
-      <input name="password" type="password" id="password" value="" maxlength="20" /><br>
-      <input name="Submit" type="submit" id="submit" value="Login" />
+    <div id="container">dtms<br><br>
+		<div style="text-align: center">
+    		<form method="post" action="" id="login_form" />
+    		    username<br>
+    		<input name="username" type="text" id="username" value="" maxlength="20" /><br><br>
+    		    password<br>
+    		  <input name="password" type="password" id="password" value="" maxlength="20" /><br>
+    		  <input name="Submit" type="submit" id="submit" value="Login" />
+		</div>
     </form>
     <br>
     <span id="msgbox" style="display:none"></span>
