@@ -25,9 +25,11 @@ def list(request, a_num=0, houseMode=0):
         items = items.distinct()
 
     # throw items into Item_list for all the methods in the class Item_list
+    # workaround for the user/house bug where transactions were based on the
+    # viewed list, as opposed to the entire house
     itemlist = Item_list(list=items,
                   house_id=request.session['house_id'],
-                  user_id=request.session['user_id'])
+                  user_id=request.session['user_id'], archive_id=a_num)
 
     # get a list of tags
     tags = set([])

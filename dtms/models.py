@@ -15,10 +15,12 @@ class User(models.Model):
 
 class Item_list:
 
-    def __init__(self, list = None, house_id = None, user_id = None):
+    def __init__(self, list = None, house_id = None, user_id = None,
+                 archive_id = None):
         self.list = list
         self.house_id = house_id
         self.uid = int(user_id)
+        self.archive_id = archive_id
         self.gen_balancing_transactions()
 
     def ret_list(self):
@@ -52,6 +54,7 @@ class Item_list:
         self.will_pay = {}
         self.expects = {}
         self.sign = {}
+        new_list = Item.objects.filter(house_id=self.house_id).filter(archive_id=self.archive_id)
 
         users = User.objects.filter(house_id=self.house_id)
         balance_sum = {}
@@ -59,12 +62,13 @@ class Item_list:
             balance_sum[a.id] = 0
     
         # add in how much users owe
-        for i in self.list:
+        for i in new_list:
             for e in i.user_item_rel_set.all():
                 balance_sum[e.user.id] += e.payment_amount * -1
 
+
         # subtract out how much buyers paid
-        for i in self.list:
+        for i in new_list:
             for e in i.buyer_item_rel_set.all():
                 balance_sum[e.buyer.id] += e.payment_amount
 
@@ -111,6 +115,7 @@ class Item_list:
 
         self.ind_will_pay = [p for p in transactions if p[0] == self.uid]
         self.ind_expects = [p for p in transactions if p[1] == self.uid]
+
 
         
         self.names_and_balances = {}
