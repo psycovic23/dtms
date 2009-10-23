@@ -8,8 +8,8 @@
 	<script type="text/javascript" src="jqModal.js"></script>
 	<script type="text/javascript" src="javascript.js"></script>
 	<script type="text/javascript" src="jquery.flot.js"></script>
-	<script type="text/javascript" src="jquery.flot.pie.js"></script>
 	<script type="text/javascript" src="jquery.autocomplete.js"></script>
+	<script type="text/javascript" src="jqModal.js"></script>
 	<link rel="stylesheet" type="text/css" href="reset-fonts-grids.css">
 	<link rel="stylesheet" type="text/css" href="base.css">
 	<link type="text/css" href="style.css" rel="Stylesheet" />
@@ -20,8 +20,8 @@
 	<script type="text/javascript" src="../static/jqModal.js"></script>
 	<script type="text/javascript" src="../static/javascript.js"></script>
 	<script type="text/javascript" src="../static/jquery.flot.js"></script>
-	<script type="text/javascript" src="../static/jquery.flot.pie.js"></script>
 	<script type="text/javascript" src="../static/jquery.autocomplete.js"></script>
+	<script type="text/javascript" src="../static/jqModal.js"></script>
 	<link rel="stylesheet" type="text/css" href="../static/reset-fonts-grids.css">
 	<link rel="stylesheet" type="text/css" href="../static/base.css">
 	<link type="text/css" href="../static/style.css" rel="Stylesheet" />
@@ -51,7 +51,7 @@
 		<div id="yui-b">
 			<div id="leftMenu">
 				<ul>
-					<li><a id="new_cycle">new cycle</a></li>
+					<li><a class="jqModal" id="newCycleMenu">new cycle</a></li>
 					<li><a id="add_item">add item</a></li>
 					<li><a id="loadItemList">item list</a></li>
 					<li><a id="showArchives">show archives</a></li>
@@ -63,6 +63,11 @@
 	<div id="ft">
 		<!-- PUT FOOTER CODE HERE -->
 	</div>
+</div>
+<div class="jqmWindow" id="clearCyclePopup">
+	are you sure you want to clear this cycle?<br>
+	<a id="confirmClearCycle" class="jqmClose">yes</a>
+	<a class="jqmClose">no</a>
 </div>
 </body>
 </html>

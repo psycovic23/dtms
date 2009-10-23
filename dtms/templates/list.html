@@ -80,7 +80,7 @@
 	
 
 	<div id="list">
-		{% for x in items %}
+		{% for x in list.ret_user_list %}
 		<div class="item" id= "{{ x.id }}list">
 			<span class="item_name">{{ x.name }}&nbsp;</span><span class="price"> | ${{x.price|floatformat:2}} </span>
 			{% ifequal category.1 "current" %}

@@ -25,6 +25,23 @@ h3 {
 
 /* layout business */
 
+.jqmWindow {
+    display: none;
+    
+    position: fixed;
+    top: 17%;
+    left: 50%;
+    
+    width: 170px;
+    
+    background-color: #EEE;
+    color: #333;
+    border: 1px solid black;
+    padding: 12px;
+}
+
+.jqmOverlay { background-color: #000; }
+
 #rightPanel {
 	display: none;
 }
@@ -46,7 +63,7 @@ h3 {
 	width:400px;
 	margin-left: auto;
 	margin-right: auto;
-	border-bottom: 1px #000 dashed;
+	border-bottom: 1px #ccc solid;
 	padding-left: 40px;
 	padding-right: 40px;
 	text-align: center;

@@ -501,6 +501,7 @@ function loadArchives(){
 }
 
 $(document).ready(function(){
+	$('#clearCyclePopup').jqm();
 
 //---------------- JS code for index page -------------------
 
@@ -509,7 +510,7 @@ $(document).ready(function(){
 
 	// button calls
 
-	$("#new_cycle").click(function(){
+	$("#confirmClearCycle").click(function(){
 		loadClearCycle();
 	});
 

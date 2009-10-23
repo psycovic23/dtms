@@ -49,12 +49,20 @@ class Item_list:
             counter = counter + 1
         return json.dumps(ret_obj)
         
+    def ret_user_list(self):
+        # find anything that you bought or used
+        t = self.list.filter(user_item_rel__user__exact=User.objects.get(id=self.uid))
+        y = self.list.filter(buyer_item_rel__buyer__exact=User.objects.get(id=self.uid))
+        items = t | y
+        items = items.distinct()
+        return items
+
+
     def gen_balancing_transactions(self):
         balances = {}
         self.will_pay = {}
         self.expects = {}
         self.sign = {}
-        new_list = Item.objects.filter(house_id=self.house_id).filter(archive_id=self.archive_id)
 
         users = User.objects.filter(house_id=self.house_id)
         balance_sum = {}
@@ -62,13 +70,13 @@ class Item_list:
             balance_sum[a.id] = 0
     
         # add in how much users owe
-        for i in new_list:
+        for i in self.list:
             for e in i.user_item_rel_set.all():
                 balance_sum[e.user.id] += e.payment_amount * -1
 
 
         # subtract out how much buyers paid
-        for i in new_list:
+        for i in self.list:
             for e in i.buyer_item_rel_set.all():
                 balance_sum[e.buyer.id] += e.payment_amount
 

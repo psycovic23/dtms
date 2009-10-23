@@ -6,23 +6,14 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext, Template, Context
 from django.template.loader import get_template
 from django.utils import simplejson as json
-import operator, decimal
-import pdb
+import operator, decimal, pdb
+from operator import eq
 from mysite.dtms.models import *
-#from mysite.dtms.item_list import *
 
 
 def list(request, a_num=0, houseMode=0):
 
     items = Item.objects.filter(house_id=request.session['house_id']).filter(archive_id=a_num)
-
-    # for self mode
-    if houseMode == "0":
-        # find anything that you bought or used
-        t = items.filter(user_item_rel__user__exact=User.objects.get(id=request.session['user_id']))
-        y = items.filter(buyer_item_rel__buyer__exact=User.objects.get(id=request.session['user_id']))
-        items = t | y
-        items = items.distinct()
 
     # throw items into Item_list for all the methods in the class Item_list
     # workaround for the user/house bug where transactions were based on the
@@ -38,17 +29,17 @@ def list(request, a_num=0, houseMode=0):
 
     # generate strings to show what time period/archive category we're in
     arch = Item.objects.filter(archive_id=a_num).order_by('purch_date')
-    if len(arch) != 0:
+    if arch:
         if a_num == '0':
-            category = ([str(arch[0].purch_date.strftime('%b %d, %Y')), "current"])
+            category = ([arch[0].purch_date.strftime('%b %d, %Y'), "current"])
         else:
-            category = ([str(arch[0].purch_date.strftime('%b %d, %Y')),
-                         str(arch[len(arch)-1].purch_date.strftime('%b %d, %Y'))])
+            category = ([arch[0].purch_date.strftime('%b %d, %Y'),
+                         arch[len(arch)-1].purch_date.strftime('%b %d, %Y')])
     else:
         category = [' ', 'no items!']
 
     t = get_template('list.html')
-    if len(items) == 0:
+    if not items:
         empty = "1"
     else:
         empty = "0"
