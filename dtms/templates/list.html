@@ -3,13 +3,14 @@
 		<div id="titlebar">
 			<span class="header">{{ category.0 }} to {{ category.1 }}</span>
 			<a id="showAnalysis">&nbsp a</a>
-			<a id="houseMode">house</a>
+			<a id="houseMode">h</a>
 		</div>
 		<br>
 		
 		{% ifequal houseMode "0" %}
 		<div id="moneyStatus">
 			<div class="ind_balance">
+				<span style="margin-left: 45px" class="gray">your balance</span><br>
 				{% ifequal list.ind_sign 'p' %}
 					<span class="pos">+{{ list.ind_balance|floatformat:2 }}</span>
 				{% endifequal %}
@@ -18,6 +19,7 @@
 				{% endifnotequal %}
 			</div>
 		
+			<span class="gray" style="float:right;">transactions</span><br>
 			<table>
 		
 				{% for x in list.ind_will_pay %}
@@ -76,9 +78,13 @@
 	</div>
 	
 	<br>
-	
-	
+	{% ifequal houseMode "1" %}
+	<span style="margin-left: 8px;" class="gray">house items | item cost</span>
+	{% endifequal %}
 
+	{% ifequal houseMode "0" %}
+	<div style="margin-left: 8px;" class="gray">your items | amount you pay</div>
+	{% endifequal %}
 	<div id="list">
 		{% for x in list.ret_list %}
 		<div class="item" id= "{{ x.id }}list">

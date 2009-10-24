@@ -182,13 +182,41 @@ function loadItemList(args){
 
 		// load graph data and hide the div
 		var graphdata = JSON.parse(data['graphData']);
-		$.plot($("#graph"), graphdata,  {xaxis: {autoscaleMargin: .5, ticks: 0}, yaxis: {autoscaleMargin: .5}, grid: {hoverable: true, clickable: true}, bars: {show: true} }); 
+	    function showTooltip(x, y, contents) {
+	        $('<div id="tooltip">' + contents + '</div>').css( {
+	            position: 'absolute',
+	            display: 'none',
+	            top: y + 5,
+	            left: x + 5,
+	            border: '1px solid #fdd',
+	            padding: '2px',
+	            'background-color': '#fee',
+	            opacity: 0.80
+	        }).appendTo("body").fadeIn(600);
+	    }
+
+		$.plot($("#graph"), graphdata, {
+			xaxis: {autoscaleMargin: .5, ticks: 0}, 
+			yaxis: {autoscaleMargin: .5}, 
+			grid: {hoverable: true, clickable: true}, 
+			bars: {show: true},
+			legend: { show: false }
+		}); 
 
 		// potential bug - if tags have overlapping text, it filters incorrectly
 		$("#graph").bind("plotclick", function(event, pos, item){
 			if ($("span.tag:contains('" + item.series.label + "')").length != 0){
 				$("span.tag:contains('" + item.series.label + "')").parent().slideDown();
 				$("span.tag:not(:contains('" + item.series.label + "'))").parent().slideUp();
+			}
+		}).bind("plothover", function(event, pos, item){
+			if (item){
+				var x = item.datapoint[0].toFixed(2), 
+					y = item.datapoint[1].toFixed(2);
+				showTooltip(item.pageX, item.pageY,
+					item.series.label + ": $" + y );
+			} else {
+				$("#tooltip").remove();
 			}
 		});
 
@@ -227,11 +255,14 @@ function loadItemList(args){
 		});
 
 
+		// this is for clicking on names in house mode and highlighting items
 		$("td.hoverable").click(function(){
 			if (options['houseMode'] == 1){
 				if ($(".item:contains('" + $(this).html() + "')").length != 0){
-					$(".item:contains('" + $(this).html() + "')").slideDown();
-					$(".item:not(:contains('" + $(this).html() + "'))").slideUp();
+					$(".item:contains('" + $(this).html() + "')")
+						.css({'backgroundColor': '#ffc97c'});
+					$(".item:not(:contains('" + $(this).html() + "'))")
+						.css({'backgroundColor': '#fff'});
 				}
 			}
 		}).hover(
@@ -305,7 +336,7 @@ function submitForm(list_users){
 		'price': $("#price").val(),
 		'buyer': 1,
 		'comments': $("#comments").val(),
-		'tags': tag,
+		'tags': tag.toLowerCase(),
 		'sub_tag': $("#sub_tag").val(),
 		'archive_id': 0,
 	};

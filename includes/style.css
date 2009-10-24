@@ -27,12 +27,10 @@ h3 {
 
 .jqmWindow {
     display: none;
-    
-    position: fixed;
+    position: absolute;
 
     top: 17%;
-	margin-left: auto;
-	margin-right: auto;
+	margin-left: 33%;
     width: 170px;
     
     background-color: #fff;
@@ -178,7 +176,7 @@ h3 {
 }
 
 #moneyStatus {
-	width: 400px;
+	width: 500px;
 	margin: auto;
 	clear: both;
 }
@@ -212,7 +210,7 @@ h3 {
 	font-size: 15pt;
 }
 .gray {
-	color: #999;
+	color: #666;
 	font-size:10pt;
 }
 
