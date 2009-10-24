@@ -2,25 +2,37 @@
 <head>
 	{% ifequal MEDIA_URL "localhost" %}
 	<script type="text/javascript" src="jquery.js"></script>
+	<link rel="stylesheet" type="text/css" href="extra_styles.css">
 	{% endifequal %}
 	{% ifnotequal MEDIA_URL "localhost" %}
 	<script type="text/javascript" src="{{ MEDIA_URL }}/jquery.js"></script>
+	<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/extra_styles.css">
 	{% endifnotequal %}
 
 	<script type="text/javascript">
 
 	$(document).ready(function(){
+		$('#num_people').change(function(){
+			for (var i = 0; i < $(this).val(); i++){
+				$(this).after('<br><input type="text" id="' + i + 'name" class="name_input">');
+			}
+			$(this).after('<br><br><span class="name_input">enter their names here</span><br>');
+		});
+
 		$("#submit").click(function(){
 			var d = {};
-			d.name = $("#username").val();
-			d.email = $("#email").val();
+			d.house_name = $("#house_name").val();
+			d.users = [];
+			$('.name_input:input').each(function(){
+				d.users.push($(this).val());
+			})
 			d.password = $("#password").val();
-			d.house_id = $("#house_id").val();
 			
 			$.ajax({
 				url: '/dtms/adduser',
 				type: 'POST',
-				data: d,
+				data: {'d': JSON.stringify(d)},
+				dataType: 'json',
 				success: function(responseData){
 					console.log('success');
 				},
@@ -30,26 +42,28 @@
 			});
 
 		});
+		$("#reset").click(function(){
+				$(".name_input").remove();
+				$("#num_people").val("");
+		});
 	});
 	</script>
 
 </head>
 <body>
-		{% if success %}
-		<p>success</p>
-		{% endif %}
-		<p>username</p>
-		<input type="text" id="username"><br>
-		
-		<p>email</p>
-		<input type="text" id="email"><br>
+    <div id="container">dtms - create user <br><br>
+		<div style="text-align: center">
+			<p>choose a house name</p>
+			<input type="text" id="house_name"><br>
+			
+			<p>how many people live in your house?</p>
+			<input name="num_people" type="text" id="num_people"><br><br>
 
-		<p>house id</p>
-		<input type="text" id="house_id"><br>
-		<p>password</p>
-		<input type="password" id="password"><br>
-		<input type="button" id="submit" value="submit"><br>
-
-	<div id="content"></div>
+			<p>choose a group password</p>
+			<input type="password" id="password"><br>
+			<input type="button" id="submit" value="submit">
+			<input type="button" id="reset" value="reset form">
+		</div>
+	</div>
 </body>
 </html>

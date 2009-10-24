@@ -57,10 +57,18 @@ def list(request, a_num=0, houseMode=0):
 
 def adduser(request):
     if not request.POST:
-        return render_to_response('adduser.html', {'success': False})
+        return render_to_response('adduser.html', {'success': False},
+                              context_instance = RequestContext(request))
     else:
-        u = User(name=request.POST['name'], email=request.POST['email'], house_id=request.POST['house_id'], password=request.POST['password'])
-        u.save()
+        nextHID = User.objects.order_by('-house_id')[0].house_id + 1
+        d = json.loads(request.POST['d'])
+        for t in d['users']:
+            u = User(name=t,
+                     house_name=d['house_name'], 
+                     house_id=nextHID, 
+                     password=d['password'])
+            u.save()
+
         return HttpResponse('success')
 
 def addItemPage(request):
@@ -142,7 +150,7 @@ def add_item(request):
             purch_date      = p_d,
             price           = x['price'], 
             comments        = x['comments'], 
-            house_id        = x['house_id'], 
+            house_id        = request.session['house_id'],
             archive_id      = 0, 
             tag             = t, 
             sub_tag         = x['sub_tag']
@@ -261,7 +269,8 @@ def login(request):
                               context_instance = RequestContext(request))
     else:
         try:
-            m = User.objects.get(name=request.POST.get('username'))        
+            m = User.objects.filter(house_name=request.POST.get('house_name')) \
+                                    .get(name=request.POST.get('username'))        
         except:
             return HttpResponse('no')
 

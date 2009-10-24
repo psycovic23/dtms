@@ -8,6 +8,7 @@ class User(models.Model):
     name        = models.CharField(max_length=30)
     email       = models.EmailField(max_length=75)
     house_id    = models.PositiveIntegerField()
+    house_name  = models.CharField(max_length=30)
     password    = models.CharField(max_length=50)
 
     def __unicode__(self):

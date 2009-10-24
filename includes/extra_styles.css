@@ -1,0 +1,44 @@
+body {
+    font-family: Georgia, Serif;
+    font-size: 20pt;
+	background-color: #181818;
+}
+
+.messagebox {
+     position:absolute;
+     width:auto;
+     margin-left:30px;
+     border:1px solid #c93;
+     background:#ffc;
+     padding:3px;
+}
+.messageboxok {
+     position:absolute;
+     width:auto;
+     margin-left:30px;
+     border:1px solid #349534;
+     background:#C9FFCA;
+     padding:3px;
+     font-weight:bold;
+     color:#008000;
+}
+.messageboxerror {
+     position:absolute;
+     width:auto;
+     margin-left:30px;
+     border:1px solid #CC0000;
+     background:#F7CBCA;
+     padding:3px;
+     font-weight:bold;
+     color:#CC0000;
+}
+
+#container {
+	border: 1px solid #999;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	width: 400px;
+	padding:10px;
+	margin: 200px auto;
+	background-color: #fff;
+}

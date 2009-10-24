@@ -307,7 +307,6 @@ function submitForm(list_users){
 		'comments': $("#comments").val(),
 		'tags': tag,
 		'sub_tag': $("#sub_tag").val(),
-		'house_id': 1,
 		'archive_id': 0,
 	};
 

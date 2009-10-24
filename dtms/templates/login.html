@@ -2,9 +2,11 @@
 <head>
 	{% ifequal MEDIA_URL "localhost" %}
 	<script type="text/javascript" src="jquery.js"></script>
+	<link rel="stylesheet" type="text/css" href="extra_styles.css">
 	{% endifequal %}
 	{% ifnotequal MEDIA_URL "localhost" %}
 	<script type="text/javascript" src="{{ MEDIA_URL }}/jquery.js"></script>
+	<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/extra_styles.css">
 	{% endifnotequal %}
 
 	<script type="text/javascript">
@@ -19,6 +21,7 @@
 					data: {  
 						username:$('#username').val(),
 						password:$('#password').val(),
+						house_name:$('#house_name').val()
 					},
 	            	success: function(data) {
 	                	if(data=='yes'){
@@ -45,58 +48,14 @@
     });
     
     </script>
-    <style type="text/css">
-    body {
-        font-family: Georgia, Serif;
-        font-size: 20pt;
-		background-color: #181818;
-    }
-    
-    .messagebox {
-         position:absolute;
-         width:auto;
-         margin-left:30px;
-         border:1px solid #c93;
-         background:#ffc;
-         padding:3px;
-    }
-    .messageboxok {
-         position:absolute;
-         width:auto;
-         margin-left:30px;
-         border:1px solid #349534;
-         background:#C9FFCA;
-         padding:3px;
-         font-weight:bold;
-         color:#008000;
-    }
-    .messageboxerror {
-         position:absolute;
-         width:auto;
-         margin-left:30px;
-         border:1px solid #CC0000;
-         background:#F7CBCA;
-         padding:3px;
-         font-weight:bold;
-         color:#CC0000;
-    }
-
-    #container {
-		border: 1px solid #999;
-		-moz-border-radius: 5px;
-		-webkit-border-radius: 5px;
-		width: 400px;
-		padding:10px;
-		margin: 200px auto;
-		background-color: #fff;
-}
-    </style>
 </head>
 
 <body>
     <div id="container">dtms<br><br>
 		<div style="text-align: center">
     		<form method="post" action="" id="login_form" />
+				house name<br>
+					<input name="house_name" type="text" id="house_name" value="" maxlength="30" /><br><br>
     		    username<br>
     		<input name="username" type="text" id="username" value="" maxlength="20" /><br><br>
     		    password<br>
