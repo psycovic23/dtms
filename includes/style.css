@@ -226,7 +226,7 @@ h3 {
 .item_description {
 	margin: auto;
 	width: 400px;
-	border-bottom: 1px #181818 dashed;
+	border-bottom: 1px #ccc solid;
 	padding: 5px 10px;
 }
 

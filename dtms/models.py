@@ -17,15 +17,29 @@ class User(models.Model):
 class Item_list:
 
     def __init__(self, list = None, house_id = None, user_id = None,
-                 archive_id = None):
+                 archive_id = None, houseMode = 0):
         self.list = list
         self.house_id = house_id
         self.uid = int(user_id)
         self.archive_id = archive_id
         self.gen_balancing_transactions()
+        self.houseMode = houseMode
 
     def ret_list(self):
-        return self.list 
+        if self.houseMode=='1':
+            return self.list 
+        else:
+            # find anything that you bought or used and how much you paid for it
+            t = self.list.filter(user_item_rel__user__exact=User.objects.get(id=self.uid))
+            y = self.list.filter(buyer_item_rel__buyer__exact=User.objects.get(id=self.uid))
+            items = t | y
+            items = items.distinct()
+            for t in items:
+                try: 
+                    t.price = t.user_item_rel_set.get(user=User.objects.get(id=self.uid)).payment_amount
+                except:
+                    t.price = 0
+            return items
 
     def barGraphData(self, houseMode=0):
         x = {}
@@ -50,15 +64,6 @@ class Item_list:
             counter = counter + 1
         return json.dumps(ret_obj)
         
-    def ret_user_list(self):
-        # find anything that you bought or used
-        t = self.list.filter(user_item_rel__user__exact=User.objects.get(id=self.uid))
-        y = self.list.filter(buyer_item_rel__buyer__exact=User.objects.get(id=self.uid))
-        items = t | y
-        items = items.distinct()
-        return items
-
-
     def gen_balancing_transactions(self):
         balances = {}
         self.will_pay = {}
@@ -120,12 +125,8 @@ class Item_list:
             balance_sum[expects[0]] -= amount
             balance_sum[owes[0]] += amount
 
-        
-
         self.ind_will_pay = [p for p in transactions if p[0] == self.uid]
         self.ind_expects = [p for p in transactions if p[1] == self.uid]
-
-
         
         self.names_and_balances = {}
         for u, v in zip(users, balances.items()):

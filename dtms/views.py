@@ -20,7 +20,8 @@ def list(request, a_num=0, houseMode=0):
     # viewed list, as opposed to the entire house
     itemlist = Item_list(list=items,
                   house_id=request.session['house_id'],
-                  user_id=request.session['user_id'], archive_id=a_num)
+                  user_id=request.session['user_id'], archive_id=a_num,
+                         houseMode=houseMode)
 
     # get a list of tags
     tags = set([])
@@ -44,14 +45,19 @@ def list(request, a_num=0, houseMode=0):
     else:
         empty = "0"
 
-    html = t.render(Context({"empty": empty, "uid": request.session['user_id'], "items": items,
-                           "list": itemlist, "tags": tags, "category": category,
-                             "houseMode": houseMode}))
-
     if houseMode == "1":
         graphData = itemlist.barGraphData(1)
     else:
         graphData = itemlist.barGraphData()
+
+    html = t.render(Context({"empty": empty, 
+                             "uid": request.session['user_id'], 
+                             "items": items,
+                             "list": itemlist, 
+                             "tags": tags, 
+                             "category": category,
+                             "houseMode": houseMode}))
+
     return HttpResponse(json.dumps({'html': html, 'graphData':
                                     graphData}))
 
