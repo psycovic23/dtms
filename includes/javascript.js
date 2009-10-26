@@ -181,7 +181,7 @@ function loadItemList(args){
 		});
 
 		// load graph data and hide the div
-		var graphdata = JSON.parse(data['graphData']);
+		var graphdata = eval(data['graphData']);
 	    function showTooltip(x, y, contents) {
 	        $('<div id="tooltip">' + contents + '</div>').css( {
 	            position: 'absolute',
@@ -199,8 +199,7 @@ function loadItemList(args){
 			xaxis: {autoscaleMargin: .5, ticks: 0}, 
 			yaxis: {autoscaleMargin: .5}, 
 			grid: {hoverable: true, clickable: true}, 
-			bars: {show: true},
-			legend: { show: false }
+			bars: {show: true}
 		}); 
 
 		// potential bug - if tags have overlapping text, it filters incorrectly
@@ -345,8 +344,9 @@ function submitForm(list_users){
 	if ($("#expanded_section").css('display') == "none"){
 		var uid = $("#user_id").val();
 		var p = $("#price").val();
-		var ind_p = p / list_users.number_of_selected();
-		$("#" + uid + "expanded_buyer").val(p);
+		var ind_p = Math.round(100 * p / list_users.number_of_selected())/100;
+		$("#" + uid + "expanded_buyer").val(ind_p * list_users.number_of_selected());
+		data['price'] = String(ind_p * list_users.number_of_selected()); 
 		var a = list_users.return_names();
 		for (t in a){
 			if (a[t])
