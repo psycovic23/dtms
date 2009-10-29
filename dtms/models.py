@@ -170,6 +170,8 @@ class Item(models.Model):
     comments    = models.CharField(default='',max_length=400)
     house_id    = models.IntegerField()
     
+    class Meta:
+        ordering = ['-purch_date']
 
     def shortDisplayBuyers(self):
         if len(self.buyer_item_rel_set.all()) != 1:
