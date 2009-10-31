@@ -345,7 +345,7 @@ function submitForm(list_users){
 		var uid = $("#user_id").val();
 		var p = $("#price").val();
 		var ind_p = Math.round(100 * p / list_users.number_of_selected())/100;
-		$("#" + uid + "expanded_buyer").val(ind_p * list_users.number_of_selected());
+		$("#" + uid + "expanded_buyer").val(Math.round(ind_p * list_users.number_of_selected()*100)/100);
 		data['price'] = String(ind_p * list_users.number_of_selected()); 
 		var a = list_users.return_names();
 		for (t in a){
