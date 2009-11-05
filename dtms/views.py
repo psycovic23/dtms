@@ -24,9 +24,12 @@ def list(request, a_num=0, houseMode=0):
                          houseMode=houseMode)
 
     # get a list of tags
-    tags = set([])
-    for t in items:
-        tags.add(Tag.objects.get(item__exact=t))
+    #tags = set([])
+    #for t in items:
+    #    tags.add(Tag.objects.get(item__exact=t))
+
+    tags = set([p.tag for p in items])
+
 
     # generate strings to show what time period/archive category we're in
     arch = Item.objects.filter(archive_id=a_num).order_by('purch_date')
