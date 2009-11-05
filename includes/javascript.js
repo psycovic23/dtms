@@ -250,7 +250,7 @@ function loadItemList(args){
 		else
 			$("#houseMode").html('h');
 		$("#houseMode").click(function(){
-			loadItemList({'houseMode': (options['houseMode'] + 1) % 2});
+			loadItemList({'houseMode': (options['houseMode'] + 1) % 2, 'archive_id':$("#archive_id").html()});
 		});
 
 

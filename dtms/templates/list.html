@@ -4,6 +4,7 @@
 			<span class="header">{{ category.0 }} to {{ category.1 }}</span>
 			<a id="showAnalysis">&nbsp a</a>
 			<a id="houseMode">h</a>
+			<span id="archive_id" style="display:none">{{ archive_id }}</span>
 		</div>
 		<br>
 		
@@ -88,7 +89,8 @@
 	<div id="list">
 		{% for x in list.ret_list %}
 		<div class="item" id= "{{ x.id }}list">
-			<span class="item_name">{{ x.name }}&nbsp;</span><span class="price"> | ${{x.price|floatformat:2}} </span>
+			<span class="item_name">{{ x.name }}&nbsp;</span>
+			<span class="price"> | ${{x.price|floatformat:2}} </span>
 			{% ifequal category.1 "current" %}
 			<a class="delete">d</a>
 			<a class="edit">e</a>

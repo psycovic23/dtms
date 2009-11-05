@@ -38,7 +38,7 @@ class Item_list:
                 try: 
                     t.price = t.user_item_rel_set.get(user=User.objects.get(id=self.uid)).payment_amount
                 except:
-                    t.price = 0
+                    t.price = -1 * t.buyer_item_rel_set.get(buyer=User.objects.get(id=self.uid)).payment_amount
             return items
 
     def barGraphData(self, houseMode=0):

@@ -56,7 +56,8 @@ def list(request, a_num=0, houseMode=0):
                              "list": itemlist, 
                              "tags": tags, 
                              "category": category,
-                             "houseMode": houseMode}))
+                             "houseMode": houseMode,
+                             "archive_id": a_num}))
 
     return HttpResponse(json.dumps({'html': html, 'graphData':
                                     graphData}))
