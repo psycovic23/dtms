@@ -14,14 +14,14 @@ from re import sub
 
 def list(request, a_num=0, houseMode=0):
 
-    items = Item.objects.filter(house_id=request.session['house_id']).filter(archive_id=a_num)
+    items = Item.objects.filter(house_id=1).filter(archive_id=a_num)
 
     # throw items into Item_list for all the methods in the class Item_list
     # workaround for the user/house bug where transactions were based on the
     # viewed list, as opposed to the entire house
     itemlist = Item_list(list=items,
-                  house_id=request.session['house_id'],
-                  user_id=request.session['user_id'], archive_id=a_num,
+                  house_id=1,
+                  user_id=1, archive_id=a_num,
                          houseMode=houseMode)
 
     # get a list of tags
@@ -55,7 +55,7 @@ def list(request, a_num=0, houseMode=0):
         graphData = itemlist.barGraphData()
 
     html = t.render(Context({"empty": empty, 
-                             "uid": request.session['user_id'], 
+                             "uid": 1, 
                              "items": items,
                              "list": itemlist, 
                              "tags": tags, 
@@ -89,9 +89,9 @@ def adduser(request):
 def addItemPage(request):
     t = get_template('addItem.html')
     html = t.render(Context({"names":
-                             User.objects.filter(house_id=request.session['house_id']),
-                             "user_id": request.session['user_id']}))
-    tags = Tag.objects.filter(house_id=request.session['house_id'])
+                             User.objects.filter(house_id=1),
+                             "user_id": 1}))
+    tags = Tag.objects.filter(house_id=1)
     return HttpResponse(json.dumps({'html': html, 'tags': [p.name for p in
                                                            tags]}))
 
@@ -100,7 +100,7 @@ def addItemPage(request):
 def showArchives(request):
     # retrieve archive_id groups and their ranges to display in the archive
     # section
-    r = Item.objects.filter(house_id=request.session['house_id']).order_by('archive_id').reverse()
+    r = Item.objects.filter(house_id=1).order_by('archive_id').reverse()
     if len(r) != 0:
         m = r[0].archive_id + 1
     else:
@@ -117,16 +117,16 @@ def showArchives(request):
 
 def index(request):
     try:
-        request.session['user_id']
+        1
     except:
         return login(request)
     else:
         return render_to_response('index.html', {"names":
-                                             User.objects.filter(house_id=request.session['house_id']),
+                                             User.objects.filter(house_id=1),
                                              "house_id":
-                                             request.session['house_id'],
+                                             1,
                                              "user_id":
-                                             request.session['user_id']},
+                                             1},
                               context_instance = RequestContext(request))
 
 # fix the bad naming of variables
@@ -144,9 +144,9 @@ def add_item(request):
         # add edit tags
         try:
             t = Tag.objects.get(name=x['tags'],
-                                house_id=request.session['house_id'])
+                                house_id=1)
         except:
-            t = Tag(name=x['tags'], house_id=request.session['house_id'])
+            t = Tag(name=x['tags'], house_id=1)
             t.save()
 
         # if edit_id exists, save the id and delete original record
@@ -165,7 +165,7 @@ def add_item(request):
             purch_date      = p_d,
             price           = x['price'], 
             comments        = x['comments'], 
-            house_id        = request.session['house_id'],
+            house_id        = 1,
             archive_id      = 0, 
             tag             = t, 
             sub_tag         = x['sub_tag']
@@ -216,7 +216,7 @@ def edit_item(request):
 
         users_string = {}
 
-        for x in User.objects.filter(house_id=request.session['house_id']):
+        for x in User.objects.filter(house_id=1):
             users_string[x.id] = 0
         
         for x in users:
@@ -252,8 +252,8 @@ def edit_item(request):
         return HttpResponse(json.dumps(info))
 
 def clear_cycle(request):
-    i = Item.objects.filter(house_id=request.session['house_id']).filter(archive_id=0)
-    r = Item.objects.filter(house_id=request.session['house_id']).order_by('archive_id').reverse()
+    i = Item.objects.filter(house_id=1).filter(archive_id=0)
+    r = Item.objects.filter(house_id=1).order_by('archive_id').reverse()
     m = r[0].archive_id + 1
 
     for t in i:
@@ -276,8 +276,8 @@ def login(request):
     # add in recovery from failed attempt
     if not request.POST:
         try:
-            del request.session['house_id']
-            del request.session['user_id']
+            del 1
+            del 1
         except:
             pass
         return render_to_response('login.html', {}, 
@@ -290,8 +290,8 @@ def login(request):
             return HttpResponse('no')
 
         if m.password == request.POST['password']:
-            request.session['house_id'] = m.house_id
-            request.session['user_id'] = m.id
+            1 = m.house_id
+            1 = m.id
             return HttpResponse('yes')
         else:
             return HttpResponse('no')
