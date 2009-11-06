@@ -79,6 +79,10 @@ class Item_list:
         for i in self.list:
             for e in i.user_item_rel_set.all():
                 balance_sum[e.user.id] += e.payment_amount * -1
+
+
+        # subtract out how much buyers paid
+        for i in self.list:
             for e in i.buyer_item_rel_set.all():
                 balance_sum[e.buyer.id] += e.payment_amount
 

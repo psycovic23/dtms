@@ -9,8 +9,6 @@ from django.utils import simplejson as json
 import operator, decimal, pdb
 from operator import eq
 from mysite.dtms.models import *
-import cProfile
-from re import sub
 
 
 def list(request, a_num=0, houseMode=0):
@@ -64,12 +62,8 @@ def list(request, a_num=0, houseMode=0):
                              "houseMode": houseMode,
                              "archive_id": a_num}))
 
-    x = json.dumps({'html':html, 'graphData': graphData})
-    x = sub("\\\\n", "",x)
-    x = sub("\\\\t", "",x)
-    print x
-
-    return HttpResponse(x)
+    return HttpResponse(json.dumps({'html': html, 'graphData':
+                                    graphData}))
 
 def adduser(request):
     if not request.POST:
