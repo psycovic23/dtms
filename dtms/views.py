@@ -9,6 +9,7 @@ from django.utils import simplejson as json
 import operator, decimal, pdb
 from operator import eq
 from mysite.dtms.models import *
+from re import sub
 
 
 def list(request, a_num=0, houseMode=0):
@@ -62,8 +63,12 @@ def list(request, a_num=0, houseMode=0):
                              "houseMode": houseMode,
                              "archive_id": a_num}))
 
-    return HttpResponse(json.dumps({'html': html, 'graphData':
-                                    graphData}))
+    x = json.dumps({'html': html, 'graphData': graphData})
+    x = sub("\\\\n", "", x)
+    x = sub("\\\\t", "", x)
+    
+
+    return HttpResponse(x)
 
 def adduser(request):
     if not request.POST:
