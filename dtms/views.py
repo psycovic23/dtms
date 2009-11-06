@@ -67,6 +67,7 @@ def list(request, a_num=0, houseMode=0):
     x = json.dumps({'html':html, 'graphData': graphData})
     x = sub("\\\\n", "",x)
     x = sub("\\\\t", "",x)
+    print x
 
     return HttpResponse(x)
 
