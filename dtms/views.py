@@ -33,7 +33,7 @@ def list(request, a_num=0, houseMode=0):
 
 
     # generate strings to show what time period/archive category we're in
-    arch = Item.objects.filter(archive_id=a_num).order_by('purch_date')
+    arch = items.order_by('purch_date')
     if arch:
         if a_num == '0':
             category = ([arch[0].purch_date.strftime('%b %d, %Y'), "current"])

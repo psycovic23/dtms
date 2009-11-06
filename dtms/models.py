@@ -34,11 +34,12 @@ class Item_list:
             y = self.list.filter(buyer_item_rel__buyer__exact=User.objects.get(id=self.uid))
             items = t | y
             items = items.distinct()
+            u = User.objects.get(id=self.uid)
             for t in items:
                 try: 
-                    t.price = t.user_item_rel_set.get(user=User.objects.get(id=self.uid)).payment_amount
+                    t.price = t.user_item_rel_set.get(user=u).payment_amount
                 except:
-                    t.price = -1 * t.buyer_item_rel_set.get(buyer=User.objects.get(id=self.uid)).payment_amount
+                    t.price = -1 * t.buyer_item_rel_set.get(buyer=u).payment_amount
             return items
 
     def barGraphData(self, houseMode=0):
