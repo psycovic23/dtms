@@ -28,7 +28,7 @@ class Item_list:
 
     def ret_list(self):
         if self.houseMode=='1':
-            return self.list 
+            return self.list .order_by('-id')
         else:
             # find anything that you bought or used and how much you paid for it
             u = User.objects.select_related().get(id=self.uid)
