@@ -259,7 +259,7 @@ function loadItemList(args){
 
 
 		// this is for clicking on names in house mode and highlighting items
-		$("td.hoverable").(function(){
+		$("td.hoverable").click(function(){
 			if (options['houseMode'] == 1){
 				if ($(".item_description:contains('" + $(this).html() + "')").length != 0){
 					$(".item_description:contains('" + $(this).html() + "')")
