@@ -141,21 +141,19 @@ function loadItemList(args){
 		// give fancy js behavior
 		$(".item").toggle(
 			function(){
-				$(this).find('.item_description').slideDown('normal');
+				//$(this).find('.item_description').slideDown('normal');
+				$(this).css({'borderBottom': 0});
+				$(this).next().show();
 				$(this).unbind('mouseover').unbind('mouseout').css({'background-color': '#fff'});
 			}, function() {
-				$(this).find('.item_description').slideUp('normal');
+				$(this).next().hide();
+				$(this).css({'borderBottom': '1px #ccc solid'});
 				$(this).bind('mouseover', function(){
 					$(this).css({'background-color': '#ffc97c'});})
 				.bind('mouseout', function(){
 					$(this).css({'background-color': '#fff'});
 				});
-			}).hover(
-				function(){
-					$(this).css({'background-color': '#ffc97c'});},
-				function(){
-					$(this).css({'background-color': '#fff'});}
-			);
+			});
 
 		$(".item_description").hide();
 	
@@ -222,6 +220,12 @@ function loadItemList(args){
 		$("#graph").hide();
 
 		// taglist behavior
+		$('#tagList').hide();
+		$('#toggleTagList').toggle(function(){
+			$('#tagList').slideDown('fast');
+		}, function(){
+			$('#tagList').slideUp('fast');
+		});
 		$(".tagNames").click(function(){
 			if ($(this).html() == "all"){
 				$("div.item").slideDown();
@@ -231,7 +235,7 @@ function loadItemList(args){
 					$("span.tag:not(:contains('" + $(this).html() + "'))").parent().slideUp();
 				}
 			}
-		}).hover(function(){ $(this).css({ 'background-color': '#181818', 'color': '#fff'});}, function(){ $(this).css({ 'color': '#000','background-color': '#fff'})});
+		})
 
 
 
@@ -255,21 +259,16 @@ function loadItemList(args){
 
 
 		// this is for clicking on names in house mode and highlighting items
-		$("td.hoverable").click(function(){
+		$("td.hoverable").(function(){
 			if (options['houseMode'] == 1){
-				if ($(".item:contains('" + $(this).html() + "')").length != 0){
-					$(".item:contains('" + $(this).html() + "')")
-						.css({'backgroundColor': '#ffc97c'});
-					$(".item:not(:contains('" + $(this).html() + "'))")
-						.css({'backgroundColor': '#fff'});
+				if ($(".item_description:contains('" + $(this).html() + "')").length != 0){
+					$(".item_description:contains('" + $(this).html() + "')")
+						.prev().css({'backgroundColor': '#ffc97c'});
+					$(".item_description:not(:contains('" + $(this).html() + "'))")
+						.prev().css({'backgroundColor': '#fff'});
 				}
 			}
-		}).hover(
-			function(){
-				$(this).css({'cursor': 'pointer','background-color': '#ffc97c'});},
-			function(){
-				$(this).css({'background-color': '#fff'});}
-		);
+		});
 
 	}
 
@@ -345,7 +344,10 @@ function submitForm(list_users){
 		var uid = $("#user_id").val();
 		var p = $("#price").val();
 		var ind_p = Math.round(100 * p / list_users.number_of_selected())/100;
-		$("#" + uid + "expanded_buyer").val(Math.round(ind_p * list_users.number_of_selected()*100)/100);
+
+		if ($("#action").html() != 'edit')
+			$("#" + uid + "expanded_buyer").val(Math.round(ind_p * list_users.number_of_selected()*100)/100);
+
 		data['price'] = String(ind_p * list_users.number_of_selected()); 
 		var a = list_users.return_names();
 		for (t in a){
