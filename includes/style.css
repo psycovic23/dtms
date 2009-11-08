@@ -168,7 +168,12 @@ h3 {
 
 .tagNames {
 	cursor: pointer;
-	padding:2px 5px;
+	padding:0px 5px;
+	font-size: 8pt;
+}
+a.tagNames:hover {
+	background-color: #ffc97c;
+>>>>>>> itemlist_table:includes/style.css
 }
 
 #showAnalysis, #houseMode {
