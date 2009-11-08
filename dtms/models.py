@@ -35,16 +35,16 @@ class Item_list:
             items = self.list.filter((Q(user_item_rel__user__exact=u) |
                                       Q(buyer_item_rel__buyer__exact=u))).distinct().order_by('-id')
 
-            #rel = User_item_rel.objects.select_related().filter(Q(item__in=items) & Q(user=u)).distinct()
+            #rel = User_item_rel.objects.select_related().filter(Q(item__in=self.list) & Q(user=u)).distinct()
             #ret_items = []
 
             #for t in rel:
             #    a = t.item
-            #    #b = [p for p in items if p == a]
-            #    #b[0].price = t.payment_amount 
-            #    #b.save()
-            #    a.price = t.payment_amount
+            #    a.ind_pay = t.payment_amount
             #    ret_items.append(a)
+
+
+            #return ret_items
 
             #items = self.list.filter((~Q(user_item_rel__user__exact=u) &
             #                          Q(buyer_item_rel__buyer__exact=u))).distinct()

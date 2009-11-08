@@ -120,43 +120,4 @@
 		</tr>
 		{% endfor %}
 	</table>
-	<!--
-	<div id="list">
-		{% for x in list.ret_list %}
-		<div class="item" id= "{{ x.id }}list">
-			<span class="item_name">{{ x.name }}&nbsp;</span>
-			<span class="price"> | ${{x.price|floatformat:2}} </span>
-			{% ifequal category.1 "current" %}
-			<a class="delete">d</a>
-			<a class="edit">e</a>
-			{% endifequal %}
-			<span class="purch_date">{{ x.purch_date|date:"m/d" }}</span>
-			<span class="buyers">{{x.shortDisplayBuyers}}</span>
-			<span class="tag">{{ x.tag }}</span>
-			<br>
-			<div class="item_description">
-				<br>
-				<div style="float:left;">
-					buyers:
-					<table>
-						{% for t in x.listBuyers %}
-						<tr><td>{{ t.buyer.name }}</td><td>${{ t.payment_amount|floatformat:2 }}</td></tr>
-						{% endfor %}
-					</table>
-				</div>
-				<div style="float:right;">
-					users:
-					<table>
-						{% for t in x.listUsers %}
-						<tr><td>{{ t.user.name }}</td><td>${{ t.payment_amount|floatformat:2 }}</td></tr>
-						{% endfor %}
-					</table>
-				</div>
-				<div style="clear:both;"></div>
-				<span class="comments">{{ x.comments }}</span>
-			</div>
-		</div>
-		{% endfor %}
-	</div>
-	-->
 </div>
