@@ -3,7 +3,6 @@ from django.utils import simplejson as json
 import operator
 import pdb
 import datetime
-from django.db.models import Q
 
 class User(models.Model):
     name        = models.CharField(max_length=30)
@@ -31,39 +30,17 @@ class Item_list:
             return self.list 
         else:
             # find anything that you bought or used and how much you paid for it
-            u = User.objects.select_related().get(id=self.uid)
-            items = self.list.filter((Q(user_item_rel__user__exact=u) |
-                                      Q(buyer_item_rel__buyer__exact=u))).distinct().order_by('-id')
-
-            #rel = User_item_rel.objects.select_related().filter(Q(item__in=items) & Q(user=u)).distinct()
-            #ret_items = []
-
-            #for t in rel:
-            #    a = t.item
-            #    #b = [p for p in items if p == a]
-            #    #b[0].price = t.payment_amount 
-            #    #b.save()
-            #    a.price = t.payment_amount
-            #    ret_items.append(a)
-
-            #items = self.list.filter((~Q(user_item_rel__user__exact=u) &
-            #                          Q(buyer_item_rel__buyer__exact=u))).distinct()
-            #rel = Buyer_item_rel.objects.filter(Q(item__in=items) &
-            #                                    Q(buyer=u)).distinct()
-            #for t in rel:
-            #    a = t.item
-            #    a.price = -1 * t.payment_amount
-            #    ret_items.append(a)
-
-            #return ret_items
-
+            t = self.list.filter(user_item_rel__user__exact=User.objects.get(id=self.uid))
+            y = self.list.filter(buyer_item_rel__buyer__exact=User.objects.get(id=self.uid))
+            items = t | y
+            items = items.distinct()
+            u = User.objects.get(id=self.uid)
             for t in items:
                 try: 
                     t.price = t.user_item_rel_set.get(user=u).payment_amount
                 except:
                     t.price = -1 * t.buyer_item_rel_set.get(buyer=u).payment_amount
             return items
-
 
     def barGraphData(self, houseMode=0):
         x = {}

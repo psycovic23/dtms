@@ -14,7 +14,7 @@ from re import sub
 
 def list(request, a_num=0, houseMode=0):
 
-    items = Item.objects.select_related().filter(house_id=request.session['house_id']).filter(archive_id=a_num)
+    items = Item.objects.filter(house_id=request.session['house_id']).filter(archive_id=a_num)
 
     # throw items into Item_list for all the methods in the class Item_list
     # workaround for the user/house bug where transactions were based on the
@@ -24,7 +24,13 @@ def list(request, a_num=0, houseMode=0):
                   user_id=request.session['user_id'], archive_id=a_num,
                          houseMode=houseMode)
 
+    # get a list of tags
+    #tags = set([])
+    #for t in items:
+    #    tags.add(Tag.objects.get(item__exact=t))
+
     tags = set([p.tag for p in items])
+
 
     # generate strings to show what time period/archive category we're in
     arch = items.order_by('purch_date')
@@ -58,6 +64,9 @@ def list(request, a_num=0, houseMode=0):
                              "archive_id": a_num}))
 
     x = json.dumps({'html': html, 'graphData': graphData})
+    x = sub("\\\\n", "", x)
+    x = sub("\\\\t", "", x)
+    
 
     return HttpResponse(x)
 
@@ -213,7 +222,6 @@ def edit_item(request):
         for x in users:
             users_string[x.user.id] = float(x.payment_amount)
 
-        print i.price
         info = {
             'name': i.name, 
             'price': str(i.price), 

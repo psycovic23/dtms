@@ -74,6 +74,7 @@ h3 {
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
 	border: 1px solid #999;
+	padding: 10px;
 	background-color: #fff;
 }
 
@@ -147,11 +148,11 @@ h3 {
 	font-size:30pt;
 	color:#333;
 	margin:0 15px;
-	cursor: pointer;
 }
 
-#action:hover, #cancel:hover {
+#submit:hover, #cancel:hover {
 	color: #40ad34;
+	cursor:pointer;
 }
 
 #list_users li {
@@ -167,16 +168,11 @@ h3 {
 
 .tagNames {
 	cursor: pointer;
-	padding:0px 5px;
-	font-size: 8pt;
+	padding:2px 5px;
 }
-a.tagNames:hover {
-	background-color: #181818;
-	color: #fff;
-}
+
 #showAnalysis, #houseMode {
 	float:right;
-	cursor: pointer;
 }
 
 #moneyStatus {
@@ -185,9 +181,6 @@ a.tagNames:hover {
 	clear: both;
 }
 
-#toggleTagList {
-	cursor: pointer;
-}
 
 #tagList {
 	width: 400px;
@@ -224,23 +217,24 @@ a.tagNames:hover {
 .item { 
 	padding: 3px;
 	margin: 7px 0px;
-/*	width: 400px; */
+	width: 600px; 
 	cursor: pointer;
-}
-
-tr.item:hover {
-	background-color:#ffc97c;
 }
 
 .item_description {
 	margin: auto;
-	/*width: 400px;*/
+	width: 400px;
 	border-bottom: 1px #ccc solid;
 	padding: 5px 10px;
 }
 
 .item_name {
 	margin-left:5px;
+}
+
+.tag, .buyers, .delete, .purch_date, .edit{
+	float:right;
+	margin-right:5px;
 }
 
 .purch_date, .buyers, .edit, .delete {
@@ -258,21 +252,9 @@ tr.item:hover {
 td {
 	padding: 5px 5px;
 }
-.item {
-	border-bottom: 1px #ccc solid;
-}
-#moneyStatus table, #tableTransactions, tr table {
+table {
 	border: 1px #000 solid;
 }
-
-
 #moneyStatus table {
 	float: right;
 }
-td.hoverable {
-	cursor: pointer;
-}
-td.hoverable:hover {
-	background-color: #ffc97c;
-}
-
