@@ -171,8 +171,7 @@ h3 {
 	font-size: 8pt;
 }
 a.tagNames:hover {
-	background-color: #181818;
-	color: #fff;
+	background-color: #ffc97c;
 }
 #showAnalysis, #houseMode {
 	float:right;
