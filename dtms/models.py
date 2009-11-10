@@ -3,7 +3,7 @@ from django.utils import simplejson as json
 import operator
 import pdb
 import datetime
-from django.db.models import Q
+from django.db.models import Q, Sum
 
 class User(models.Model):
     name        = models.CharField(max_length=30)
@@ -96,15 +96,20 @@ class Item_list:
 
         users = User.objects.filter(house_id=self.house_id)
         balance_sum = {}
+
         for a in users:
-            balance_sum[a.id] = 0
+            b_p = Buyer_item_rel.objects.filter(Q(item__in=self.list) &
+                                                Q(buyer=a))\
+                    .distinct().aggregate(p=Sum('payment_amount'))
+            u_p = User_item_rel.objects.filter(Q(item__in=self.list) &
+                                               Q(user=a))\
+                    .distinct().aggregate(p=Sum('payment_amount'))
+            if b_p['p'] == None:
+                b_p['p'] = 0
+            if u_p['p'] == None:
+                u_p['p'] = 0
+            balance_sum[a.id] = b_p['p'] + u_p['p'] * -1
     
-        # add in how much users owe
-        for i in self.list:
-            for e in i.user_item_rel_set.all():
-                balance_sum[e.user.id] += e.payment_amount * -1
-            for e in i.buyer_item_rel_set.all():
-                balance_sum[e.buyer.id] += e.payment_amount
 
         # transactions
         transactions = [] 

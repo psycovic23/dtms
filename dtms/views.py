@@ -47,6 +47,7 @@ def list(request, a_num=0, houseMode=0):
         graphData = itemlist.barGraphData(1)
     else:
         graphData = itemlist.barGraphData()
+    #graphData=[]
 
     html = t.render(Context({"empty": empty, 
                              "uid": request.session['user_id'], 
