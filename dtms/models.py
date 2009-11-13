@@ -31,7 +31,12 @@ class Item_list:
         if self.houseMode=='1':
             items = self.item_list
             for x in items:
-                x.buyerCache = list(x.buyer_item_rel_set.all())
+                tempBuyer = x.buyer_item_rel_set.all()
+                x.buyerCache = list(tempBuyer)
+                if tempBuyer.count() != 1:
+                    x.buyerName = 'multiple'
+                else:
+                    x.buyerName = tempBuyer[0].buyer.name
                 x.userCache = list(x.user_item_rel_set.all())
             return items
         else:
@@ -41,7 +46,12 @@ class Item_list:
                                       Q(buyer_item_rel__buyer__exact=u))).distinct().order_by('-id')
 
             for x in items:
-                x.buyerCache = list(x.buyer_item_rel_set.all())
+                tempBuyer = x.buyer_item_rel_set.all()
+                x.buyerCache = list(tempBuyer)
+                if tempBuyer.count() != 1:
+                    x.buyerName = 'multiple'
+                else:
+                    x.buyerName = tempBuyer[0].buyer.name
                 x.userCache = list(x.user_item_rel_set.all())
 
             for t in items:
@@ -185,16 +195,6 @@ class Item(models.Model):
     class Meta:
         ordering = ['-purch_date']
 
-    def shortDisplayBuyers(self):
-        if self.buyer_item_rel_set.all().count() != 1:
-            return "multiple buyers"
-        else:
-            return self.buyer_item_rel_set.all()[0].buyer.name
-    def listBuyers(self):
-        return self.buyer_item_rel_set.all()
-    
-    def listUsers(self):
-        return self.user_item_rel_set.all()
 
     def tag_name(self):
         return self.tag
