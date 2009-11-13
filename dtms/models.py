@@ -17,9 +17,10 @@ class User(models.Model):
 
 class Item_list:
 
-    def __init__(self, list = None, house_id = None, user_id = None,
+    def __init__(self, item_list = None, house_id = None, user_id = None,
                  archive_id = None, houseMode = 0):
-        self.list = list
+        self.item_list = item_list
+
         self.house_id = house_id
         self.uid = int(user_id)
         self.archive_id = archive_id
@@ -28,49 +29,35 @@ class Item_list:
 
     def ret_list(self):
         if self.houseMode=='1':
-            return self.list .order_by('-id')
+            items = self.item_list
+            for x in items:
+                x.buyerCache = list(x.buyer_item_rel_set.all())
+                x.userCache = list(x.user_item_rel_set.all())
+            return items
         else:
             # find anything that you bought or used and how much you paid for it
             u = User.objects.select_related().get(id=self.uid)
-            items = self.list.filter((Q(user_item_rel__user__exact=u) |
+            items = self.item_list.filter((Q(user_item_rel__user__exact=u) |
                                       Q(buyer_item_rel__buyer__exact=u))).distinct().order_by('-id')
 
-            #rel = User_item_rel.objects.select_related().filter(Q(item__in=self.list) & Q(user=u)).distinct()
-            #ret_items = []
-
-            #for t in rel:
-            #    a = t.item
-            #    a.ind_pay = t.payment_amount
-            #    ret_items.append(a)
-
-
-            #return ret_items
-
-            #items = self.list.filter((~Q(user_item_rel__user__exact=u) &
-            #                          Q(buyer_item_rel__buyer__exact=u))).distinct()
-            #rel = Buyer_item_rel.objects.filter(Q(item__in=items) &
-            #                                    Q(buyer=u)).distinct()
-            #for t in rel:
-            #    a = t.item
-            #    a.price = -1 * t.payment_amount
-            #    ret_items.append(a)
-
-            #return ret_items
+            for x in items:
+                x.buyerCache = list(x.buyer_item_rel_set.all())
+                x.userCache = list(x.user_item_rel_set.all())
 
             for t in items:
-                try: 
-                    t.price = t.user_item_rel_set.get(user=u).payment_amount
+                try:
+                    t.price = [ p.payment_amount for p in t.userCache if p.user==u ][0]
                 except:
-                    t.price = -1 * t.buyer_item_rel_set.get(buyer=u).payment_amount
+                    t.price = -1 * [ p.payment_amount for p in t.buyerCache if p.buyer==u ][0]
             return items
 
 
     def barGraphData(self, houseMode=0):
         x = {}
         if houseMode == 0:
-            new_list = self.list.filter(users__id__exact=self.uid)
+            new_list = self.item_list.filter(users__id__exact=self.uid)
         else:
-            new_list = self.list
+            new_list = self.item_list
 
         for i in new_list:
             if str(i.tag) not in x:
@@ -98,10 +85,10 @@ class Item_list:
         balance_sum = {}
 
         for a in users:
-            b_p = Buyer_item_rel.objects.filter(Q(item__in=self.list) &
+            b_p = Buyer_item_rel.objects.filter(Q(item__in=self.item_list) &
                                                 Q(buyer=a))\
                     .distinct().aggregate(p=Sum('payment_amount'))
-            u_p = User_item_rel.objects.filter(Q(item__in=self.list) &
+            u_p = User_item_rel.objects.filter(Q(item__in=self.item_list) &
                                                Q(user=a))\
                     .distinct().aggregate(p=Sum('payment_amount'))
             if b_p['p'] == None:
@@ -199,7 +186,7 @@ class Item(models.Model):
         ordering = ['-purch_date']
 
     def shortDisplayBuyers(self):
-        if len(self.buyer_item_rel_set.all()) != 1:
+        if self.buyer_item_rel_set.all().count() != 1:
             return "multiple buyers"
         else:
             return self.buyer_item_rel_set.all()[0].buyer.name

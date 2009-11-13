@@ -12,14 +12,15 @@ from mysite.dtms.models import *
 from re import sub
 
 
-def list(request, a_num=0, houseMode=0):
+def item_list(request, a_num=0, houseMode=0):
 
     items = Item.objects.select_related().filter(house_id=request.session['house_id']).filter(archive_id=a_num)
+
 
     # throw items into Item_list for all the methods in the class Item_list
     # workaround for the user/house bug where transactions were based on the
     # viewed list, as opposed to the entire house
-    itemlist = Item_list(list=items,
+    itemlist = Item_list(item_list=items,
                   house_id=request.session['house_id'],
                   user_id=request.session['user_id'], archive_id=a_num,
                          houseMode=houseMode)
@@ -93,7 +94,7 @@ def showArchives(request):
     # retrieve archive_id groups and their ranges to display in the archive
     # section
     r = Item.objects.filter(house_id=request.session['house_id']).order_by('archive_id').reverse()
-    if len(r) != 0:
+    if r.count() != 0:
         m = r[0].archive_id + 1
     else:
         m = 0

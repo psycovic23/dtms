@@ -279,7 +279,7 @@ function loadItemList(args){
 
 		// determine what archive list to load, based on arguments from options
 		
-		var url_str = '/dtms/list';
+		var url_str = '/dtms/item_list';
 		url_str += '/' + options['archive_id'] + '/' + options['houseMode'] + '/';
 
 		$.ajax({
