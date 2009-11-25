@@ -44,12 +44,14 @@ class Item_list:
                 if len(b_o) != 1:
                     t.buyerName = 'multiple'
                 else:
-                    t.buyerName = b_o.items()[0][0]
+                    #(Pdb) b_o.items()
+                    #[(u'14', [4.5899999999999999, u'susan'])]
+                    t.buyerName = b_o.items()[0][1][1]
 
-                if u_o.has_key(u.name):
-                    t.price = u_o[u.name]
+                if u_o.has_key(str(u.id)):
+                    t.price = u_o[str(u.id)][0]
                 else:
-                    t.price = b_o[u.name]
+                    t.price = b_o[str(u.id)][0]
             return items
 
 
@@ -85,7 +87,12 @@ class Item_list:
         users = User.objects.filter(house_id=self.house_id)
         balance_sum = {}
 
+        for x in self.item_list:
+            print x.users_a
+            pass
+
         for a in users:
+
             b_p = Buyer_item_rel.objects.filter(Q(item__in=self.item_list) &
                                                 Q(buyer=a))\
                     .distinct().aggregate(p=Sum('payment_amount'))
@@ -186,18 +193,10 @@ class newItem(models.Model):
         ordering = ['-purch_date']
 
     def buyers_o(self):
-        x = json.loads(self.buyers_a)
-        for (k,v) in x.items():
-            x[User.objects.get(id=k).name] = v
-            del x[k]
-        return x
+        return json.loads(self.buyers_a)
 
     def users_o(self):
-        x = json.loads(self.users_a)
-        for (k,v) in x.items():
-            x[User.objects.get(id=k).name] = v
-            del x[k]
-        return x
+        return json.loads(self.users_a)
 
     def __unicode__(self):
         return self.name
