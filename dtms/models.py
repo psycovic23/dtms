@@ -86,24 +86,28 @@ class Item_list:
 
         users = User.objects.filter(house_id=self.house_id)
         balance_sum = {}
+        for x in users:
+            balance_sum[x.id] = 0
 
         for x in self.item_list:
-            print x.users_a
-            pass
+            for (k,v) in x.users_o().items():
+                balance_sum[int(k)] -= v[0]
+            for (k,v) in x.buyers_o().items():
+                balance_sum[int(k)] += v[0]
 
-        for a in users:
+        #for a in users:
 
-            b_p = Buyer_item_rel.objects.filter(Q(item__in=self.item_list) &
-                                                Q(buyer=a))\
-                    .distinct().aggregate(p=Sum('payment_amount'))
-            u_p = User_item_rel.objects.filter(Q(item__in=self.item_list) &
-                                               Q(user=a))\
-                    .distinct().aggregate(p=Sum('payment_amount'))
-            if b_p['p'] == None:
-                b_p['p'] = 0
-            if u_p['p'] == None:
-                u_p['p'] = 0
-            balance_sum[a.id] = b_p['p'] + u_p['p'] * -1
+        #    b_p = Buyer_item_rel.objects.filter(Q(item__in=self.item_list) &
+        #                                        Q(buyer=a))\
+        #            .distinct().aggregate(p=Sum('payment_amount'))
+        #    u_p = User_item_rel.objects.filter(Q(item__in=self.item_list) &
+        #                                       Q(user=a))\
+        #            .distinct().aggregate(p=Sum('payment_amount'))
+        #    if b_p['p'] == None:
+        #        b_p['p'] = 0
+        #    if u_p['p'] == None:
+        #        u_p['p'] = 0
+        #    balance_sum[a.id] = b_p['p'] + u_p['p'] * -1
     
 
         # transactions
