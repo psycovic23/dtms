@@ -28,37 +28,28 @@ class Item_list:
         self.houseMode = houseMode
 
     def ret_list(self):
+        print self.houseMode
         if self.houseMode=='1':
-            items = self.item_list
-            for x in items:
-                tempBuyer = x.buyer_item_rel_set.all()
-                x.buyerCache = list(tempBuyer)
-                if tempBuyer.count() != 1:
-                    x.buyerName = 'multiple'
-                else:
-                    x.buyerName = tempBuyer[0].buyer.name
-                x.userCache = list(x.user_item_rel_set.all())
-            return items
+            return self.item_list
         else:
             # find anything that you bought or used and how much you paid for it
             u = User.objects.select_related().get(id=self.uid)
-            items = self.item_list.filter((Q(user_item_rel__user__exact=u) |
-                                      Q(buyer_item_rel__buyer__exact=u))).distinct().order_by('-id')
-
-            for x in items:
-                tempBuyer = x.buyer_item_rel_set.all()
-                x.buyerCache = list(tempBuyer)
-                if tempBuyer.count() != 1:
-                    x.buyerName = 'multiple'
-                else:
-                    x.buyerName = tempBuyer[0].buyer.name
-                x.userCache = list(x.user_item_rel_set.all())
+            items = self.item_list.filter((Q(user_item__user__exact=u) |
+                                      Q(buyer_item__user__exact=u))).distinct().order_by('id')
 
             for t in items:
-                try:
-                    t.price = [ p.payment_amount for p in t.userCache if p.user==u ][0]
-                except:
-                    t.price = -1 * [ p.payment_amount for p in t.buyerCache if p.buyer==u ][0]
+                u_o = t.users_o()
+                b_o = t.buyers_o()
+
+                if len(b_o) != 1:
+                    t.buyerName = 'multiple'
+                else:
+                    t.buyerName = b_o.items()[0][0]
+
+                if u_o.has_key(u.name):
+                    t.price = u_o[u.name]
+                else:
+                    t.price = b_o[u.name]
             return items
 
 
@@ -171,6 +162,59 @@ class Tag(models.Model):
             total_price += x.price
         return [str(self.name), float(total_price)]
 
+class newItem(models.Model):
+
+    name        = models.CharField(max_length=40)
+    price       = models.DecimalField(max_digits=6, decimal_places=2)
+    archive_id  = models.IntegerField()
+    house_id    = models.IntegerField()
+
+    tag         = models.ForeignKey(Tag)
+    sub_tag     = models.CharField(default='',max_length=40)
+    comments    = models.CharField(default='',max_length=400)
+    purch_date  = models.DateField(default=datetime.datetime.now())
+    date_edited = models.DateTimeField(auto_now_add=True)
+
+    users_a     = models.CharField(max_length=200)
+    users       = models.ManyToManyField(User, through='User_item',
+                                         related_name='users')
+    buyers_a    = models.CharField(max_length=200)
+    buyers      = models.ManyToManyField(User, through='Buyer_item',
+                                         related_name='buyers')
+    
+    class Meta:
+        ordering = ['-purch_date']
+
+    def buyers_o(self):
+        x = json.loads(self.buyers_a)
+        for (k,v) in x.items():
+            x[User.objects.get(id=k).name] = v
+            del x[k]
+        return x
+
+    def users_o(self):
+        x = json.loads(self.users_a)
+        for (k,v) in x.items():
+            x[User.objects.get(id=k).name] = v
+            del x[k]
+        return x
+
+    def __unicode__(self):
+        return self.name
+
+class User_item(models.Model):
+    user        = models.ForeignKey(User)
+    item        = models.ForeignKey(newItem)
+
+    def __unicode__(self):
+        return str([self.user, self.item])
+
+class Buyer_item(models.Model):
+    user        = models.ForeignKey(User)
+    item        = models.ForeignKey(newItem)
+
+    def __unicode__(self):
+        return [self.name, self.item]
 # all item_model revisions attach to this. this attaches to item_status
 class Item(models.Model):
 

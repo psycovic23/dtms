@@ -105,15 +105,15 @@
 				<br>
 					buyers:
 					<table>
-						{% for t in x.buyerCache %}
-						<tr><td>{{ t.buyer.name }}</td><td>${{ t.payment_amount|floatformat:2 }}</td></tr>
+						{% for name, price in x.buyers_o.items %}
+						<tr><td>{{ name }}</td><td>${{ price|floatformat:2 }}</td></tr>
 						{% endfor %}
 					</table>
 			</td><td style="float:right;">
 					users:
 					<table>
-						{% for t in x.userCache %}
-						<tr><td>{{ t.user.name }}</td><td>${{ t.payment_amount|floatformat:2 }}</td></tr>
+						{% for name, price in x.users_o.items %}
+						<tr><td>{{ name }}</td><td>${{ price|floatformat:2 }}</td></tr>
 						{% endfor %}
 					</table>
 				</td><td></td>

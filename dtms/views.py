@@ -11,10 +11,9 @@ from operator import eq
 from mysite.dtms.models import *
 from re import sub
 
-
 def item_list(request, a_num=0, houseMode=0):
 
-    items = Item.objects.select_related().filter(house_id=request.session['house_id']).filter(archive_id=a_num)
+    items = newItem.objects.select_related().filter(house_id=request.session['house_id']).filter(archive_id=a_num)
 
 
     # throw items into Item_list for all the methods in the class Item_list
@@ -44,11 +43,11 @@ def item_list(request, a_num=0, houseMode=0):
     else:
         empty = "0"
 
-    if houseMode == "1":
-        graphData = itemlist.barGraphData(1)
-    else:
-        graphData = itemlist.barGraphData()
-    #graphData=[]
+    #if houseMode == "1":
+    #    graphData = itemlist.barGraphData(1)
+    #else:
+    #    graphData = itemlist.barGraphData()
+    graphData=[]
 
     html = t.render(Context({"empty": empty, 
                              "uid": request.session['user_id'], 
