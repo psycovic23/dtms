@@ -3,7 +3,11 @@ from django.utils import simplejson as json
 import operator
 import pdb
 import datetime
+import decimal
 from django.db.models import Q, Sum
+
+def decimal_parse(s): 
+    return decimal.Decimal(str(round(float(s), 2)))
 
 class User(models.Model):
     name        = models.CharField(max_length=30)
@@ -30,12 +34,12 @@ class Item_list:
     def ret_list(self):
         print self.houseMode
         if self.houseMode=='1':
-            return self.item_list
+            return self.item_list.order_by('-id')
         else:
             # find anything that you bought or used and how much you paid for it
             u = User.objects.select_related().get(id=self.uid)
             items = self.item_list.filter((Q(user_item__user__exact=u) |
-                                      Q(buyer_item__user__exact=u))).distinct().order_by('id')
+                                      Q(buyer_item__user__exact=u))).distinct().order_by('-id')
 
             for t in items:
                 u_o = t.users_o()
@@ -67,14 +71,14 @@ class Item_list:
                 x[str(i.tag)] = 0
 
             if houseMode == 0:
-                x[str(i.tag)] += float(i.user_item_rel_set.get(user__id__exact=self.uid).payment_amount)
+                x[str(i.tag)] += i.users_o()[str(self.uid)][0]
             else:
-                x[str(i.tag)] += float(i.price)
+                x[str(i.tag)] += i.price
 
         ret_obj = []
         counter = 1
         for k,v in x.iteritems():
-            ret_obj.append({'data': [ [counter, v ] ],'label': k })
+            ret_obj.append({'data': [ [counter, str(v) ] ],'label': k })
             counter = counter + 1
         return json.dumps(ret_obj)
         
@@ -87,7 +91,7 @@ class Item_list:
         users = User.objects.filter(house_id=self.house_id)
         balance_sum = {}
         for x in users:
-            balance_sum[x.id] = 0
+            balance_sum[x.id] = decimal.Decimal('0')
 
         for x in self.item_list:
             for (k,v) in x.users_o().items():
@@ -95,24 +99,9 @@ class Item_list:
             for (k,v) in x.buyers_o().items():
                 balance_sum[int(k)] += v[0]
 
-        #for a in users:
-
-        #    b_p = Buyer_item_rel.objects.filter(Q(item__in=self.item_list) &
-        #                                        Q(buyer=a))\
-        #            .distinct().aggregate(p=Sum('payment_amount'))
-        #    u_p = User_item_rel.objects.filter(Q(item__in=self.item_list) &
-        #                                       Q(user=a))\
-        #            .distinct().aggregate(p=Sum('payment_amount'))
-        #    if b_p['p'] == None:
-        #        b_p['p'] = 0
-        #    if u_p['p'] == None:
-        #        u_p['p'] = 0
-        #    balance_sum[a.id] = b_p['p'] + u_p['p'] * -1
-    
-
         # transactions
         transactions = [] 
-        self.ind_balance = float(balance_sum[self.uid])
+        self.ind_balance = balance_sum[self.uid]
 
         balances = balance_sum.copy()
 
@@ -128,7 +117,7 @@ class Item_list:
             self.ind_sign = 'n'
     
         # while array is non zero
-        while len([p for p in balance_sum if float(balance_sum[p]) > .01]) != 0:
+        while len([p for p in balance_sum if balance_sum[p] != 0]) != 0:
     
             # owes = [key, amount]
             owes = min([(val, key) for (key, val) in balance_sum.items()])
@@ -154,7 +143,7 @@ class Item_list:
         
         self.names_and_balances = {}
         for u, v in zip(users, balances.items()):
-            self.names_and_balances[u.name] = float(v[1])
+            self.names_and_balances[u.name] = v[1]
 
         self.names_and_balances = self.names_and_balances.items()
         self.transactions = transactions
@@ -171,7 +160,7 @@ class Tag(models.Model):
         total_price = 0
         for x in t:
             total_price += x.price
-        return [str(self.name), float(total_price)]
+        return [str(self.name), total_price]
 
 class newItem(models.Model):
 
@@ -197,10 +186,10 @@ class newItem(models.Model):
         ordering = ['-purch_date']
 
     def buyers_o(self):
-        return json.loads(self.buyers_a)
+        return json.loads(self.buyers_a, parse_float=decimal_parse)
 
     def users_o(self):
-        return json.loads(self.users_a)
+        return json.loads(self.users_a, parse_float=decimal_parse)
 
     def __unicode__(self):
         return self.name

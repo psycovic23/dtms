@@ -38,16 +38,13 @@ def item_list(request, a_num=0, houseMode=0):
         category = [' ', 'no items!']
 
     t = get_template('list.html')
-    if not items:
-        empty = "1"
-    else:
-        empty = "0"
+    empty = len(items)
 
-    #if houseMode == "1":
-    #    graphData = itemlist.barGraphData(1)
-    #else:
-    #    graphData = itemlist.barGraphData()
-    graphData=[]
+    if houseMode == "1":
+        graphData = itemlist.barGraphData(1)
+    else:
+        graphData = itemlist.barGraphData()
+        #graphData = []
 
     html = t.render(Context({"empty": empty, 
                              "uid": request.session['user_id'], 
@@ -92,17 +89,16 @@ def addItemPage(request):
 def showArchives(request):
     # retrieve archive_id groups and their ranges to display in the archive
     # section
-    r = Item.objects.filter(house_id=request.session['house_id']).order_by('archive_id').reverse()
+    r = newItem.objects.filter(house_id=request.session['house_id']).order_by('archive_id').reverse()
     if r.count() != 0:
         m = r[0].archive_id + 1
     else:
         m = 0
 
-    
     arch = []
 
     for i in range(1, m):
-        x = Item.objects.filter(archive_id=i).order_by('purch_date')
+        x = newItem.objects.filter(archive_id=i).order_by('purch_date')
         arch.append([i, str(x[0].purch_date), str(x[len(x)-1].purch_date)])
 
     return render_to_response('showArchives.html', {"archive_list": arch})
@@ -135,15 +131,15 @@ def add_item(request):
 
         # add edit tags
         try:
-            t = Tag.objects.get(name=x['tags'],
+            tag = Tag.objects.get(name=x['tags'],
                                 house_id=request.session['house_id'])
         except:
-            t = Tag(name=x['tags'], house_id=request.session['house_id'])
-            t.save()
+            tag = Tag(name=x['tags'], house_id=request.session['house_id'])
+            tag.save()
 
         # if edit_id exists, save the id and delete original record
         if 'edit_id' in x:
-            ref_item            = Item.objects.get(id=x['edit_id'])
+            ref_item            = newItem.objects.get(id=x['edit_id'])
             
             # delete tag that has no items
             if (len(ref_item.tag.item_set.all()) == 1) and (ref_item.tag !=
@@ -152,15 +148,29 @@ def add_item(request):
 
             ref_item.delete()
 
-        ref_item = Item(
-            name            = x['name'], 
-            purch_date      = p_d,
-            price           = x['price'], 
-            comments        = x['comments'], 
-            house_id        = request.session['house_id'],
-            archive_id      = 0, 
-            tag             = t, 
-            sub_tag         = x['sub_tag']
+        buyer_temp = {}
+        user_temp = {}
+
+        for t in x['expanded_buyers']:
+            if decimal.Decimal(t[1]) != 0:
+                u_eb = User.objects.get(id=t[0])
+                buyer_temp[u_eb.id] = [float(t[1]), u_eb.name]
+
+        for t in x['expanded_users']:
+            if decimal.Decimal(t[1]) != 0:
+                u_eb = User.objects.get(id=t[0])
+                user_temp[u_eb.id] = [float(t[1]), u_eb.name]
+
+        ref_item = newItem(
+            name = x['name'],
+            price = x['price'],
+            archive_id = 0,
+            house_id = request.session['house_id'],
+            tag = tag,
+            comments = x['comments'],
+            purch_date = p_d,
+            users_a = json.dumps(user_temp), 
+            buyers_a = json.dumps(buyer_temp)
         )
 
         # assign old id number
@@ -171,20 +181,17 @@ def add_item(request):
 
         for t in x['expanded_buyers']:
             if decimal.Decimal(t[1]) != 0:
-                b_link = Buyer_item_rel(
-                    buyer           = User.objects.get(id=t[0]),
+                b_link = Buyer_item(
+                    user            = User.objects.get(id=t[0]),
                     item            = ref_item,
-                    payment_amount  = t[1]
                 )
                 b_link.save()
 
         for t in x['expanded_users']:
             if decimal.Decimal(t[1]) != 0:
-                u_link = User_item_rel(
+                u_link = User_item(
                     user            = User.objects.get(id=t[0]),
                     item            = ref_item,
-                    maybe_buying    = 0,
-                    payment_amount  = t[1]
                 )
                 u_link.save()
 
@@ -203,38 +210,35 @@ def is_equal_values(list):
 # sends item info to the add item page in order to fill it in
 def edit_item(request):
     if request.POST:
-        i = Item.objects.get(id=request.POST.get('item_id'))
-        users = i.user_item_rel_set.all()
+        i = newItem.objects.get(id=request.POST.get('item_id'))
+        users = i.user_item_set.all()
 
         users_string = {}
 
-        for x in User.objects.filter(house_id=request.session['house_id']):
-            users_string[x.id] = 0
-        
         for x in users:
-            users_string[x.user.id] = float(x.payment_amount)
+            users_string[x.user.id] = i.users_o()[str(x.user.id)][0]
 
-        print i.price
         info = {
             'name': i.name, 
             'price': str(i.price), 
             'purch_date': i.purch_date.isoformat().replace('-','/'), 
-            'tags': str(i.tag_name()), 
+            'tags': i.tag.name, 
             'comments': i.comments, 
-            'users': users_string, 'sub_tag': str(i.sub_tag_name())
+            'users': users_string
         }
 
         ind_pay = {}
         buyer_pay = {}
-        #if (is_equal_values([p.payment_amount for p in
-        #                    i.user_item_rel_set.all()]) == False) or ( len(i.buyer_item_rel_set.all()) != 1 ):
-        for t in i.user_item_rel_set.all():
-            ind_pay[t.user.id] = float(t.payment_amount)
 
-        for t in i.buyer_item_rel_set.all():
-            buyer_pay[t.buyer.id] = float(t.payment_amount)
+        for (k,v) in i.users_o().items():
+            ind_pay[k] = v[0]
+
+        for (k,v) in i.buyers_o().items():
+            buyer_pay[k] = v[0]
+
         info['ind_pay'] = ind_pay
         info['buyer_pay'] = buyer_pay
+
         if (is_equal_values(buyer_pay) == True) and (is_equal_values(ind_pay) ==
                                                     True):
             info['equalArray'] = 1
@@ -245,8 +249,8 @@ def edit_item(request):
         return HttpResponse(json.dumps(info))
 
 def clear_cycle(request):
-    i = Item.objects.filter(house_id=request.session['house_id']).filter(archive_id=0)
-    r = Item.objects.filter(house_id=request.session['house_id']).order_by('archive_id').reverse()
+    i = newItem.objects.filter(house_id=request.session['house_id']).filter(archive_id=0)
+    r = newItem.objects.filter(house_id=request.session['house_id']).order_by('archive_id').reverse()
     m = r[0].archive_id + 1
 
     for t in i:
@@ -257,7 +261,7 @@ def clear_cycle(request):
 
 def delete_item(request):
     if request.POST:
-        i = Item.objects.get(id=request.POST.get('delete_id'))
+        i = newItem.objects.get(id=request.POST.get('delete_id'))
 
         # delete tag that has no items
         if len(i.tag.item_set.all()) == 1:

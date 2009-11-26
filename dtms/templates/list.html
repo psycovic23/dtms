@@ -1,5 +1,5 @@
 <div id="topblock">
-	{% ifequal empty "0" %}
+	{% ifnotequal empty "0" %}
 		<div id="titlebar">
 			<span class="header">{{ category.0 }} to {{ category.1 }}</span>
 			<a id="showAnalysis">&nbsp a</a>
@@ -61,10 +61,10 @@
 			<br>
 		</div>
 		{% endifequal %}
-	{% endifequal %}
+	{% endifnotequal %}
 
-	{% ifequal empty "1" %}
-		<h1> no items!</h1>
+	{% ifequal empty 0 %}
+		<h1>no items!</h1>
 	{% endifequal %}
 
 </div>

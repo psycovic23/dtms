@@ -94,8 +94,16 @@
 		return selected_users;
 	}
 
-	$.fn.set_names = function(a){
-		selected_users = a;
+	$.fn.set_names = function(t){
+		selected_users = t;
+		for (x in t){
+			if (t[x] != 0){
+				$('#' + x + 'option').addClass('selected_yes').removeClass('unselected');
+				t[x] = 1;	
+			} else {
+				t[x] = 0;
+			}
+		}
 	}
 
 	$.fn.number_of_selected = function(){
@@ -458,17 +466,7 @@ function loadAddItem(edit_id){
 						success: function(data){
 		
 							// set the user buttons to reflect who's using the item
-							t = {};
-							for (x in data['users']){
-								if (data['users'][x] != 0){
-									$('#' + x + 'option').addClass('selected_yes').removeClass('unselected');
-									t[x] = 1;	
-								} else {
-									t[x] = 0;
-								}
-							}
-							$list_users.set_names(t);
-		
+							$list_users.set_names(data['users']);
 		
 							// editing add_item form data
 							$('#name').val(data['name']);
@@ -476,14 +474,13 @@ function loadAddItem(edit_id){
 							$('#purch_date').val(data['purch_date']);
 							$('#comments').val(data['comments']);
 							$('#tags').val(data['tags']);
-							$('#sub_tag').val(data['sub_tag']);
 							for (x in data['ind_pay'])
 								$("#" + x + "expanded_user").val(data['ind_pay'][x]);
 							
 							for (x in data['buyer_pay'])
 								$("#" + x + "expanded_buyer").val(data['buyer_pay'][x]);
 	
-	
+							// hide or display the clickable items
 							if (data['equalArray'] != 1){
 								$("#expanded_section").css("display", "inline");
 							} else {
