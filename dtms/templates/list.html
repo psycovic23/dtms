@@ -94,11 +94,13 @@
 		<tr id="{{ x.id }}list" class="item">
 			<td class="price">${{x.price|floatformat:2}}</td>
 			<td style="width:200px;"> {{ x.name }}</td>
-			<td style="text-align: right">{{ x.tag }}</td>
+			<td class="tag" style="text-align: right; width:120px;">{{ x.tag }}</td>
 			<td style="text-align: right">{{ x.buyerName}}</td>
 			<td>{{ x.purch_date|date:"m/d" }}</td>
+			{% ifequal archive_id "0" %}
 			<td class="edit">e</td>
 			<td class="delete">d</td>
+			{% endifequal %}
 		</tr>
 		<tr class="item_description">
 			<td></td><td>
@@ -109,6 +111,8 @@
 						<tr><td>{{ value.1 }}</td><td>${{ value.0|floatformat:2 }}</td></tr>
 						{% endfor %}
 					</table>
+					<br>
+					{{ x.comments }} 
 			</td><td style="float:right;">
 					users:
 					<table>
@@ -116,7 +120,7 @@
 						<tr><td>{{ value.1 }}</td><td>${{ value.0|floatformat:2 }}</td></tr>
 						{% endfor %}
 					</table>
-				</td><td></td>
+				</td><td></td><td></td><td></td>
 		</tr>
 		{% endfor %}
 	</table>

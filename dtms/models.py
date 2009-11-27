@@ -61,10 +61,10 @@ class Item_list:
 
     def barGraphData(self, houseMode=0):
         x = {}
+        new_list = self.item_list
+        
         if houseMode == 0:
             new_list = self.item_list.filter(users__id__exact=self.uid)
-        else:
-            new_list = self.item_list
 
         for i in new_list:
             if str(i.tag) not in x:
@@ -105,19 +105,17 @@ class Item_list:
 
         balances = balance_sum.copy()
 
-       # for v in balance_sum.iteritems():
-       #     if v >= 0:
-       #         self.sign[k] = 'p'
-       #     else:
-       #         self.sign[k] = 'n'
-
         if self.ind_balance >= 0:
             self.ind_sign = 'p'
         else:
             self.ind_sign = 'n'
     
         # while array is non zero
+        counter = 1
         while len([p for p in balance_sum if balance_sum[p] != 0]) != 0:
+            counter += 1
+            if counter > 10:
+                raise Exception, "Infinite loop in creating transaction"
     
             # owes = [key, amount]
             owes = min([(val, key) for (key, val) in balance_sum.items()])
@@ -154,13 +152,6 @@ class Tag(models.Model):
 
     def __unicode__(self):
         return self.name
-
-    def cat_price(self):
-        t = self.user_set.all()
-        total_price = 0
-        for x in t:
-            total_price += x.price
-        return [str(self.name), total_price]
 
 class newItem(models.Model):
 

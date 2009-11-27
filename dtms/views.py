@@ -163,7 +163,7 @@ def add_item(request):
 
         ref_item = newItem(
             name = x['name'],
-            price = x['price'],
+            price = decimal.Decimal(x['price']),
             archive_id = 0,
             house_id = request.session['house_id'],
             tag = tag,
@@ -195,6 +195,11 @@ def add_item(request):
                 )
                 u_link.save()
 
+        # error checking
+        if sum([p[0] for p in ref_item.users_o().values()]) != ref_item.price\
+           or sum([p[0] for p in ref_item.buyers_o().values()]) != ref_item.price:
+            raise Exception, "Item values don't add up"
+
         return HttpResponse('success')
 
 def is_equal_values(list):
@@ -213,28 +218,22 @@ def edit_item(request):
         i = newItem.objects.get(id=request.POST.get('item_id'))
         users = i.user_item_set.all()
 
-        users_string = {}
-
-        for x in users:
-            users_string[x.user.id] = i.users_o()[str(x.user.id)][0]
-
         info = {
             'name': i.name, 
             'price': str(i.price), 
             'purch_date': i.purch_date.isoformat().replace('-','/'), 
             'tags': i.tag.name, 
-            'comments': i.comments, 
-            'users': users_string
+            'comments': i.comments
         }
 
         ind_pay = {}
         buyer_pay = {}
 
         for (k,v) in i.users_o().items():
-            ind_pay[k] = v[0]
+            ind_pay[k] = str(v[0])
 
         for (k,v) in i.buyers_o().items():
-            buyer_pay[k] = v[0]
+            buyer_pay[k] = str(v[0])
 
         info['ind_pay'] = ind_pay
         info['buyer_pay'] = buyer_pay
@@ -245,7 +244,7 @@ def edit_item(request):
         else:
             info['equalArray'] = 0
 
-
+        print json.dumps(info)
         return HttpResponse(json.dumps(info))
 
 def clear_cycle(request):

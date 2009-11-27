@@ -3,11 +3,20 @@
 	<input type="text" id="name">
 	<br><br>
 	<div id="hideable">
-	<h1>how much was it?</h1>
-	
-	<span style="font-family:georgia; font-size:16pt;">$</span><input type="text" id="price">
+		<h1>how much was it?</h1>
+		
+		<span style="font-family:georgia; font-size:16pt;">$</span><input type="text" id="price">
+		<a id="advanced">advanced selection</a>
+		<div id="basic_users">
+			<h1>who's using it?</h1>
+			<ul id="list_users">
+				{% for x in names %}
+				<li class="option_text" id="{{x.id}}option">{{ x }}</li>
+				{% endfor %}
+			</ul>
+		</div>
+		<br>
 	</div>
-	<a id="advanced">advanced selection</a>
 	
 	<br><br>
 	<div id="expanded_section">
@@ -34,15 +43,6 @@
 		</div>
 	</div>
 	
-	<div id="basic_users">
-		<h1>who's using it?</h1>
-		<ul id="list_users">
-			{% for x in names %}
-			<li class="option_text" id="{{x.id}}option">{{ x }}</li>
-			{% endfor %}
-		</ul>
-	</div>
-	<br>
 	<h3>purchase date</h3> <input type="text" id="purch_date" size="10">
 	<h3>tag</h3> <input type="text" id="tags">
 	<input style="display:none" type="text" id="sub_tag">

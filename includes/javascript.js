@@ -99,9 +99,6 @@
 		for (x in t){
 			if (t[x] != 0){
 				$('#' + x + 'option').addClass('selected_yes').removeClass('unselected');
-				t[x] = 1;	
-			} else {
-				t[x] = 0;
 			}
 		}
 	}
@@ -236,11 +233,11 @@ function loadItemList(args){
 		});
 		$(".tagNames").click(function(){
 			if ($(this).html() == "all"){
-				$("div.item").slideDown();
+				$("tr.item").show();
 			} else {
-				if ($("span.tag:contains('" + $(this).html() + "')").length != 0){
-					$("span.tag:contains('" + $(this).html() + "')").parent().slideDown();
-					$("span.tag:not(:contains('" + $(this).html() + "'))").parent().slideUp();
+				if ($("td.tag:contains('" + $(this).html() + "')").length != 0){
+					$("td.tag:contains('" + $(this).html() + "')").parent().show();
+					$("td.tag:not(:contains('" + $(this).html() + "'))").parent().hide();
 				}
 			}
 		})
@@ -387,6 +384,8 @@ function submitForm(list_users){
 		});
 	} else {
 		alert('your math sucks. try again.');
+		$("#hideable").css("display", "none");
+		$("expanded_section").css("display", "inline");
 	}
 
 }
@@ -404,11 +403,9 @@ function loadAddItem(edit_id){
 		$("#advanced").click(function(){
 			if ($("#expanded_section").css("display") == "none"){
 				$("#expanded_section").css("display", "inline");
-				$("#basic_users").css("display", "none");
 				$("#hideable").css("display", "none");
 			} else {
 				$("#expanded_section").css("display", "none");
-				$("#basic_users").css("display", "inline");
 				$("#hideable").css("display", "inline");
 			}
 		});
@@ -465,27 +462,28 @@ function loadAddItem(edit_id){
 						dataType: 'json',
 						success: function(data){
 		
-							// set the user buttons to reflect who's using the item
-							$list_users.set_names(data['users']);
-		
 							// editing add_item form data
 							$('#name').val(data['name']);
 							$('#price').val(data['price']);
 							$('#purch_date').val(data['purch_date']);
 							$('#comments').val(data['comments']);
 							$('#tags').val(data['tags']);
-							for (x in data['ind_pay'])
+							for (x in data['ind_pay']){
 								$("#" + x + "expanded_user").val(data['ind_pay'][x]);
+							}
 							
 							for (x in data['buyer_pay'])
 								$("#" + x + "expanded_buyer").val(data['buyer_pay'][x]);
 	
+							$("#expanded_section").css("display", "inline");
+							$("#hideable").css("display", "none");
+							// removing this for now
 							// hide or display the clickable items
-							if (data['equalArray'] != 1){
-								$("#expanded_section").css("display", "inline");
-							} else {
-								$("#expanded_section").css("display", "none");
-							}
+							//if (data['equalArray'] != 1){
+							//	$("#expanded_section").css("display", "inline");
+							//} else {
+							//	$("#expanded_section").css("display", "none");
+							//}
 						},
 						error: function(data){ document.write(data.responseText); }
 					});
