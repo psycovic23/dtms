@@ -13,10 +13,11 @@
 
 	$(document).ready(function(){
 		$('#num_people').change(function(){
+			$(this).attr('disabled', 'true');
 			for (var i = 0; i < $(this).val(); i++){
-				$(this).after('<br><input type="text" id="' + i + 'name" class="name_input">');
+			$(this).after('<div class="name_input"><input type="text" id="' + i + 'name" class="name_input"></div>');
 			}
-			$(this).after('<br><br><span class="name_input">enter their names here</span><br>');
+			$(this).after('<div class="name_input">enter their names here</div>');
 		});
 
 		$("#submit").click(function(){
@@ -44,7 +45,7 @@
 		});
 		$("#reset").click(function(){
 				$(".name_input").remove();
-				$("#num_people").val("");
+				$("#num_people").val("").removeAttr("disabled");
 		});
 	});
 	</script>
@@ -57,7 +58,7 @@
 			<input type="text" id="house_name"><br>
 			
 			<p>how many people live in your house?</p>
-			<input name="num_people" type="text" id="num_people"><br><br>
+			<input name="num_people" type="text" id="num_people"><br>
 
 			<p>choose a group password</p>
 			<input type="password" id="password"><br>

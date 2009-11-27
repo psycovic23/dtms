@@ -64,8 +64,15 @@ def adduser(request):
         return render_to_response('adduser.html', {'success': False},
                               context_instance = RequestContext(request))
     else:
-        nextHID = User.objects.order_by('-house_id')[0].house_id + 1
         d = json.loads(request.POST['d'])
+        if len(User.objects.filter(house_name=d['house_name'])) != 0:
+            return HttpResponse('house name already exists. choose another')
+        
+        if len(set(d['users'])) != len(d['users']):
+            return HttpResponse('same name in the list twice')
+
+        nextHID = User.objects.order_by('-house_id')[0].house_id + 1
+
         for t in d['users']:
             u = User(name=t,
                      house_name=d['house_name'], 
@@ -202,16 +209,6 @@ def add_item(request):
 
         return HttpResponse('success')
 
-def is_equal_values(list):
-    t = []
-    for (k,v) in list.items():
-        t.append(v)
-        
-    for i in range(0, len(t)-1):
-        if t[i] != t[i+1]:
-            return False
-    return True
-
 # sends item info to the add item page in order to fill it in
 def edit_item(request):
     if request.POST:
@@ -237,12 +234,6 @@ def edit_item(request):
 
         info['ind_pay'] = ind_pay
         info['buyer_pay'] = buyer_pay
-
-        if (is_equal_values(buyer_pay) == True) and (is_equal_values(ind_pay) ==
-                                                    True):
-            info['equalArray'] = 1
-        else:
-            info['equalArray'] = 0
 
         print json.dumps(info)
         return HttpResponse(json.dumps(info))

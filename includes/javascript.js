@@ -325,6 +325,8 @@ function submitForm(list_users){
 	var str= $("#purch_date").val();
 	var d = str.split("/");
 	var tag;
+
+	// prevent submitting twice
 	$('#action').unbind('click');
 
 
@@ -371,21 +373,25 @@ function submitForm(list_users){
 	data = $.extend(data, {'expanded_users': getArrayFromInputFields("expanded_users")});
 
 	if (sum(getArrayFromInputFields("expanded_buyers")) == Math.round(sum(getArrayFromInputFields("expanded_users"))*100)/100){
-		var c = JSON.stringify(data);
+		if (sum(getArrayFromInputFields("expanded_users")) != 0){
+			var c = JSON.stringify(data);
 	
-		$.ajax({
-			url: '/dtms/add_item', 
-			type: "POST",
-			data: {'string': c},
-			success: function(data){
-				loadItemList();
-			},
-			error: function(xhr){ document.write(xhr.responseText); }
-		});
+			$.ajax({
+				url: '/dtms/add_item', 
+				type: "POST",
+				data: {'string': c},
+				success: function(data){
+					loadItemList();
+				},
+				error: function(xhr){ document.write(xhr.responseText); }
+			});
+		} else {
+			alert('select people to use the item');
+		}
 	} else {
 		alert('your math sucks. try again.');
 		$("#hideable").css("display", "none");
-		$("expanded_section").css("display", "inline");
+		$("#expanded_section").css("display", "inline");
 	}
 
 }
