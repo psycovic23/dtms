@@ -263,7 +263,7 @@ def delete_item(request):
         i = newItem.objects.get(id=request.POST.get('delete_id'))
 
         # delete tag that has no items
-        if len(i.tag.item_set.all()) == 1:
+        if len(i.tag.newitem_set.all()) == 1:
             i.tag.delete()
         i.delete()
         return HttpResponse(json.dumps({'delete_message': 'deleted'}))
