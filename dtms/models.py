@@ -45,13 +45,6 @@ class Item_list:
                 u_o = t.users_o()
                 b_o = t.buyers_o()
 
-                if len(b_o) != 1:
-                    t.buyerName = 'multiple'
-                else:
-                    #(Pdb) b_o.items()
-                    #[(u'14', [4.5899999999999999, u'susan'])]
-                    t.buyerName = b_o.items()[0][1][1]
-
                 if u_o.has_key(str(u.id)):
                     t.price = u_o[str(u.id)][0]
                 else:
@@ -181,6 +174,17 @@ class newItem(models.Model):
 
     def users_o(self):
         return json.loads(self.users_a, parse_float=decimal_parse)
+
+    def buyerName(self):
+        u_o = self.users_o()
+        b_o = self.buyers_o()
+
+        if len(b_o) != 1:
+            return 'multiple'
+        else:
+            #(Pdb) b_o.items()
+            #[(u'14', [4.5899999999999999, u'susan'])]
+            return b_o.items()[0][1][1]
 
     def __unicode__(self):
         return self.name
