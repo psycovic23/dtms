@@ -34,7 +34,7 @@ class Item_list:
     def ret_list(self):
         print self.houseMode
         if self.houseMode=='1':
-            return self.item_list.order_by('-id')
+            return self.item_list.order_by('-purch_date')
         else:
             # find anything that you bought or used and how much you paid for it
             u = User.objects.select_related().get(id=self.uid)
@@ -56,7 +56,7 @@ class Item_list:
                     t.price = u_o[str(u.id)][0]
                 else:
                     t.price = b_o[str(u.id)][0]
-            return items
+            return items.order_by('-purch_date')
 
 
     def barGraphData(self, houseMode=0):
