@@ -70,6 +70,10 @@ def adduser(request):
         
         if len(set(d['users'])) != len(d['users']):
             return HttpResponse('same name in the list twice')
+        
+        if len(d['password']) == 0:
+            return HttpResponse('put in a password!')
+        
 
         nextHID = User.objects.order_by('-house_id')[0].house_id + 1
 

@@ -12,7 +12,7 @@
 	<script type="text/javascript">
 
 	$(document).ready(function(){
-		$('#num_people').change(function(){
+		$('#num_people').blur(function(){
 			$(this).attr('disabled', 'true');
 			for (var i = 0; i < $(this).val(); i++){
 			$(this).after('<div class="name_input"><input type="text" id="' + i + 'name" class="name_input"></div>');
@@ -30,15 +30,19 @@
 			d.password = $("#password").val();
 			
 			$.ajax({
-				url: '/dtms/adduser',
+				url: '/dtms/signup',
 				type: 'POST',
 				data: {'d': JSON.stringify(d)},
-				dataType: 'json',
-				success: function(responseData){
-					console.log('success');
+				success: function(data){
+					$("#error").html(data);
+					if (data == 'success'){
+						$("#error").html('success. redirecting you to login');
+						setTimeout("document.location='login';",2000);
+					}
+						
 				},
-				error: function(responseData){
-					console.log('fail');
+				error: function(data){
+					console.log('writing error');
 				}
 			});
 
@@ -53,6 +57,7 @@
 </head>
 <body>
     <div id="container">dtms - create user <br><br>
+		<div id="error" style="color: red;"></div>
 		<div style="text-align: center">
 			<p>choose a house name</p>
 			<input type="text" id="house_name"><br>

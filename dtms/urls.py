@@ -6,7 +6,7 @@ from views import *
     #admin.autodiscover()
 
 urlpatterns = patterns('',
-	(r'^adduser$', adduser),
+	(r'^signup$', adduser),
     (r'^addItem$', addItemPage),
     (r'^list$', item_list),
 	(r'^list/(?P<a_num>\d+)/$', item_list),
