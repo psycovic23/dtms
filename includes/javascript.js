@@ -4,6 +4,7 @@
 
 // toggle_selected plugin - toggles colors for list_users
 (function($) {		
+ 	// dictionary containing keys of who is selected
 	var selected_users = {};
 
 	// for state of all_button
@@ -143,10 +144,10 @@ function loadItemList(args){
 		// load the data into rightPanel	
 		$("#rightPanel").html(data['html']).fadeIn("fast");
 
-		// give fancy js behavior
+		// fancy actions for clicking on an item in the items list
+		// it reveals the item_description tr and stops the hover coloring
 		$(".item").toggle(
 			function(){
-				//$(this).find('.item_description').slideDown('normal');
 				$(this).css({'borderBottom': 0});
 				$(this).next().show();
 				$(this).unbind('mouseover').unbind('mouseout').css({'background-color': '#fff'});
@@ -160,6 +161,7 @@ function loadItemList(args){
 				});
 			});
 
+		// hide item_description on load
 		$(".item_description").hide();
 	
 		// delete button behavior
@@ -177,7 +179,6 @@ function loadItemList(args){
 	
 		// edit button behavior
 		$(".edit").click(function(){
-
 			// this id corresponds to the unique id in the django db
 			edit_id = parseInt($(this).parent().attr('id'));
 			loadAddItem(edit_id);
@@ -185,6 +186,7 @@ function loadItemList(args){
 
 		// load graph data and hide the div
 		var graphdata = eval(data['graphData']);
+		// tool tip for hovering (need to add fadeout)
 	    function showTooltip(x, y, contents) {
 	        $('<div id="tooltip">' + contents + '</div>').css( {
 	            position: 'absolute',
@@ -224,13 +226,14 @@ function loadItemList(args){
 
 		$("#graph").hide();
 
-		// taglist behavior
 		$('#tagList').hide();
+		// dropdown taglist
 		$('#toggleTagList').toggle(function(){
 			$('#tagList').slideDown('fast');
 		}, function(){
 			$('#tagList').slideUp('fast');
 		});
+		// filtering for tag list
 		$(".tagNames").click(function(){
 			if ($(this).html() == "all"){
 				$("tr.item").show();
@@ -244,7 +247,7 @@ function loadItemList(args){
 
 
 
-		// load analysis button
+		// load analysis button (this is actually just the graph button)
 		$("#showAnalysis").toggle(function(){
 			$("#graph").slideDown('slow');
 			$(this).val('hide analysis')
@@ -279,9 +282,7 @@ function loadItemList(args){
 
 
 	// call to run Config function
-
 	$("#rightPanel").fadeOut("fast", function(){
-
 		// determine what archive list to load, based on arguments from options
 		
 		var url_str = '/dtms/item_list';
@@ -483,13 +484,6 @@ function loadAddItem(edit_id){
 	
 							$("#expanded_section").css("display", "inline");
 							$("#hideable").css("display", "none");
-							// removing this for now
-							// hide or display the clickable items
-							//if (data['equalArray'] != 1){
-							//	$("#expanded_section").css("display", "inline");
-							//} else {
-							//	$("#expanded_section").css("display", "none");
-							//}
 						},
 						error: function(data){ document.write(data.responseText); }
 					});
