@@ -188,7 +188,7 @@ function loadItemList(args){
 		var graphdata = eval(data['graphData']);
 		// tool tip for hovering (need to add fadeout)
 	    function showTooltip(x, y, contents) {
-	        $('<div id="tooltip">' + contents + '</div>').css( {
+	        var t = $('<div id="tooltip">' + contents + '</div>').css( {
 	            position: 'absolute',
 	            display: 'none',
 	            top: y + 5,
@@ -198,6 +198,9 @@ function loadItemList(args){
 	            'background-color': '#fee',
 	            opacity: 0.80
 	        }).appendTo("body").fadeIn(600);
+			function f() { t.fadeOut(600); };
+			setTimeout(f, 600);
+
 	    }
 
 		$.plot($("#graph"), graphdata, {
@@ -373,6 +376,7 @@ function submitForm(list_users){
 	data = $.extend(data, {'expanded_buyers': getArrayFromInputFields("expanded_buyers")});
 	data = $.extend(data, {'expanded_users': getArrayFromInputFields("expanded_users")});
 
+	// add up all the values from expanded_buyers and expanded_users
 	if (sum(getArrayFromInputFields("expanded_buyers")) == Math.round(sum(getArrayFromInputFields("expanded_users"))*100)/100){
 		if (sum(getArrayFromInputFields("expanded_users")) != 0){
 			var c = JSON.stringify(data);
