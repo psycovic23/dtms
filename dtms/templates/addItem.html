@@ -6,22 +6,28 @@
 		<h1>how much was it?</h1>
 		
 		<span style="font-family:georgia; font-size:16pt;">$</span><input type="text" id="price">
-		<a id="advanced">advanced selection</a>
+		<br><br>
+		<div class="mega">who bought it?</div>
+		<a class="advanced gray" style="cursor: pointer">(change buyers)</a>
+		<br><br>
+		<span style="margin-left: 50px;">{{ default_buyer }}</span>
+		<br><br>
+
 		<div id="basic_users">
-			<h1>who's using it?</h1>
+			<div class="mega">who's using it?</div>
+			<a class="advanced gray" style="cursor: pointer">(manually input payment breakdown)</a>
+			<br>
 			<ul id="list_users">
 				{% for x in names %}
 				<li class="option_text" id="{{x.id}}option">{{ x }}</li>
 				{% endfor %}
 			</ul>
 		</div>
-		<br>
 	</div>
 	
-	<br><br>
 	<div id="expanded_section">
 		<div id="expanded_buyers">
-			<h1>how much did the buyers spend?</h1>
+			<h1>how much did each buyer spend?</h1>
 			<table>
 				{% for x in names%}
 				<tr>

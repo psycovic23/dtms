@@ -90,7 +90,8 @@ def addItemPage(request):
     t = get_template('addItem.html')
     html = t.render(Context({"names":
                              User.objects.filter(house_id=request.session['house_id']),
-                             "user_id": request.session['user_id']}))
+                             "user_id": request.session['user_id'],
+                             "default_buyer": User.objects.get(id=request.session['user_id']).name }))
     tags = Tag.objects.filter(house_id=request.session['house_id'])
     return HttpResponse(json.dumps({'html': html, 'tags': [p.name for p in
                                                            tags]}))

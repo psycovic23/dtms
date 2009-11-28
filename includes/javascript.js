@@ -406,7 +406,7 @@ function loadAddItem(edit_id){
 		$("#tags").autocomplete(data['tags']);
 	
 		// make the advanced selection button
-		$("#advanced").click(function(){
+		$(".advanced").click(function(){
 			if ($("#expanded_section").css("display") == "none"){
 				$("#expanded_section").css("display", "inline");
 				$("#hideable").css("display", "none");
