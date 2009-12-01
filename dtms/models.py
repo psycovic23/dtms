@@ -39,7 +39,7 @@ class Item_list:
             # find anything that you bought or used and how much you paid for it
             u = User.objects.select_related().get(id=self.uid)
             items = self.item_list.filter((Q(user_item__user__exact=u) |
-                                      Q(buyer_item__user__exact=u))).distinct().order_by('-id')
+                                      Q(buyer_item__user__exact=u))).distinct().order_by('-purch_date')
 
             for t in items:
                 u_o = t.users_o()
@@ -49,7 +49,7 @@ class Item_list:
                     t.price = u_o[str(u.id)][0]
                 else:
                     t.price = b_o[str(u.id)][0]
-            return items.order_by('-purch_date')
+            return items
 
 
     def barGraphData(self, houseMode=0):
