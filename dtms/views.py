@@ -175,7 +175,7 @@ def add_item(request):
 
         ref_item = newItem(
             name = x['name'],
-            price = decimal.Decimal(x['price']),
+            price = decimal.Decimal(str(round(float(x['price']), 2))),
             archive_id = 0,
             house_id = request.session['house_id'],
             tag = tag,
