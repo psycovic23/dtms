@@ -2,8 +2,8 @@
 	{% ifnotequal empty "0" %}
 		<div id="titlebar">
 			<span class="header">{{ category.0 }} to {{ category.1 }}</span>
-			<a id="showAnalysis">&nbsp a</a>
-			<a id="houseMode">h</a>
+			<a id="showAnalysis">&nbsp<img src="images/graph_20px.png" /></a>
+			<a id="houseMode"></a>
 			<span id="archive_id" style="display:none">{{ archive_id }}</span>
 		</div>
 		<br>
@@ -98,8 +98,8 @@
 			<td style="text-align: right">{{ x.buyerName}}</td>
 			<td>{{ x.purch_date|date:"m/d" }}</td>
 			{% ifequal archive_id "0" %}
-			<td class="edit">e</td>
-			<td class="delete">d</td>
+			<td class="edit"><img src="images/edit_15px.png" /></td>
+			<td class="delete"><img src="images/delete_15px.png"</td>
 			{% endifequal %}
 		</tr>
 		<tr class="item_description">

@@ -261,9 +261,9 @@ function loadItemList(args){
 
 		// show house mode button
 		if (options['houseMode'] == 1)
-			$("#houseMode").html('y');
+			$("#houseMode").html('<img src="images/person_20px.png" />');
 		else
-			$("#houseMode").html('h');
+			$("#houseMode").html('<img src="images/house_20px.png" />');
 		$("#houseMode").click(function(){
 			loadItemList({'houseMode': (options['houseMode'] + 1) % 2, 'archive_id':$("#archive_id").html()});
 		});
