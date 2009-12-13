@@ -2,7 +2,7 @@
 	{% ifnotequal empty "0" %}
 		<div id="titlebar">
 			<span class="header">{{ category.0 }} to {{ category.1 }}</span>
-			<a id="showAnalysis">&nbsp<img src="../static/images/graph_20px.png" /></a>
+			<a id="showAnalysis">&nbsp&nbsp&nbsp<img src="../static/images/graph_20px.png" /></a>
 			<a id="houseMode"></a>
 			<span id="archive_id" style="display:none">{{ archive_id }}</span>
 		</div>
@@ -70,7 +70,7 @@
 </div>
 
 <div id="bottomblock">
-	<div id="toggleTagList" class="gray">show tag list</div>
+	<div id="toggleTagList" class="gray">filter by tags</div>
 	<div id="tagList">
 		<span class="gray">tags: &nbsp</span>
 		{% for t in tags %}

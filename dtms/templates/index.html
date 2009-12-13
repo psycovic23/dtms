@@ -7,9 +7,10 @@
 	<meta name="description" content="">
 	{% ifequal MEDIA_URL "localhost" %}
 	<script type="text/javascript" src="jquery.js"></script>
-	<script type="text/javascript" src="jqModal.js"></script>
 	<script type="text/javascript" src="javascript.js"></script>
 	<script type="text/javascript" src="jquery.flot.js"></script>
+	<script type="text/javascript" src="highcharts.js"></script>
+	<script type="text/javascript" src="excanvas.compiled.js"></script>
 	<script type="text/javascript" src="jquery.autocomplete.js"></script>
 	<script type="text/javascript" src="jqModal.js"></script>
 	<script type="text/javascript" src="json2.js"></script>
@@ -20,7 +21,6 @@
 	{% endifequal %}
 	{% ifnotequal MEDIA_URL "localhost" %}
 	<script type="text/javascript" src="../static/jquery.js"></script>
-	<script type="text/javascript" src="../static/jqModal.js"></script>
 	<script type="text/javascript" src="../static/javascript.js"></script>
 	<script type="text/javascript" src="../static/jquery.flot.js"></script>
 	<script type="text/javascript" src="../static/jquery.autocomplete.js"></script>

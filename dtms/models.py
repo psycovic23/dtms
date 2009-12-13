@@ -48,7 +48,7 @@ class Item_list:
                 if u_o.has_key(str(u.id)):
                     t.price = u_o[str(u.id)][0]
                 else:
-                    t.price = b_o[str(u.id)][0]
+                    t.price = -1 * b_o[str(u.id)][0]
             return items
 
 
