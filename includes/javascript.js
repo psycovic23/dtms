@@ -4,54 +4,63 @@
 
 // toggle_selected plugin - toggles colors for list_users
 (function($) {		
- 	// dictionary containing keys of who is selected
-	var selected_users = {};
+	$.fn.toggle_selected = function(multi){
 
-	// for state of all_button
-	var allbutton_status = 0;
+		if (multi === undefined){
+			var multi = true;
+		}
+			
+		var $list = this;
+		$list.data('selected', {});
+		var $list_elements = $('li', this);
 
-	$.fn.toggle_selected = function () {
-		$list = this;
-		$list_elements = $('li', this);
+		if (multi == true){
+			var $all_button = $('<li>All</a>');
+			$all_button.data('status', 0);
+			$(this).prepend($all_button);
 
-		$all_button = $('<li class="option_text">All</a>');
-		$(this).prepend($all_button);
+			// all button behaviors
+			if (!$all_button.hasClass("unselected")){
+				$all_button.addClass("unselected");
+				$all_button.mouseover( function() {
+					$all_button.addClass("hover");
+				});	
+				$all_button.mouseout( function() {
+					$all_button.removeClass("hover");
+				});
+			}
 
-		// all button behaviors
-		if (!$all_button.hasClass("unselected")){
-			$all_button.addClass("unselected");
-			$all_button.mouseover( function() {
-				$all_button.addClass("hover");
-			});	
-			$all_button.mouseout( function() {
-				$all_button.removeClass("hover");
+			$all_button.click(function(){
+				$list_elements.removeClass();
+				if ($all_button.data('status') == 0){
+					$all_button.addClass('selected_yes');
+					$list_elements.addClass('selected_yes');
+					$all_button.data('status', 1);
+					$list_elements.each(function(){
+						var temp = $list.data('selected');
+						temp[parseInt($(this).attr('id'))] = 1;
+						$list.data('selected', temp);
+					});
+				} else {
+					$all_button.removeClass('selected_yes');
+					$list_elements.addClass('unselected');
+					$all_button.data('status', 0);
+					$list_elements.each(function(){
+						var temp = $list.data('selected');
+						temp[parseInt($(this).attr('id'))] = 0;
+						$list.data('selected', temp);
+					});
+				}
+				console.log($list.data('selected'));
 			});
 		}
-
-		$all_button.click(function(){
-			$list_elements.removeClass().addClass('option_text');
-			if (allbutton_status == 0){
-				$all_button.addClass('selected_yes');
-				$list_elements.addClass('selected_yes');
-				allbutton_status = 1;
-				$list_elements.each(function(){
-					selected_users[parseInt($(this).attr('id'))] = 1;
-				});
-			}
-			else {
-				$all_button.removeClass('selected_yes');
-				$list_elements.addClass('unselected');
-				allbutton_status = 0;
-				$list_elements.each(function(){
-					selected_users[parseInt($(this).attr('id'))] = 0;
-				});
-			}
-		});
 		
 		// each element of list behavior
-		return $list_elements.each( function() {
+		$list_elements.each( function() {
 			
-			selected_users[parseInt($(this).attr('id'))] = 0;
+			var temp = $list.data('selected');
+			temp[parseInt($(this).attr('id'))] = 0;
+			$list.data('selected', temp);
 
 			// initialize each to unselected and add mouseover/out event
 			if (!$(this).hasClass("unselected")){
@@ -68,13 +77,16 @@
 				var id = parseInt($(this).attr('id'));
 	
 				// flip between unselected and selected
-				if ($(this).hasClass("hover") || $(this).hasClass('unselected')){
+				if ($(this).hasClass('unselected')){
 					$(this).removeClass("hover").removeClass('unselected').addClass("selected_yes").unbind('mouseover').unbind('mouseout'); 
-					selected_users[id] = 1;
-	
+					temp = $list.data('selected');
+					temp[id] = 1;
+					$list.data('selected', temp);
 				} else if ($(this).hasClass("selected_yes")){
-					selected_users[id] = 0;
-					$(this).removeClass("selected_yes").addClass("unselected");
+					temp = $list.data('selected');
+					temp[id] = 0;
+					$list.data('selected', temp);
+					$(this).removeClass("selected_yes").removeClass('hover').addClass("unselected");
 					$(this).mouseover( function() {
 						$(this).addClass("hover");
 					});	
@@ -82,21 +94,30 @@
 						$(this).removeClass("hover");
 					}); 
 				}
+
+				if (multi == false){
+					$list_elements.not(this).removeClass('selected_yes').addClass("unselected").each(function(){
+						temp = $list.data('selected');
+						temp[parseInt($(this).attr('id'))] = 0;
+						$list.data('selected', temp);
+					});
+				}
+				console.log($list.data('selected'));
 			});
 		});
+		return $list;
 	}
 
 	$.fn.clear_names = function(){
 		$(this).removeClass("selected_yes").addClass("unselected");
-		allbutton_status = 0;
 	}
 
 	$.fn.return_names = function(){
-		return selected_users;
+		return $(this).data('selected');
 	}
 
 	$.fn.set_names = function(t){
-		selected_users = t;
+		$(this).data('selected', t);
 		for (x in t){
 			if (t[x] != 0){
 				$('#' + x + 'option').addClass('selected_yes').removeClass('unselected');
@@ -114,7 +135,8 @@
 			return num;
 		}
 
-		return nnz(selected_users);
+		console.log($(this).data('selected'));
+		return nnz($(this).data('selected'));
 	}
 
 })(jQuery);
@@ -351,19 +373,19 @@ function submitForm(list_users){
 	};
 
 	// this only works for users_yes, not the maybe part	
-	if ($("#expanded_section").css('display') == "none"){
-		var uid = $("#user_id").val();
+	if ($("#expanded_users").css('display') == "none"){
+		var uid = $("#uid").html();
 		var p = $("#price").val();
 		var ind_p = Math.round(100 * p / list_users.number_of_selected())/100;
 
-		if ($("#action").html() != 'edit')
-			$("#" + uid + "expanded_buyer").val(Math.round(ind_p * list_users.number_of_selected()*100)/100);
+		if ($("#action").html() != 'edit' && $("#expanded_buyers").css('display') == 'none')
+			$("#" + uid + "eb").val(Math.round(ind_p * list_users.number_of_selected()*100)/100);
 
 		data['price'] = String(ind_p * list_users.number_of_selected()); 
 		var a = list_users.return_names();
 		for (t in a){
 			if (a[t])
-				$("#" + parseInt(t) + "expanded_user").val(ind_p);
+				$("#" + parseInt(t) + "eu").val(ind_p);
 		}
 	} else {
 		data['price'] = (sum(getArrayFromInputFields("expanded_buyers")));
@@ -392,11 +414,17 @@ function submitForm(list_users){
 			});
 		} else {
 			alert('select people to use the item');
+			$("#action").click(function(){
+				submitForm($list_users);
+			});
 		}
 	} else {
 		alert('your math sucks. try again.');
 		$("#hideable").css("display", "none");
 		$("#expanded_section").css("display", "inline");
+		$("#action").click(function(){
+			submitForm($list_users);
+		});
 	}
 
 }
@@ -405,21 +433,32 @@ function submitForm(list_users){
 function loadAddItem(edit_id){
 	function addItemConfigure(data){
 		// load item list
-		var $list_users = $('#list_users').toggle_selected();
+		var $list_users = $('#list_users').toggle_selected(true);
 		setFieldsToZero();
 
 		$("#tags").autocomplete(data['tags']);
+		var $list_buyers = $("#list_buyers").toggle_selected(false);
 	
-		// make the advanced selection button
-		$(".advanced").click(function(){
-			if ($("#expanded_section").css("display") == "none"){
-				$("#expanded_section").css("display", "inline");
-				$("#hideable").css("display", "none");
-			} else {
-				$("#expanded_section").css("display", "none");
-				$("#hideable").css("display", "inline");
-			}
+		// make the advanced selection buttons
+		$("#b_buyer").toggle(function(){
+			$("#basic_buyers").css("display", "none");
+			$("#expanded_buyers").css("display", "inline");
+		}, function() {
+			$("#expanded_buyers").css("display", "none");
+			$("#basic_buyers").css("display", "inline");
 		});
+
+		$("#b_user").toggle(function(){
+			$("#basic_users").css("display", "none");
+			$("#expanded_users").css("display", "inline");
+		}, function() {
+			$("#expanded_users").css("display", "none");
+			$("#basic_users").css("display", "inline");
+		});
+
+		// hide expanded sections
+		$("#expanded_buyers").css('display', 'none');
+		$("#expanded_users").css('display', 'none');
 	
 		// item submit button
 		$("#action").click(function(){
@@ -452,7 +491,6 @@ function loadAddItem(edit_id){
 
 				// initialization steps
 				$("#action").text('submit');
-				$("#expanded_section").css("display", "none");
 				setFieldsToZero();
 
 				$list_users = addItemConfigure(data);
@@ -480,14 +518,16 @@ function loadAddItem(edit_id){
 							$('#comments').val(data['comments']);
 							$('#tags').val(data['tags']);
 							for (x in data['ind_pay']){
-								$("#" + x + "expanded_user").val(data['ind_pay'][x]);
+								$("#" + x + "eu").val(data['ind_pay'][x]);
 							}
 							
 							for (x in data['buyer_pay'])
-								$("#" + x + "expanded_buyer").val(data['buyer_pay'][x]);
+								$("#" + x + "eb").val(data['buyer_pay'][x]);
 	
-							$("#expanded_section").css("display", "inline");
-							$("#hideable").css("display", "none");
+							$("#expanded_buyers").css("display", "inline");
+							$("#expanded_users").css("display", "inline");
+							$("#basic_buyers").css("display", "none");
+							$("#basic_users").css("display", "none");
 						},
 						error: function(data){ document.write(data.responseText); }
 					});

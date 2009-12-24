@@ -154,8 +154,8 @@ def add_item(request):
             ref_item            = newItem.objects.get(id=x['edit_id'])
             
             # delete tag that has no items
-            if (len(ref_item.tag.newitem_set.all()) == 1) and (ref_item.tag !=
-                                                            t):
+            if (len(ref_item.tag.newitem_set.all()) == 1) and (ref_item.tag
+                                                               !=tag):
                 ref_item.tag.delete()
 
             ref_item.delete()

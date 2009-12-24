@@ -45,7 +45,7 @@ h3 {
 	display: none;
 }
 
-#topblock, #bottomblock, #genericWrapper{
+#topblock, #bottomblock, #addItemContainer{
 	border: 1px solid #999;
 	-moz-border-radius: 5px;
 	-webkit-border-radius: 5px;
@@ -100,45 +100,27 @@ h3 {
 
 /* Styles for the toggle_selected plugin used in the addItemBox window*/
 
-#advanced {
-	color: #000;
-	font-size:6pt;
-}
-.selected_maybe {
-	background-color: #e8e781;
-	color: #000;
-	border: 1px #000 solid;
-}	
-
-#basic_users .unselected {
-	background-color: #fff; 
-	border: 1px #fff solid;
-	color: #000; 
+#addItemContainer li {
+	cursor: pointer;
 	padding: 3px 5px;
+	list-style-type: none;
+	display: inline;
+}
+#addItemContainer li::selection {
+	background: transparent;
 }
 
-#basic_users .selected_yes, #basic_users .hover {
+.unselected {
+	background-color: #fff; 
+	color: #000; 
+}
+
+.selected_yes, .hover {
 	background-color: #181818; 
 	color: #fff;
-	border: 1px #000 solid;
-	padding: 3px 5px;
 }
 
-#all_name::-moz-selection {
-	background:transparent;
-}
-
-#all_name {
-	cursor: pointer;
-}
-
-.option_text::-moz-selection {
-	background:transparent;
-}
-.option_text {
-	cursor: pointer;
-}
-#list_users::-moz-selection {
+#addItemContainer li::selection, #list_buyers::selection, #list_user::selection, #list_buyers::-moz-selection, #list_users::-moz-selection {
 	background:transparent;
 }
 
@@ -153,15 +135,6 @@ h3 {
 #action:hover, #cancel:hover {
 	color: #40ad34;
 }
-
-#list_users li {
-	display:inline;
-}
-
-#expanded_section {
-	display: none;
-}
-
 
 /* styles for the list of items that comes from /list */
 

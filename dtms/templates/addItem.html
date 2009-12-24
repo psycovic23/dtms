@@ -1,52 +1,49 @@
-<div id="genericWrapper">
+<div id="addItemContainer">
 	<h1>what was it?</h1>
 	<input type="text" id="name">
 	<br><br>
-	<div id="hideable">
-		<h1>how much was it?</h1>
-		
-		<span style="font-family:georgia; font-size:16pt;">$</span><input type="text" id="price">
-		<br><br>
-		<div class="mega">who bought it?</div>
-		<a class="advanced gray" style="cursor: pointer">(change buyers)</a>
-		<br><br>
-		<span style="margin-left: 50px;">{{ default_buyer }}</span>
-		<br><br>
 
-		<div id="basic_users">
-			<div class="mega">who's using it?</div>
-			<a class="advanced gray" style="cursor: pointer">(manually input payment breakdown)</a>
-			<br>
-			<ul id="list_users">
-				{% for x in names %}
-				<li class="option_text" id="{{x.id}}option">{{ x }}</li>
-				{% endfor %}
-			</ul>
-		</div>
+	<h1>how much was it?</h1>
+	<span style="font-family:georgia; font-size:16pt;">$</span><input type="text" id="price">
+	<br><br>
+
+
+	<h1>who bought it?</h1><a id="b_buyer" class="gray" style="cursor: pointer">(breakdown payments)</a>
+	<div id="expanded_buyers">
+		<table>
+			{% for x in names%}
+			<tr>
+				<td>{{ x }}: </td><td><input type="text" value="0" id="{{x.id}}eb"></td>
+			</tr>
+			{% endfor %}
+		</table>
 	</div>
-	
-	<div id="expanded_section">
-		<div id="expanded_buyers">
-			<h1>how much did each buyer spend?</h1>
-			<table>
-				{% for x in names%}
-				<tr>
-					<td>{{ x }}: </td><td><input type="text" value="0" id="{{x.id}}expanded_buyer"></td>
-				</tr>
-				{% endfor %}
-			</table>
-		</div>
-	
-		<div id="expanded_users">
-			<h1>how much will each person pay?</h1>
-			<table>
-				{% for x in names%}
-				<tr>
-					<td>{{ x }}: </td><td><input type="text" value="0" id="{{x.id}}expanded_user"></td>
-				</tr>
-				{% endfor %}
-			</table>
-		</div>
+	<div id="basic_buyers">
+		<br>
+		<ul id="list_buyers">
+			{% for x in names %}
+			<li class="option_text" id="{{x.id}}b">{{ x }}</li>
+			{% endfor %}
+		</ul>
+	</div>
+
+	<h1>who's using it?</h1><a id="b_user" class="gray" style="cursor: pointer">(breakdown payment)</a>
+	<div id="basic_users">
+		<br>
+		<ul id="list_users">
+			{% for x in names %}
+			<li class="option_text" id="{{x.id}}a">{{ x }}</li>
+			{% endfor %}
+		</ul>
+	</div>
+	<div id="expanded_users">
+		<table>
+			{% for x in names%}
+			<tr>
+				<td>{{ x }}: </td><td><input type="text" value="0" id="{{x.id}}eu"></td>
+			</tr>
+			{% endfor %}
+		</table>
 	</div>
 	
 	<h3>purchase date</h3> <input type="text" id="purch_date" size="10">
