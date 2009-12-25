@@ -1,5 +1,5 @@
 body {
-	font-family: Georgia;
+	font-family: Georgia, sans-serif;
 	background-color: #181818;
 }
 
@@ -24,6 +24,11 @@ h3 {
 
 
 /* layout business */
+#graph {
+	position: relative;
+	height:300px;
+	width: 600px;
+}
 
 .jqmWindow {
     display: none;
@@ -217,14 +222,6 @@ tr.item:hover {
 
 .purch_date, .buyers, .edit, .delete {
 	color: #999;
-}
-
-#graph {
-	width: 400px;
-	height: 200px;
-	margin-left: auto;
-	margin-right: auto;
-	clear: both;
 }
 
 td {

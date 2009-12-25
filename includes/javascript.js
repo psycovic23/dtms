@@ -51,7 +51,6 @@
 						$list.data('selected', temp);
 					});
 				}
-				console.log($list.data('selected'));
 			});
 		}
 		
@@ -102,7 +101,6 @@
 						$list.data('selected', temp);
 					});
 				}
-				console.log($list.data('selected'));
 			});
 		});
 		return $list;
@@ -135,7 +133,6 @@
 			return num;
 		}
 
-		console.log($(this).data('selected'));
 		return nnz($(this).data('selected'));
 	}
 
@@ -206,50 +203,6 @@ function loadItemList(args){
 			loadAddItem(edit_id);
 		});
 
-		// load graph data and hide the div
-		var graphdata = eval(data['graphData']);
-		// tool tip for hovering (need to add fadeout)
-	    function showTooltip(x, y, contents) {
-	        var t = $('<div id="tooltip">' + contents + '</div>').css( {
-	            position: 'absolute',
-	            display: 'none',
-	            top: y + 5,
-	            left: x + 5,
-	            border: '1px solid #fdd',
-	            padding: '2px',
-	            'background-color': '#fee',
-	            opacity: 0.80
-	        }).appendTo("body").fadeIn(600);
-			function f() { t.fadeOut(600); };
-			setTimeout(f, 600);
-
-	    }
-
-		$.plot($("#graph"), graphdata, {
-			xaxis: {autoscaleMargin: .5, ticks: 0}, 
-			yaxis: {autoscaleMargin: .5}, 
-			grid: {hoverable: true, clickable: true}, 
-			bars: {show: true}
-		}); 
-
-		// potential bug - if tags have overlapping text, it filters incorrectly
-		$("#graph").bind("plotclick", function(event, pos, item){
-			if ($("span.tag:contains('" + item.series.label + "')").length != 0){
-				$("span.tag:contains('" + item.series.label + "')").parent().slideDown();
-				$("span.tag:not(:contains('" + item.series.label + "'))").parent().slideUp();
-			}
-		}).bind("plothover", function(event, pos, item){
-			if (item){
-				var x = item.datapoint[0].toFixed(2), 
-					y = item.datapoint[1].toFixed(2);
-				showTooltip(item.pageX, item.pageY,
-					item.series.label + ": $" + y );
-			} else {
-				$("#tooltip").remove();
-			}
-		});
-
-		$("#graph").hide();
 
 		$('#tagList').hide();
 		// dropdown taglist
@@ -258,6 +211,7 @@ function loadItemList(args){
 		}, function(){
 			$('#tagList').slideUp('fast');
 		});
+
 		// filtering for tag list
 		$(".tagNames").click(function(){
 			if ($(this).html() == "all"){
@@ -272,13 +226,61 @@ function loadItemList(args){
 
 
 
-		// load analysis button (this is actually just the graph button)
+		// graph stuff
+		var graphdata = eval(data['graphData']);
+
+		$("#graph").hide();
+		var chart1 = 0;
 		$("#showAnalysis").toggle(function(){
-			$("#graph").slideDown('slow');
-			$(this).val('hide analysis')
+			$("#graph").show();
+			if (chart1 == 0){
+				chart1 = new Highcharts.Chart({
+					chart: {
+						renderTo: 'graph',
+						defaultSeriesType: 'column',
+						height: 200,
+						margin: [50,50,100,80]
+					},
+					title: {
+						text: "let's see where that all went..."
+					},
+					xAxis: {
+						categories: graphdata[0]['categories'],
+						labels: {
+							rotation: -45,
+							align: 'right',
+							style: {
+								font: 'normal 13px georgia, sans-serif'
+							}
+						}
+					},
+					yAxis: {
+						min: 0,
+						title: {
+							text: '$'
+						}
+					},
+					legend: {
+						enabled: false
+					},
+					tooltip: {
+						formatter: function(){
+							return '<b>'+ this.x + ': $' + this.y + '</b><br/>';
+						}
+					},
+					series: [{
+						name: 'money',
+						data: graphdata[0]['series'],
+						dataLabels: {
+							enabled: false
+						}
+					}]
+				});
+			}
+			//$("#graph").slideDown('slow');
+			//$(this).val('hide analysis')
 		}, function(){
 			$("#graph").slideUp('slow');
-			$(this).val('show analysis');
 		});
 
 		// show house mode button
@@ -573,7 +575,7 @@ function loadArchives(){
 }
 
 $(document).ready(function(){
-	$('#clearCyclePopup').jqm();
+	$('#clearCyclePopup').jqm({trigger: 'a#newCycleMenu'});
 
 //---------------- JS code for index page -------------------
 

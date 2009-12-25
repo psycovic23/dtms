@@ -67,13 +67,13 @@ class Item_list:
                 x[str(i.tag)] += i.users_o()[str(self.uid)][0]
             else:
                 x[str(i.tag)] += i.price
-
-        ret_obj = []
-        counter = 1
-        for k,v in x.iteritems():
-            ret_obj.append({'data': [ [counter, str(v) ] ],'label': k })
-            counter = counter + 1
-        return json.dumps(ret_obj)
+        
+        categories = []
+        series = []
+        for (k,v) in x.iteritems():
+            categories.append(k)
+            series.append(float(v))
+        return json.dumps([{'categories': categories, 'series': series}])
         
     def gen_balancing_transactions(self):
         balances = {}
