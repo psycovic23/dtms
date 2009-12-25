@@ -347,86 +347,84 @@ function submitForm(list_users){
 		return sum;
 	}
 
-	// gets all the information from the forms
-	var str= $("#purch_date").val();
-	var d = str.split("/");
-	var tag;
+	// 1 is when button is active
+	if ($('#action').data('status') == 1){
+		// gets all the information from the forms
+		var str= $("#purch_date").val();
+		var d = str.split("/");
+		var tag;
 
-	// prevent submitting twice
-	$('#action').unbind('click');
-
-
-	if ($("#tags").val() == '')
-		tag = "Uncategorized";
-	else
-		tag = $("#tags").val();
-
-	var data = {
-		'name': $("#name").val(),
-		'purch_date': d,
-		'price': $("#price").val(),
-		'buyer': 1,
-		'comments': $("#comments").val(),
-		'tags': tag.toLowerCase(),
-		'sub_tag': $("#sub_tag").val(),
-		'archive_id': 0,
-	};
-
-	// this only works for users_yes, not the maybe part	
-	if ($("#expanded_users").css('display') == "none"){
-		var uid = $("#uid").html();
-		var p = $("#price").val();
-		var ind_p = Math.round(100 * p / list_users.number_of_selected())/100;
-
-		if ($("#action").html() != 'edit' && $("#expanded_buyers").css('display') == 'none')
-			$("#" + uid + "eb").val(Math.round(ind_p * list_users.number_of_selected()*100)/100);
-
-		data['price'] = String(ind_p * list_users.number_of_selected()); 
-		var a = list_users.return_names();
-		for (t in a){
-			if (a[t])
-				$("#" + parseInt(t) + "eu").val(ind_p);
-		}
-	} else {
-		data['price'] = (sum(getArrayFromInputFields("expanded_buyers")));
-	}
+		// prevent submitting twice
+		$('#action').data('status', 0);
 
 
-	if ($("#action").html() == 'edit')
-		data = $.extend(data, {'edit_id': edit_id});
+		if ($("#tags").val() == '')
+			tag = "Uncategorized";
+		else
+			tag = $("#tags").val();
 
-	data = $.extend(data, {'expanded_buyers': getArrayFromInputFields("expanded_buyers")});
-	data = $.extend(data, {'expanded_users': getArrayFromInputFields("expanded_users")});
+		var data = {
+			'name': $("#name").val(),
+			'purch_date': d,
+			'price': $("#price").val(),
+			'buyer': 1,
+			'comments': $("#comments").val(),
+			'tags': tag.toLowerCase(),
+			'sub_tag': $("#sub_tag").val(),
+			'archive_id': 0,
+		};
 
-	// add up all the values from expanded_buyers and expanded_users
-	if (sum(getArrayFromInputFields("expanded_buyers")) == Math.round(sum(getArrayFromInputFields("expanded_users"))*100)/100){
-		if (sum(getArrayFromInputFields("expanded_users")) != 0){
-			var c = JSON.stringify(data);
-	
-			$.ajax({
-				url: '/dtms/add_item', 
-				type: "POST",
-				data: {'string': c},
-				success: function(data){
-					loadItemList();
-				},
-				error: function(xhr){ document.write(xhr.responseText); }
-			});
+		// this only works for users_yes, not the maybe part	
+		if ($("#expanded_users").css('display') == "none"){
+			var uid = $("#uid").html();
+			var p = $("#price").val();
+			var ind_p = Math.round(100 * p / list_users.number_of_selected())/100;
+
+			if ($("#action").html() != 'edit' && $("#expanded_buyers").css('display') == 'none')
+				$("#" + uid + "eb").val(Math.round(ind_p * list_users.number_of_selected()*100)/100);
+
+			data['price'] = String(ind_p * list_users.number_of_selected()); 
+			var a = list_users.return_names();
+			for (t in a){
+				if (a[t])
+					$("#" + parseInt(t) + "eu").val(ind_p);
+			}
 		} else {
-			alert('select people to use the item');
-			$("#action").click(function(){
-				submitForm($list_users);
-			});
+			data['price'] = (sum(getArrayFromInputFields("expanded_buyers")));
 		}
-	} else {
-		alert('your math sucks. try again.');
-		$("#hideable").css("display", "none");
-		$("#expanded_section").css("display", "inline");
-		$("#action").click(function(){
-			submitForm($list_users);
-		});
-	}
 
+
+		if ($("#action").html() == 'edit')
+			data = $.extend(data, {'edit_id': edit_id});
+
+		data = $.extend(data, {'expanded_buyers': getArrayFromInputFields("expanded_buyers")});
+		data = $.extend(data, {'expanded_users': getArrayFromInputFields("expanded_users")});
+
+		if (sum(getArrayFromInputFields("expanded_buyers")) != Math.round(sum(getArrayFromInputFields("expanded_users"))*100)/100){
+			alert("the amount people paid and the amount people owe don't add up. check the values in the 'breakdown payments' sections");
+			$("#action").data('status',1);
+			return;
+		}
+
+		if (sum(getArrayFromInputFields("expanded_buyers")) == 0){
+			alert("apparently this item costs 0 dollars. are you sure?");
+			$("#action").data('status',1);
+			return;
+		}
+
+		// submit data
+		var c = JSON.stringify(data);
+		$.ajax({
+			url: '/dtms/add_item', 
+			type: "POST",
+			data: {'string': c},
+			success: function(data){
+				loadItemList();
+			},
+			error: function(xhr){ document.write(xhr.responseText); }
+		});
+
+	}
 }
 
 
@@ -464,6 +462,9 @@ function loadAddItem(edit_id){
 		$("#action").click(function(){
 			submitForm($list_users);
 		});
+
+		// set action button to be active
+		$("#action").data('status', 1);
 
 		$("#cancel").click(function(){
 			loadItemList();
