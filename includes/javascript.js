@@ -231,7 +231,6 @@ function loadItemList(args){
 		/* graph code */
 
 		var graphdata = eval(data['graphData']);
-		console.log(graphdata);
 
 		$("#graph").hide();
 		var chart1 = 0;
