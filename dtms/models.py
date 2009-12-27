@@ -73,6 +73,10 @@ class Item_list:
         for (k,v) in x.iteritems():
             categories.append(k)
             series.append(float(v))
+
+        if len(categories) == 1:
+            categories.append(' ')
+            series.append(float(0))
         return json.dumps([{'categories': categories, 'series': series}])
         
     def gen_balancing_transactions(self):
@@ -107,7 +111,7 @@ class Item_list:
         counter = 1
         while len([p for p in balance_sum if balance_sum[p] != 0]) != 0:
             counter += 1
-            if counter > 10:
+            if counter > 15:
                 raise Exception, "Infinite loop in creating transaction"
     
             # owes = [key, amount]
@@ -133,7 +137,7 @@ class Item_list:
         self.ind_expects = [p for p in transactions if p[1] == self.uid]
         
         self.names_and_balances = {}
-        for u, v in zip(users, balances.items()):
+        for u, v in zip(users, sorted(balances.items())):
             self.names_and_balances[u.name] = v[1]
 
         self.names_and_balances = self.names_and_balances.items()

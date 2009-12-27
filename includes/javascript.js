@@ -1,8 +1,5 @@
-//--------------------------------------------------
-// This section is code for the user list in the add_item popup
-
-
-// toggle_selected plugin - toggles colors for list_users
+/* toggle_selected plugin - toggles colors for list_users
+ * if multi is true, then we can select multiple names from the list */
 (function($) {		
 	$.fn.toggle_selected = function(multi){
 
@@ -138,33 +135,34 @@
 
 })(jQuery);
 
-function setFieldsToZero(){
-	$("#expanded_buyers input").val(0);
-	$("#expanded_users input").val(0);
-}
+// ------------------------------------------------
 
-// this sucks. fix this
-d = {}
 
-//-----------------------------------------
-// this refreshes the item list. making it into a function so I can call it again when edits are made and we have to refresh on the fly
+/* this refreshes the item list in the right panel. 
+ * takes in the archive_id and housemode, only two things needed.
+ * defaults to current archive_id and usermode
+ * */
+
 function loadItemList(args){
 	var default_args = {
-		'archive_id':	0,
+		'archive_id':	'0',
 		'houseMode':	'0'
 	}
 
 	options = {};
 	$.extend(options, default_args, args);
 
-	// applies JS code to the item list that's dumped into the DOM
+	/* applies JS code to the item list that's dumped into the DOM.
+	 * this function doesn't actually make the ajax call, it just applies what's needed once the call is made.
+	 **/
 	function onListUpdate(data, options){
 		
 		// load the data into rightPanel	
 		$("#rightPanel").html(data['html']).fadeIn("fast");
 
-		// fancy actions for clicking on an item in the items list
-		// it reveals the item_description tr and stops the hover coloring
+
+		/* code for row behaviors in table */
+
 		$(".item").toggle(
 			function(){
 				$(this).css({'borderBottom': 0});
@@ -204,7 +202,11 @@ function loadItemList(args){
 		});
 
 
+
+		/* tag list code */
+
 		$('#tagList').hide();
+
 		// dropdown taglist
 		$('#toggleTagList').toggle(function(){
 			$('#tagList').slideDown('fast');
@@ -226,8 +228,10 @@ function loadItemList(args){
 
 
 
-		// graph stuff
+		/* graph code */
+
 		var graphdata = eval(data['graphData']);
+		console.log(graphdata);
 
 		$("#graph").hide();
 		var chart1 = 0;
@@ -283,7 +287,8 @@ function loadItemList(args){
 			$("#graph").slideUp('slow');
 		});
 
-		// show house mode button
+
+		/* houseMode button code */
 		if (options['houseMode'] == 1)
 			$("#houseMode").html('<img src="../static/images/person_20px.png" />');
 		else
@@ -307,11 +312,9 @@ function loadItemList(args){
 
 	}
 
-
-	// call to run Config function
+	/* makes the ajax call, then calls onListUpdate to make everything pretty */
 	$("#rightPanel").fadeOut("fast", function(){
 		// determine what archive list to load, based on arguments from options
-		
 		var url_str = '/dtms/item_list';
 		url_str += '/' + options['archive_id'] + '/' + options['houseMode'] + '/';
 
@@ -330,8 +333,10 @@ function loadItemList(args){
 }
 
 
-// scrapes form and submits to /add_item
-function submitForm(list_users){
+/* scrapes form and submits to /add_item */
+function submitForm(list_users, list_buyers){
+
+	/* scrapes a div containing input fields and stores the values into an array */
 	function getArrayFromInputFields(id){
 		var values = [];
 		var $d = $("#" + id + " input");
@@ -341,6 +346,7 @@ function submitForm(list_users){
 		return values;
 	}
 
+	/* sums an array */
 	function sum(a){
 		var sum = 0;
 		for (x in a){
@@ -349,25 +355,28 @@ function submitForm(list_users){
 		return sum;
 	}
 
-	// 1 is when button is active
+	/* start the scraping of the form and processing.
+	 * when $("#action").data('status') == 1, that means the button is active */
 	if ($('#action').data('status') == 1){
 		// gets all the information from the forms
 		var str= $("#purch_date").val();
-		var d = str.split("/");
+		var purch_date = str.split("/");
 		var tag;
 
 		// prevent submitting twice
 		$('#action').data('status', 0);
 
 
+		// default tag name is uncategorized
 		if ($("#tags").val() == '')
 			tag = "Uncategorized";
 		else
 			tag = $("#tags").val();
 
+		// data stores most info in the form
 		var data = {
 			'name': $("#name").val(),
-			'purch_date': d,
+			'purch_date': purch_date,
 			'price': $("#price").val(),
 			'buyer': 1,
 			'comments': $("#comments").val(),
@@ -376,38 +385,81 @@ function submitForm(list_users){
 			'archive_id': 0,
 		};
 
-		// this only works for users_yes, not the maybe part	
+		/* if we're in basic mode, where user is not manually inputting payment.
+		 * note - this is really just doing the calculations and putting it into the advanced payment fields.
+		 * it does this by looking at #price, dividing it by the total number of users, then putting it into each person's field.
+		 * This ind_p is rounded, then multiplied to get a usable price to insert for the buyer.
+		 * #price doesn't do anything at the moment. */
+
+		// if buyers are not expanded,
+		// if we're not editing, don't fill anything in. if we are, and we're in basic mode, calculate new rounded price
+		// there's pretty stupid code here.
+		var uid = 0;
+		if ($("#action").html() != 'edit' && $("#expanded_buyers").css('display') == "none"){
+			var a = list_buyers.return_names();
+			var counter = 0;
+
+			// technically don't need to do this because "a" will only have one buyer
+			for (t in a){
+				if (a[t]){
+					//$("#" + parseInt(t) + "eb").val(Math.round(ind_p * list_users.number_of_selected()*100)/100);
+					$("#" + parseInt(t) + "eb").val($("#price").val());
+					uid = parseInt(t);
+					counter++;
+				}
+			}
+			if (counter != 1){
+				alert('something is wrong, buyer has multiple');
+			}
+
+		}
+
 		if ($("#expanded_users").css('display') == "none"){
-			var uid = $("#uid").html();
-			var p = $("#price").val();
-			var ind_p = Math.round(100 * p / list_users.number_of_selected())/100;
+			// assert that there is only one buyer value
+			var buyer_total = sum(getArrayFromInputFields("expanded_buyers")) 
+			if ($("#expanded_buyers").css('display') == "none"){
+				if ( buyer_total != $("#" + uid + "eb").val()){
+					alert('something broke');
+				}
+			}
 
-			if ($("#action").html() != 'edit' && $("#expanded_buyers").css('display') == 'none')
-				$("#" + uid + "eb").val(Math.round(ind_p * list_users.number_of_selected()*100)/100);
+			var ind_p = Math.round(100 * buyer_total / list_users.number_of_selected())/100;
 
-			data['price'] = String(ind_p * list_users.number_of_selected()); 
+			// the "new" price
+			$("#" + uid + "eb").val(Math.round(ind_p * list_users.number_of_selected()*100)/100);
+
+			// fill in each user's payment amount
 			var a = list_users.return_names();
 			for (t in a){
 				if (a[t])
 					$("#" + parseInt(t) + "eu").val(ind_p);
 			}
-		} else {
-			data['price'] = (sum(getArrayFromInputFields("expanded_buyers")));
-		}
+
+			//if ($("#action").html() != 'edit' && $("#expanded_buyers").css('display') == 'none')
+			//	$("#" + uid + "eb").val(Math.round(ind_p * list_users.number_of_selected()*100)/100);
+
+		} 
 
 
+		// fill in price with new calculated prices
+		data['price'] = (sum(getArrayFromInputFields("expanded_buyers")));
+		
+		// if we're editing, also submit the edit_id along with everything
 		if ($("#action").html() == 'edit')
 			data = $.extend(data, {'edit_id': edit_id});
 
+		// attach arrays containing amounts people pay
 		data = $.extend(data, {'expanded_buyers': getArrayFromInputFields("expanded_buyers")});
 		data = $.extend(data, {'expanded_users': getArrayFromInputFields("expanded_users")});
 
-		if (sum(getArrayFromInputFields("expanded_buyers")) != Math.round(sum(getArrayFromInputFields("expanded_users"))*100)/100){
+		// error checking - if amount paid != amount owed
+		if (Math.round(sum(getArrayFromInputFields("expanded_buyers"))*100)/100 != Math.round(sum(getArrayFromInputFields("expanded_users"))*100)/100){
 			alert("the amount people paid and the amount people owe don't add up. check the values in the 'breakdown payments' sections");
 			$("#action").data('status',1);
 			return;
 		}
 
+		// error checking - if price = 0
 		if (sum(getArrayFromInputFields("expanded_buyers")) == 0){
 			alert("apparently this item costs 0 dollars. are you sure?");
 			$("#action").data('status',1);
@@ -429,23 +481,41 @@ function submitForm(list_users){
 	}
 }
 
-
+/* loads the additem page */
 function loadAddItem(edit_id){
+
+	// sets all input fields to zero
+	function setFieldsToZero(){
+		$("#expanded_buyers input").val(0);
+		$("#expanded_users input").val(0);
+	}
+
+	/* again, does all the js stuff, but doesn't make the ajax call */
 	function addItemConfigure(data){
-		// load item list
+		// create the basic_user listing by using the toggle_selected plugin
 		var $list_users = $('#list_users').toggle_selected(true);
+		var $list_buyers = $("#list_buyers").toggle_selected(false);
+
 		setFieldsToZero();
 
+		// autocomplete plugin for typing into the tag field
 		$("#tags").autocomplete(data['tags']);
-		var $list_buyers = $("#list_buyers").toggle_selected(false);
 	
-		// make the advanced selection buttons
+		// make the breakdown payment buttons
 		$("#b_buyer").toggle(function(){
 			$("#basic_buyers").css("display", "none");
 			$("#expanded_buyers").css("display", "inline");
+			$("#price").css("display", "none");
+			$("#basic_users").css("display", "none");
+			$("#expanded_users").css("display", "inline");
+			$("#b_user").css("display", "none");
 		}, function() {
 			$("#expanded_buyers").css("display", "none");
 			$("#basic_buyers").css("display", "inline");
+			$("#price").css("display", "inline");
+			$("#expanded_users").css("display", "none");
+			$("#basic_users").css("display", "inline");
+			$("#b_user").css("display", "inline");
 		});
 
 		$("#b_user").toggle(function(){
@@ -456,18 +526,18 @@ function loadAddItem(edit_id){
 			$("#basic_users").css("display", "inline");
 		});
 
-		// hide expanded sections
+		// initially hide expanded sections
 		$("#expanded_buyers").css('display', 'none');
 		$("#expanded_users").css('display', 'none');
 	
-		// item submit button
+		// item submit button - set to be active
 		$("#action").click(function(){
-			submitForm($list_users);
+			submitForm($list_users, $list_buyers);
 		});
-
-		// set action button to be active
 		$("#action").data('status', 1);
 
+
+		// cancel button brings us back to itemlist
 		$("#cancel").click(function(){
 			loadItemList();
 		});	
@@ -483,8 +553,7 @@ function loadAddItem(edit_id){
 		return $list_users;
 	}
 
-	var $list_users;
-
+	/* makes the ajax call to load additem. lots of code if we're editing an item */
 	$("#rightPanel").fadeOut("fast", function(){
 		$.ajax({
 			url: '/dtms/addItem',
@@ -492,20 +561,24 @@ function loadAddItem(edit_id){
 			success: function(data){
 				$("#rightPanel").html(data['html']).fadeIn("fast");
 
-				// initialization steps
+				// initialization steps - make action active, clear fields and plugin, configure DOM obj
 				$("#action").text('submit');
 				setFieldsToZero();
-
 				$list_users = addItemConfigure(data);
 				$list_users.clear_names();
 	
+				/* if we're editing an item, as opposed to creating a new one.
+				 * the difference here is that we have to load all of the previous data. */
 				if (edit_id !== undefined){
 					setFieldsToZero();
 					$list_users.clear_names();
 	
-					// change the action button to say "edit"
+					// change the action button to say "edit". also remove breakdown button
 					$("#action").text('edit');
+					$("#b_buyer").remove();
+					$("#b_user").remove();
 	
+					/* if we're editing, make ajax call to get data we need to fill in fields */
 					d = {'item_id': edit_id};
 					$.ajax({
 						url: '/dtms/edit_item',
@@ -543,6 +616,7 @@ function loadAddItem(edit_id){
 	});
 }
 
+/* clear fiscal period */
 function loadClearCycle(){
 	$.ajax({
 		url: '/dtms/clear_cycle',
@@ -559,10 +633,6 @@ function loadArchives(){
 			url: '/dtms/showArchives',
 			success: function(data){
 				$("#rightPanel").html(data).fadeIn("fast");
-	
-				// give fancy js behavior DUPLICATE CODE
-				$(".item:odd").css({'background-color': '#ffc97c'});
-				$(".item:even").css({'background-color': '#ffe1b5'});
 	
 				$(".item").click(function(){
 					var archive_id = parseInt($(this).attr('id'));
