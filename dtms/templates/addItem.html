@@ -4,16 +4,16 @@
 	<br><br>
 
 	<h1>how much was it?</h1>
-	<span style="font-family:georgia; font-size:16pt;">$</span><input type="text" size=5 id="price">
+	<span style="font-family:georgia; font-size:16pt;">$</span><input class="number" type="text" size=5 id="price">
 	<br><br>
 
 
-	<h1>who bought it?</h1><a id="b_buyer" class="gray" style="cursor: pointer">(breakdown payments)</a>
+	<h1 style="display:inline">who bought it?</h1>&nbsp;<a id="b_buyer" class="gray" style="cursor: pointer">(breakdown payments)</a>
 	<div id="expanded_buyers">
 		<table>
 			{% for x in names%}
 			<tr>
-				<td>{{ x }}: </td><td><input type="text" value="0" id="{{x.id}}eb"></td>
+				<td>{{ x }}: </td><td><input type="text" class="number" value="0" id="{{x.id}}eb"></td>
 			</tr>
 			{% endfor %}
 		</table>
@@ -27,7 +27,7 @@
 		</ul>
 	</div>
 
-	<h1>who's using it?</h1><a id="b_user" class="gray" style="cursor: pointer">(breakdown payment)</a>
+	<h1 style="display:inline">who's using it?</h1>&nbsp;<a id="b_user" class="gray" style="cursor: pointer">(breakdown payment)</a>
 	<div id="basic_users">
 		<br>
 		<ul id="list_users">
@@ -40,13 +40,14 @@
 		<table>
 			{% for x in names%}
 			<tr>
-				<td>{{ x }}: </td><td><input type="text" value="0" id="{{x.id}}eu"></td>
+				<td>{{ x }}: </td><td><input type="text" value="0" class="number" id="{{x.id}}eu"></td>
 			</tr>
 			{% endfor %}
 		</table>
 	</div>
 	
-	<h3>purchase date</h3> <input type="text" id="purch_date" size="10">
+	<h3 style="display:inline">purchase date</h3>&nbsp; <span class="gray">(yyyy/mm/dd)</span>
+	<br><input type="text" id="purch_date" size="10">
 	<h3>tag</h3> <input type="text" id="tags">
 	<input style="display:none" type="text" id="sub_tag">
 	<h1>any comments about it?</h1>

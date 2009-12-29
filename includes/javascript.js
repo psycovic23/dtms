@@ -358,12 +358,37 @@ function submitForm(list_users, list_buyers){
 	 * when $("#action").data('status') == 1, that means the button is active */
 	if ($('#action').data('status') == 1){
 		// gets all the information from the forms
-		var str= $("#purch_date").val();
-		var purch_date = str.split("/");
+		var purch_date_str= $("#purch_date").val();
+		var purch_date = purch_date_str.split("/");
 		var tag;
+		var quit = 0;
 
 		// prevent submitting twice
 		$('#action').data('status', 0);
+
+		// error check price
+		$('.number').each(function(){
+			var t = $(this).val();
+			if (t.match(/[^\d\.]/) != null){
+				alert('recheck your prices');
+				$("#action").data("status", 1);
+				quit = 1;
+				return;
+			}
+		});
+		
+		if (quit == 1)
+			return;
+
+		// error check date
+		if (purch_date_str.match(/[^\d\/]/) != null || 
+				parseInt(purch_date[1]) > 12 || parseInt(purch_date[1]) < 1 || 
+				parseInt(purch_date[2]) < 1 || parseInt(purch_date[2]) > 31 ||
+				parseInt(purch_date[0]) < 2009 || parseInt(purch_date[3]) > 2012){
+			alert("check your dates again");
+			$("#action").data("status", 1);
+			return;
+		}
 
 
 		// default tag name is uncategorized
