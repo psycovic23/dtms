@@ -1,5 +1,8 @@
 body {
-	font-family: Georgia, sans-serif;
+	font-family: georgia;
+	font-weight: normal;
+	font-size: 12pt;
+	color: #333;
 	background-color: #181818;
 }
 
@@ -9,7 +12,6 @@ h1, .mega {
 }
 
 .banner {
-	font-family: georgia;
 	font-size: 36pt;
 	color: #ccc;
 }
@@ -22,11 +24,17 @@ h3 {
 	font-size: 10pt;
 }
 
+#ft {
+	background-color: #fff;
+}
 
+#tabs {
+	border-bottom: 0;
+}
 /* layout business */
-#graph {
-	height:300px;
-	width: 600px;
+#graph, #graphcontainer {
+	height:400px;
+	width:600px;
 }
 
 .jqmWindow {
@@ -45,62 +53,18 @@ h3 {
 
 .jqmOverlay { background-color: #000; }
 
-#rightPanel {
-	display: none;
+.yui-u {
+	font-family:georgia;
+	font-size: 12pt;
 }
 
-#topblock, #bottomblock, #addItemContainer{
-	border: 1px solid #999;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	width: 600px;
-	padding:10px;
-	background-color: #fff;
+#tabs {
+	margin-top: 60px;
 }
 
-#bottomblock {
-	margin-top: 20px;
+.first {
+	border-right: 1px #ccc solid;
 }
-
-#titlebar {
-	width:400px;
-	margin-left: auto;
-	margin-right: auto;
-	border-bottom: 1px #ccc solid;
-	padding-left: 40px;
-	padding-right: 40px;
-	text-align: center;
-}
-
-#leftMenu {
-	width:160px;
-	top: 100px;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border: 1px solid #999;
-	background-color: #fff;
-}
-
-/* left side menu styles */
-
-#leftMenu li {
-	list-style-type: none;
-	padding: 3px 5px;
-	border: 1px #fff solid;
-	display: block;
-}
-
-#leftMenu li:hover {
-	border:1px #000 solid;
-	color: #fff;
-	background-color: #181818;
-	cursor: pointer;
-}
-
-/* to do: make nohighlight for safari */
-
-
-
 
 /* Styles for the toggle_selected plugin used in the addItemBox window*/
 
@@ -116,12 +80,10 @@ h3 {
 
 .unselected {
 	background-color: #fff; 
-	color: #000; 
 }
 
-.selected_yes, .hover {
-	background-color: #181818; 
-	color: #fff;
+.selected, .hover {
+	border: 1px #000 solid;
 }
 
 #addItemContainer li::selection, #list_buyers::selection, #list_user::selection, #list_buyers::-moz-selection, #list_users::-moz-selection {
@@ -138,42 +100,27 @@ h3 {
 
 #action:hover, #cancel:hover {
 	color: #40ad34;
+	-webkit-transition: color .15s ease-in;
 }
 
 /* styles for the list of items that comes from /list */
 
+#add_item {
+	margin-bottom: 35px;
+}
 .tagNames {
 	cursor: pointer;
 	padding:0px 5px;
-	font-size: 8pt;
+	-webkit-transition: background-color .15s ease-in-out;
+	background-color: #fff;
 }
 a.tagNames:hover {
 	background-color: #ffc97c;
 }
-#showAnalysis, #houseMode {
-	float:right;
-	cursor: pointer;
-}
-
-#moneyStatus {
-	width: 500px;
-	margin: auto;
-	clear: both;
-}
-
-#toggleTagList {
-	cursor: pointer;
-}
-
-#tagList {
-	width: 400px;
-	clear: both;
-}
 
 .ind_balance {
 	font-size: 35pt;
-	float:left;
-	clear:both;
+	margin-bottom:35px;
 }
 
 .pos {
@@ -184,24 +131,31 @@ a.tagNames:hover {
 	color: red;
 }
 
-.bar {
-	font-size: 15pt;
-}
-
-.header {
-	color: #999;
-	font-size: 15pt;
+.date_range {
+	color: #333;
+	float:left;
+	font-size: 20pt;
 }
 .gray {
 	color: #666;
 	font-size:10pt;
 }
 
+#your, #house {
+	padding: 2px 5px;
+}
+.houseMode {
+	font-size: 8pt;
+	float:right;
+	margin-right: 25px;
+}
+
 .item { 
 	padding: 3px;
 	margin: 7px 0px;
-/*	width: 400px; */
 	cursor: pointer;
+	-webkit-transition: background-color .15s linear;
+	background-color:#fff
 }
 
 tr.item:hover {
@@ -226,21 +180,26 @@ tr.item:hover {
 td {
 	padding: 5px 5px;
 }
+
 .item {
 	border-bottom: 1px #ccc solid;
+	font-style: normal;
 }
-#moneyStatus table, #tableTransactions, tr table {
+.side_table, #tableTransactions, tr table {
 	border: 1px #000 solid;
+	margin-bottom: 35px;
+	width: 100%;
 }
 
-
-#moneyStatus table {
-	float: right;
-}
 td.hoverable {
 	cursor: pointer;
 }
+
 td.hoverable:hover {
 	background-color: #ffc97c;
+}
+
+#list {
+	width: 96%;
 }
 

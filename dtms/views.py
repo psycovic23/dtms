@@ -46,6 +46,7 @@ def item_list(request, a_num=0, houseMode=0):
         graphData = itemlist.barGraphData()
         #graphData = []
 
+    house_name = User.objects.get(id=request.session['user_id']).house_name
     html = t.render(Context({"empty": empty, 
                              "uid": request.session['user_id'], 
                              "items": items,
@@ -53,6 +54,7 @@ def item_list(request, a_num=0, houseMode=0):
                              "tags": tags, 
                              "category": category,
                              "houseMode": houseMode,
+                             "house_name": house_name,
                              "archive_id": a_num}))
 
     x = json.dumps({'html': html, 'graphData': graphData})

@@ -30,8 +30,8 @@
 			$all_button.click(function(){
 				$list_elements.removeClass();
 				if ($all_button.data('status') == 0){
-					$all_button.addClass('selected_yes');
-					$list_elements.addClass('selected_yes');
+					$all_button.addClass('selected');
+					$list_elements.addClass('selected');
 					$all_button.data('status', 1);
 					$list_elements.each(function(){
 						var temp = $list.data('selected');
@@ -39,7 +39,7 @@
 						$list.data('selected', temp);
 					});
 				} else {
-					$all_button.removeClass('selected_yes');
+					$all_button.removeClass('selected');
 					$list_elements.addClass('unselected');
 					$all_button.data('status', 0);
 					$list_elements.each(function(){
@@ -74,15 +74,15 @@
 	
 				// flip between unselected and selected
 				if ($(this).hasClass('unselected')){
-					$(this).removeClass("hover").removeClass('unselected').addClass("selected_yes").unbind('mouseover').unbind('mouseout'); 
+					$(this).removeClass("hover").removeClass('unselected').addClass("selected").unbind('mouseover').unbind('mouseout'); 
 					temp = $list.data('selected');
 					temp[id] = 1;
 					$list.data('selected', temp);
-				} else if ($(this).hasClass("selected_yes")){
+				} else if ($(this).hasClass("selected")){
 					temp = $list.data('selected');
 					temp[id] = 0;
 					$list.data('selected', temp);
-					$(this).removeClass("selected_yes").removeClass('hover').addClass("unselected");
+					$(this).removeClass("selected").removeClass('hover').addClass("unselected");
 					$(this).mouseover( function() {
 						$(this).addClass("hover");
 					});	
@@ -92,7 +92,7 @@
 				}
 
 				if (multi == false){
-					$list_elements.not(this).removeClass('selected_yes').addClass("unselected").each(function(){
+					$list_elements.not(this).removeClass('selected').addClass("unselected").each(function(){
 						temp = $list.data('selected');
 						temp[parseInt($(this).attr('id'))] = 0;
 						$list.data('selected', temp);
@@ -104,7 +104,7 @@
 	}
 
 	$.fn.clear_names = function(){
-		$(this).removeClass("selected_yes").addClass("unselected");
+		$(this).removeClass("selected").addClass("unselected");
 	}
 
 	$.fn.return_names = function(){
@@ -115,7 +115,7 @@
 		$(this).data('selected', t);
 		for (x in t){
 			if (t[x] != 0){
-				$('#' + x + 'option').addClass('selected_yes').removeClass('unselected');
+				$('#' + x + 'option').addClass('selected').removeClass('unselected');
 			}
 		}
 	}
@@ -158,7 +158,11 @@ function loadItemList(args){
 	function onListUpdate(data, options){
 		
 		// load the data into rightPanel	
-		$("#rightPanel").html(data['html']).fadeIn("fast");
+		$("#rightPanel").html(data['html']);
+
+		$("#add_item").click(function(){
+			loadAddItem();
+		});
 
 
 		/* code for row behaviors in table */
@@ -205,14 +209,6 @@ function loadItemList(args){
 
 		/* tag list code */
 
-		$('#tagList').hide();
-
-		// dropdown taglist
-		$('#toggleTagList').toggle(function(){
-			$('#tagList').slideDown('fast');
-		}, function(){
-			$('#tagList').slideUp('fast');
-		});
 
 		// filtering for tag list
 		$(".tagNames").click(function(){
@@ -230,70 +226,69 @@ function loadItemList(args){
 
 		/* graph code */
 
+		$("#graphcontainer").append("<div id='graph'></div>");
 		var graphdata = eval(data['graphData']);
-
-		$("#graph").hide();
-		var chart1 = 0;
-		$("#showAnalysis").toggle(function(){
-			$("#graph").show();
-			if (chart1 == 0){
-				chart1 = new Highcharts.Chart({
-					chart: {
-						renderTo: 'graph',
-						defaultSeriesType: 'column',
-						height: 200,
-						margin: [50,50,100,80]
-					},
+		var chart_active = 0;
+		if (chart_active == 0){
+			chart_active = 1;
+			var chart1 = new Highcharts.Chart({
+				chart: {
+					renderTo: 'graph',
+					defaultSeriesType: 'column',
+					width:600,
+					height:500,
+					margin: [50,50,100,80]
+				},
+				title: {
+					text: "let's see where that all went..."
+				},
+				xAxis: {
+					categories: graphdata[0]['categories'],
+					labels: {
+						rotation: -45,
+						align: 'right',
+						style: {
+							font: 'normal 13px georgia, sans-serif'
+						}
+					}
+				},
+				yAxis: {
+					min: 0,
 					title: {
-						text: "let's see where that all went..."
-					},
-					xAxis: {
-						categories: graphdata[0]['categories'],
-						labels: {
-							rotation: -45,
-							align: 'right',
-							style: {
-								font: 'normal 13px georgia, sans-serif'
-							}
-						}
-					},
-					yAxis: {
-						min: 0,
-						title: {
-							text: '$'
-						}
-					},
-					legend: {
+						text: '$'
+					}
+				},
+				legend: {
+					enabled: false
+				},
+				tooltip: {
+					formatter: function(){
+						return '<b>'+ this.x + ': $' + this.y + '</b><br/>';
+					}
+				},
+				series: [{
+					name: 'money',
+					data: graphdata[0]['series'],
+					dataLabels: {
 						enabled: false
-					},
-					tooltip: {
-						formatter: function(){
-							return '<b>'+ this.x + ': $' + this.y + '</b><br/>';
-						}
-					},
-					series: [{
-						name: 'money',
-						data: graphdata[0]['series'],
-						dataLabels: {
-							enabled: false
-						}
-					}]
-				});
-			}
-			//$("#graph").slideDown('slow');
-			//$(this).val('hide analysis')
-		}, function(){
-			$("#graph").slideUp('slow');
-		});
-
-
+					}
+				}]
+			});
+		}
+		
 		/* houseMode button code */
-		if (options['houseMode'] == 1)
-			$("#houseMode").html('<img src="../static/images/person_20px.png" />');
-		else
-			$("#houseMode").html('<img src="../static/images/house_20px.png" />');
-		$("#houseMode").click(function(){
-			loadItemList({'houseMode': (options['houseMode'] + 1) % 2, 'archive_id':$("#archive_id").html()});
+		if (options['houseMode'] == 1){
+			$("#house").addClass('selected');
+			$("#your").css('cursor', 'pointer');
+		} else {
+			$("#your").addClass('selected');
+			$("#house").css('cursor', 'pointer');
+		}
+		$(".houseMode").click(function(){
+			if (!$(this).hasClass('selected')){
+				$("#graph").remove();
+				loadItemList({'houseMode': (options['houseMode'] + 1) % 2, 'archive_id':$("#archive_id").html()});
+			}
 		});
 
 
@@ -312,22 +307,20 @@ function loadItemList(args){
 	}
 
 	/* makes the ajax call, then calls onListUpdate to make everything pretty */
-	$("#rightPanel").fadeOut("fast", function(){
-		// determine what archive list to load, based on arguments from options
-		var url_str = '/dtms/item_list';
-		url_str += '/' + options['archive_id'] + '/' + options['houseMode'] + '/';
+	// determine what archive list to load, based on arguments from options
+	var url_str = '/dtms/item_list';
+	url_str += '/' + options['archive_id'] + '/' + options['houseMode'] + '/';
 
-		$.ajax({
-			url: url_str,
-			dataType: 'json',
-			success: function(data){
-				// maybe throw these back into the config function
-				onListUpdate(data, options);
-			},
-			error: function(data){
-				document.write(data.responseText);
-			}
-		});
+	$.ajax({
+		url: url_str,
+		dataType: 'json',
+		success: function(data){
+			// maybe throw these back into the config function
+			onListUpdate(data, options);
+		},
+		error: function(data){
+			document.write(data.responseText);
+		}
 	});
 }
 
@@ -365,6 +358,29 @@ function submitForm(list_users, list_buyers){
 		// prevent submitting twice
 		$('#action').data('status', 0);
 
+		// error check price
+		$('.number').each(function(){
+			var t = $(this).val();
+			if (t.match(/[^\d\.]/) != null){
+				alert('recheck your prices');
+				$("#action").data("status", 1);
+				quit = 1;
+				return;
+			}
+		});
+		
+		if (quit == 1)
+			return;
+
+		// error check date
+		if (purch_date_str.match(/[^\d\/]/) != null || 
+				parseInt(purch_date[1]) > 12 || parseInt(purch_date[1]) < 1 || 
+				parseInt(purch_date[2]) < 1 || parseInt(purch_date[2]) > 31 ||
+				parseInt(purch_date[0]) < 2009 || parseInt(purch_date[3]) > 2012){
+			alert("check your dates again");
+			$("#action").data("status", 1);
+			return;
+		}
 
 		// default tag name is uncategorized
 		if ($("#tags").val() == '')
@@ -553,65 +569,63 @@ function loadAddItem(edit_id){
 	}
 
 	/* makes the ajax call to load additem. lots of code if we're editing an item */
-	$("#rightPanel").fadeOut("fast", function(){
-		$.ajax({
-			url: '/dtms/addItem',
-			dataType: 'json',
-			success: function(data){
-				$("#rightPanel").html(data['html']).fadeIn("fast");
+	$.ajax({
+		url: '/dtms/addItem',
+		dataType: 'json',
+		success: function(data){
+			$("#rightPanel").html(data['html']);
 
-				// initialization steps - make action active, clear fields and plugin, configure DOM obj
-				$("#action").text('submit');
+			// initialization steps - make action active, clear fields and plugin, configure DOM obj
+			$("#action").text('submit');
+			setFieldsToZero();
+			$list_users = addItemConfigure(data);
+			$list_users.clear_names();
+	
+			/* if we're editing an item, as opposed to creating a new one.
+			 * the difference here is that we have to load all of the previous data. */
+			if (edit_id !== undefined){
 				setFieldsToZero();
-				$list_users = addItemConfigure(data);
 				$list_users.clear_names();
 	
-				/* if we're editing an item, as opposed to creating a new one.
-				 * the difference here is that we have to load all of the previous data. */
-				if (edit_id !== undefined){
-					setFieldsToZero();
-					$list_users.clear_names();
+				// change the action button to say "edit". also remove breakdown button
+				$("#action").text('edit');
+				$("#b_buyer").remove();
+				$("#b_user").remove();
 	
-					// change the action button to say "edit". also remove breakdown button
-					$("#action").text('edit');
-					$("#b_buyer").remove();
-					$("#b_user").remove();
+				/* if we're editing, make ajax call to get data we need to fill in fields */
+				d = {'item_id': edit_id};
+				$.ajax({
+					url: '/dtms/edit_item',
+					type: 'POST',
+					data: d,
+					dataType: 'json',
+					success: function(data){
 	
-					/* if we're editing, make ajax call to get data we need to fill in fields */
-					d = {'item_id': edit_id};
-					$.ajax({
-						url: '/dtms/edit_item',
-						type: 'POST',
-						data: d,
-						dataType: 'json',
-						success: function(data){
-		
-							// editing add_item form data
-							$('#name').val(data['name']);
-							$('#price').val(data['price']);
-							$('#purch_date').val(data['purch_date']);
-							$('#comments').val(data['comments']);
-							$('#tags').val(data['tags']);
-							for (x in data['ind_pay']){
-								$("#" + x + "eu").val(data['ind_pay'][x]);
-							}
-							
-							for (x in data['buyer_pay'])
-								$("#" + x + "eb").val(data['buyer_pay'][x]);
+						// editing add_item form data
+						$('#name').val(data['name']);
+						$('#price').val(data['price']);
+						$('#purch_date').val(data['purch_date']);
+						$('#comments').val(data['comments']);
+						$('#tags').val(data['tags']);
+						for (x in data['ind_pay']){
+							$("#" + x + "eu").val(data['ind_pay'][x]);
+						}
+						
+						for (x in data['buyer_pay'])
+							$("#" + x + "eb").val(data['buyer_pay'][x]);
 	
-							$("#expanded_buyers").css("display", "inline");
-							$("#expanded_users").css("display", "inline");
-							$("#basic_buyers").css("display", "none");
-							$("#basic_users").css("display", "none");
-						},
-						error: function(data){ document.write(data.responseText); }
-					});
-				}
-			},
-			error: function(xhr){
-				document.write(xhr.responseText);
+						$("#expanded_buyers").css("display", "inline");
+						$("#expanded_users").css("display", "inline");
+						$("#basic_buyers").css("display", "none");
+						$("#basic_users").css("display", "none");
+					},
+					error: function(data){ document.write(data.responseText); }
+				});
 			}
-		});
+		},
+		error: function(xhr){
+			document.write(xhr.responseText);
+		}
 	});
 }
 
@@ -648,25 +662,9 @@ $(document).ready(function(){
 
 //---------------- JS code for index page -------------------
 
+	$("#tabs").tabs();
+
 	// load item list on page load
 	loadItemList();
-
-	// button calls
-
-	$("#confirmClearCycle").click(function(){
-		loadClearCycle();
-	});
-
-	$("#add_item").click(function(){
-		loadAddItem();
-	});
-
-	$("#loadItemList").click(function(){
-		loadItemList();
-	});
-
-	$("#showArchives").click(function(){
-		loadArchives();
-	});
 
 });
