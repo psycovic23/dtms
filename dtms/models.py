@@ -77,7 +77,7 @@ class Item_list:
         if len(categories) == 1:
             categories.append(' ')
             series.append(float(0))
-        return json.dumps([{'categories': categories, 'series': series}])
+        return {'categories': categories, 'series': series}
         
     def gen_balancing_transactions(self):
         balances = {}

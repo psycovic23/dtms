@@ -1,3 +1,4 @@
+<div class="yui-ge">
 <div class="yui-u first">
 	{% ifnotequal empty "0" %}
 		<span class="date_range">{{ category.0 }} to {{ category.1 }}</span>
@@ -59,7 +60,7 @@
 	</table>
 </div>
 
-<div class="yui-u">
+<div id="sidepanel" class="yui-u">
 			<div id="add_item">
 				add item
 			</div>
@@ -85,8 +86,6 @@
 			</table>
 		{% endifequal %}
 		
-		
-		
 		{% ifequal houseMode "1" %}
 			<span class="gray">everyone's balances</span>
 			<table class="side_table">
@@ -108,4 +107,5 @@
 		{% endfor %}
 		<a class="tagNames">all</a>
 	</div>
+</div>
 </div>

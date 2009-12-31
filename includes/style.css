@@ -32,10 +32,6 @@ h3 {
 	border-bottom: 0;
 }
 /* layout business */
-#graph, #graphcontainer {
-	height:400px;
-	width:600px;
-}
 
 .jqmWindow {
     display: none;
@@ -141,10 +137,10 @@ a.tagNames:hover {
 	font-size:10pt;
 }
 
-#your, #house {
+#your, #house, #your_graph, #house_graph {
 	padding: 2px 5px;
 }
-.houseMode {
+.houseMode, .houseMode_graph {
 	font-size: 8pt;
 	float:right;
 	margin-right: 25px;
@@ -188,7 +184,6 @@ td {
 .side_table, #tableTransactions, tr table {
 	border: 1px #000 solid;
 	margin-bottom: 35px;
-	width: 100%;
 }
 
 td.hoverable {
@@ -203,3 +198,11 @@ td.hoverable:hover {
 	width: 96%;
 }
 
+/* graph page */
+#graph, #graphcontainer {
+	margin: auto;
+	height:400px;
+	width:600px;
+}
+#graph_nav {
+}

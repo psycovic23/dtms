@@ -15,7 +15,6 @@ def item_list(request, a_num=0, houseMode=0):
 
     items = newItem.objects.select_related().filter(house_id=request.session['house_id']).filter(archive_id=a_num)
 
-
     # throw items into Item_list for all the methods in the class Item_list
     # workaround for the user/house bug where transactions were based on the
     # viewed list, as opposed to the entire house
@@ -40,12 +39,6 @@ def item_list(request, a_num=0, houseMode=0):
     t = get_template('list.html')
     empty = len(items)
 
-    if houseMode == "1":
-        graphData = itemlist.barGraphData(1)
-    else:
-        graphData = itemlist.barGraphData()
-        #graphData = []
-
     house_name = User.objects.get(id=request.session['user_id']).house_name
     html = t.render(Context({"empty": empty, 
                              "uid": request.session['user_id'], 
@@ -57,9 +50,25 @@ def item_list(request, a_num=0, houseMode=0):
                              "house_name": house_name,
                              "archive_id": a_num}))
 
-    x = json.dumps({'html': html, 'graphData': graphData})
+    return HttpResponse(html)
 
-    return HttpResponse(x)
+def graphData(request, a_num=0, houseMode=0):
+
+    items = newItem.objects.select_related().filter(house_id=request.session['house_id']).filter(archive_id=a_num)
+    itemlist = Item_list(item_list=items,
+                  house_id=request.session['house_id'],
+                  user_id=request.session['user_id'], archive_id=a_num,
+                         houseMode=houseMode)
+    if houseMode == "1":
+        graphData = itemlist.barGraphData(1)
+    else:
+        graphData = itemlist.barGraphData()
+
+    return HttpResponse(json.dumps(graphData))
+
+def graphs(request):
+    house_name = User.objects.get(id=request.session['user_id']).house_name
+    return render_to_response('graphs.html', {"house_name": house_name})
 
 def adduser(request):
     if not request.POST:
@@ -242,7 +251,6 @@ def edit_item(request):
         info['ind_pay'] = ind_pay
         info['buyer_pay'] = buyer_pay
 
-        print json.dumps(info)
         return HttpResponse(json.dumps(info))
 
 def clear_cycle(request):

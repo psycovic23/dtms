@@ -149,7 +149,7 @@ function loadItemList(args){
 		'houseMode':	'0'
 	}
 
-	options = {};
+	var options = {};
 	$.extend(options, default_args, args);
 
 	/* applies JS code to the item list that's dumped into the DOM.
@@ -157,8 +157,8 @@ function loadItemList(args){
 	 **/
 	function onListUpdate(data, options){
 		
-		// load the data into rightPanel	
-		$("#rightPanel").html(data['html']);
+		// load the data into mainContainer	
+		$("#mainContainer").html(data);
 
 		$("#add_item").click(function(){
 			loadAddItem();
@@ -222,59 +222,6 @@ function loadItemList(args){
 			}
 		})
 
-
-
-		/* graph code */
-
-		$("#graphcontainer").append("<div id='graph'></div>");
-		var graphdata = eval(data['graphData']);
-		var chart_active = 0;
-		if (chart_active == 0){
-			chart_active = 1;
-			var chart1 = new Highcharts.Chart({
-				chart: {
-					renderTo: 'graph',
-					defaultSeriesType: 'column',
-					width:600,
-					height:500,
-					margin: [50,50,100,80]
-				},
-				title: {
-					text: "let's see where that all went..."
-				},
-				xAxis: {
-					categories: graphdata[0]['categories'],
-					labels: {
-						rotation: -45,
-						align: 'right',
-						style: {
-							font: 'normal 13px georgia, sans-serif'
-						}
-					}
-				},
-				yAxis: {
-					min: 0,
-					title: {
-						text: '$'
-					}
-				},
-				legend: {
-					enabled: false
-				},
-				tooltip: {
-					formatter: function(){
-						return '<b>'+ this.x + ': $' + this.y + '</b><br/>';
-					}
-				},
-				series: [{
-					name: 'money',
-					data: graphdata[0]['series'],
-					dataLabels: {
-						enabled: false
-					}
-				}]
-			});
-		}
 		
 		/* houseMode button code */
 		if (options['houseMode'] == 1){
@@ -288,6 +235,7 @@ function loadItemList(args){
 			if (!$(this).hasClass('selected')){
 				$("#graph").remove();
 				loadItemList({'houseMode': (options['houseMode'] + 1) % 2, 'archive_id':$("#archive_id").html()});
+				$("#sidepanel").css('display', 'none');
 			}
 		});
 
@@ -313,7 +261,6 @@ function loadItemList(args){
 
 	$.ajax({
 		url: url_str,
-		dataType: 'json',
 		success: function(data){
 			// maybe throw these back into the config function
 			onListUpdate(data, options);
@@ -573,7 +520,7 @@ function loadAddItem(edit_id){
 		url: '/dtms/addItem',
 		dataType: 'json',
 		success: function(data){
-			$("#rightPanel").html(data['html']);
+			$("#mainContainer").html(data['html']);
 
 			// initialization steps - make action active, clear fields and plugin, configure DOM obj
 			$("#action").text('submit');
@@ -629,6 +576,88 @@ function loadAddItem(edit_id){
 	});
 }
 
+/* graph code - json call is made by jquery tabs */
+function loadGraphs(args){
+	var default_args = {
+		'archive_id':	'0',
+		'houseMode':	'0'
+	}
+
+	var options = {};
+	$.extend(options, default_args, args);
+	$("#graph").remove();
+	$("#graphContainer").append("<div id='graph'></div>");
+	var url_str = '/dtms/graphData/' + options['archive_id'] + '/' + options['houseMode'] + '/';
+	$.ajax({
+		url: url_str,
+		dataType: 'json',
+		success: function(data){
+			var chart1 = new Highcharts.Chart({
+				chart: {
+					renderTo: 'graph',
+					defaultSeriesType: 'column',
+					width:600,
+					height:500,
+					margin: [50,50,100,80]
+				},
+				title: {
+					text: "let's see where that all went..."
+				},
+				credits: {
+					enabled: false
+				},
+				xAxis: {
+					categories: data['categories'],
+					labels: {
+						rotation: -45,
+						align: 'right',
+						style: {
+							font: 'normal 13px georgia, sans-serif'
+						}
+					}
+				},
+				yAxis: {
+					min: 0,
+					title: {
+						text: '$'
+					}
+				},
+				legend: {
+					enabled: false
+				},
+				tooltip: {
+					formatter: function(){
+						return '<b>'+ this.x + ': $' + this.y + '</b><br/>';
+					}
+				},
+				series: [{
+					name: 'money',
+					data: data['series'],
+					dataLabels: {
+						enabled: false
+					}
+				}]
+			});
+
+			/* houseMode button code */
+			if (options['houseMode'] == 1){
+				$("#house_graph").addClass('selected');
+				$("#your_graph").removeClass('selected').css('cursor', 'pointer');
+			} else {
+				$("#your_graph").addClass('selected');
+				$("#house_graph").removeClass('selected').css('cursor', 'pointer');
+			}
+			$(".houseMode_graph").unbind('click');
+			$(".houseMode_graph").click(function(){
+				if (!$(this).hasClass('selected')){
+					// change this later
+					loadGraphs({'houseMode': (options['houseMode'] + 1) % 2, 'archive_id':0});
+				}
+			});
+		},
+		error: function(xhr){ document.write(xhr.responseText); }
+	});
+}
 /* clear fiscal period */
 function loadClearCycle(){
 	$.ajax({
@@ -641,11 +670,11 @@ function loadClearCycle(){
 }
 
 function loadArchives(){
-	$("#rightPanel").fadeOut("fast", function(){
+	$("#mainContainer").fadeOut("fast", function(){
 		$.ajax({
 			url: '/dtms/showArchives',
 			success: function(data){
-				$("#rightPanel").html(data).fadeIn("fast");
+				$("#mainContainer").html(data).fadeIn("fast");
 	
 				$(".item").click(function(){
 					var archive_id = parseInt($(this).attr('id'));
@@ -662,9 +691,17 @@ $(document).ready(function(){
 
 //---------------- JS code for index page -------------------
 
-	$("#tabs").tabs();
-
-	// load item list on page load
-	loadItemList();
-
+	$("#tabs").tabs({
+		load: function(event, ui){
+			// dunno why
+			$(".yui-ge").remove();
+			var $tabs = $('#tabs').tabs();
+			var selected = $tabs.tabs('option', 'selected');
+			if (selected == 0)
+				loadItemList();
+			if (selected == 1){
+				loadGraphs();
+			}
+		},
+	});
 });
