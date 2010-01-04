@@ -160,10 +160,40 @@ function loadItemList(args){
 		// load the data into mainContainer	
 		$("#mainContainer").html(data);
 
+
+		// add item button behavior
 		$("#add_item").click(function(){
 			loadAddItem();
 		});
 
+
+		// clear_cycle and delete_item jqmodal triggers
+		$('#clearCyclePopup').jqm({trigger: 'a#clearCyclePopupButton'});
+		$('#deleteItemPopup').jqm();
+
+		/* clear_cycle behavior */
+		$("#confirmClearCycle").click(function(){
+			loadClearCycle();
+		});
+
+		// delete_item behavior for jqmodal box
+		$("#confirmDeleteItem").click(function(){
+			delete_id = $("#confirmDeleteItem").data('delete_id');
+			$.ajax({
+				url: '/dtms/delete_item',
+				data: {'delete_id': delete_id},
+				type: 'POST',
+				dataType: 'json',
+				success: function(data){ loadItemList(); },
+				error: function(data){ document.write(data.responseText); }
+			});
+		});
+		
+		// delete button behavior for trash can icon
+		$(".delete").click(function(){
+			$("#confirmDeleteItem").data('delete_id', parseInt($(this).parent().attr('id')));
+			$("#deleteItemPopup").jqmShow();
+		});
 
 		/* code for row behaviors in table */
 
@@ -185,18 +215,6 @@ function loadItemList(args){
 		// hide item_description on load
 		$(".item_description").hide();
 	
-		// delete button behavior
-		$(".delete").click(function(){
-			delete_id = parseInt($(this).parent().attr('id'));
-			$.ajax({
-				url: '/dtms/delete_item',
-				data: {'delete_id': delete_id},
-				type: 'POST',
-				dataType: 'json',
-				success: function(data){ loadItemList(); },
-				error: function(data){ document.write(data.responseText); }
-			});
-		});
 	
 		// edit button behavior
 		$(".edit").click(function(){
@@ -207,7 +225,10 @@ function loadItemList(args){
 
 
 
-		/* tag list code */
+		/* archive list */
+		$("select").change(function(){
+			loadItemList({'archive_id': $(this).val()});
+		});
 
 
 		// filtering for tag list
@@ -222,7 +243,6 @@ function loadItemList(args){
 			}
 		})
 
-		
 		/* houseMode button code */
 		if (options['houseMode'] == 1){
 			$("#house").addClass('selected');
@@ -238,7 +258,6 @@ function loadItemList(args){
 				$("#sidepanel").css('display', 'none');
 			}
 		});
-
 
 		// this is for clicking on names in house mode and highlighting items
 		$("td.hoverable").click(function(){
@@ -298,9 +317,10 @@ function submitForm(list_users, list_buyers){
 	 * when $("#action").data('status') == 1, that means the button is active */
 	if ($('#action').data('status') == 1){
 		// gets all the information from the forms
-		var str= $("#purch_date").val();
-		var purch_date = str.split("/");
+		var purch_date_str= $("#purch_date").val();
+		var purch_date = purch_date_str.split("/");
 		var tag;
+		var quit = 0;
 
 		// prevent submitting twice
 		$('#action').data('status', 0);
@@ -382,6 +402,7 @@ function submitForm(list_users, list_buyers){
 			if ($("#expanded_buyers").css('display') == "none"){
 				if ( buyer_total != $("#" + uid + "eb").val()){
 					alert('something broke');
+					return;
 				}
 			}
 
@@ -579,12 +600,16 @@ function loadAddItem(edit_id){
 /* graph code - json call is made by jquery tabs */
 function loadGraphs(args){
 	var default_args = {
-		'archive_id':	'0',
+		'archive_id':	'1',
 		'houseMode':	'0'
 	}
 
 	var options = {};
 	$.extend(options, default_args, args);
+
+	$("select").unbind("change").change(function(){
+		loadGraphs({'archive_id': $(this).val()});
+	});
 	$("#graph").remove();
 	$("#graphContainer").append("<div id='graph'></div>");
 	var url_str = '/dtms/graphData/' + options['archive_id'] + '/' + options['houseMode'] + '/';
@@ -651,7 +676,7 @@ function loadGraphs(args){
 			$(".houseMode_graph").click(function(){
 				if (!$(this).hasClass('selected')){
 					// change this later
-					loadGraphs({'houseMode': (options['houseMode'] + 1) % 2, 'archive_id':0});
+					loadGraphs({'houseMode': (options['houseMode'] + 1) % 2, 'archive_id': options['archive_id']});
 				}
 			});
 		},
@@ -669,25 +694,7 @@ function loadClearCycle(){
 	});
 }
 
-function loadArchives(){
-	$("#mainContainer").fadeOut("fast", function(){
-		$.ajax({
-			url: '/dtms/showArchives',
-			success: function(data){
-				$("#mainContainer").html(data).fadeIn("fast");
-	
-				$(".item").click(function(){
-					var archive_id = parseInt($(this).attr('id'));
-					loadItemList({'archive_id': archive_id});
-				});
-			},
-			error: function(data){ document.write(data.responseText); }
-		});
-	});
-}
-
 $(document).ready(function(){
-	$('#clearCyclePopup').jqm({trigger: 'a#newCycleMenu'});
 
 //---------------- JS code for index page -------------------
 

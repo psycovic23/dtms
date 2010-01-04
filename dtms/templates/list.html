@@ -61,9 +61,18 @@
 </div>
 
 <div id="sidepanel" class="yui-u">
-			<div id="add_item">
-				add item
-			</div>
+		<div id="add_item">
+			add item
+		</div>
+
+		<a id="clearCyclePopupButton">clear</a>
+
+		<select id="archive_dropdown">
+			<option value="0"> -- view archives --</option>
+			{% for x in archive_list %}
+			<option value="{{x.0}}">{{x.1}} - {{x.2}}</option>
+			{% endfor %}
+		</select>
 		{% ifequal houseMode "0" %}
 			<div class="ind_balance">
 				<span class="gray">your balance</span><br>
@@ -108,4 +117,14 @@
 		<a class="tagNames">all</a>
 	</div>
 </div>
+</div>
+<div class="jqmWindow" id="clearCyclePopup">
+	are you sure you want to clear this cycle?<br><br>
+	<a id="confirmClearCycle" class="jqmClose">yes</a>
+	<a class="jqmClose">no</a>
+</div>
+<div class="jqmWindow" id="deleteItemPopup">
+	are you sure you want to delete this item?<br><br>
+	<a id="confirmDeleteItem" class="jqmClose">yes</a>
+	<a class="jqmClose">no</a>
 </div>
