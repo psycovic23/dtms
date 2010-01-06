@@ -26,12 +26,22 @@ h3 {
 
 #ft {
 	background-color: #fff;
+	font-size: 8pt;
+	color: #999;
+	padding-bottom: 5px;
+	border: 0px;
 }
 
 #tabs {
 	border-bottom: 0;
 }
 /* layout business */
+
+#addItemContainer {
+	text-align: center;
+	font-size: 10pt;
+	font-weight: normal;
+}
 
 .jqmWindow {
     display: none;
@@ -69,9 +79,16 @@ h3 {
 	padding: 3px 5px;
 	list-style-type: none;
 	display: inline;
+	font-size: 10pt;
+	border: 1px #fff solid;
+	font-weight: normal;
 }
 #addItemContainer li::selection {
 	background: transparent;
+}
+
+#addItemContainer table {
+	margin: auto;
 }
 
 .unselected {
@@ -79,7 +96,7 @@ h3 {
 }
 
 .selected, .hover {
-	border: 1px #000 solid;
+	border: 1px #000 solid !important;
 }
 
 #addItemContainer li::selection, #list_buyers::selection, #list_user::selection, #list_buyers::-moz-selection, #list_users::-moz-selection {
@@ -174,6 +191,8 @@ tr.item:hover {
 }
 
 td {
+	font-size: 11pt;
+	font-weight: normal;
 	padding: 5px 5px;
 }
 

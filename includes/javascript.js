@@ -600,7 +600,7 @@ function loadAddItem(edit_id){
 /* graph code - json call is made by jquery tabs */
 function loadGraphs(args){
 	var default_args = {
-		'archive_id':	'1',
+		'archive_id':	'0',
 		'houseMode':	'0'
 	}
 
@@ -617,52 +617,54 @@ function loadGraphs(args){
 		url: url_str,
 		dataType: 'json',
 		success: function(data){
-			var chart1 = new Highcharts.Chart({
-				chart: {
-					renderTo: 'graph',
-					defaultSeriesType: 'column',
-					width:600,
-					height:500,
-					margin: [50,50,100,80]
-				},
-				title: {
-					text: "let's see where that all went..."
-				},
-				credits: {
-					enabled: false
-				},
-				xAxis: {
-					categories: data['categories'],
-					labels: {
-						rotation: -45,
-						align: 'right',
-						style: {
-							font: 'normal 13px georgia, sans-serif'
-						}
-					}
-				},
-				yAxis: {
-					min: 0,
+			if (data['categories'].length > 0){
+				var chart1 = new Highcharts.Chart({
+					chart: {
+						renderTo: 'graph',
+						defaultSeriesType: 'column',
+						width:600,
+						height:500,
+						margin: [50,50,100,80]
+					},
 					title: {
-						text: '$'
-					}
-				},
-				legend: {
-					enabled: false
-				},
-				tooltip: {
-					formatter: function(){
-						return '<b>'+ this.x + ': $' + this.y + '</b><br/>';
-					}
-				},
-				series: [{
-					name: 'money',
-					data: data['series'],
-					dataLabels: {
+						text: data['display_date']
+					},
+					credits: {
 						enabled: false
-					}
-				}]
-			});
+					},
+					xAxis: {
+						categories: data['categories'],
+						labels: {
+							rotation: -45,
+							align: 'right',
+							style: {
+								font: 'normal 13px georgia, sans-serif'
+							}
+						}
+					},
+					yAxis: {
+						min: 0,
+						title: {
+							text: '$'
+						}
+					},
+					legend: {
+						enabled: false
+					},
+					tooltip: {
+						formatter: function(){
+							return '<b>'+ this.x + ': $' + this.y + '</b><br/>';
+						}
+					},
+					series: [{
+						name: 'money',
+						data: data['series'],
+						dataLabels: {
+							enabled: false
+						}
+					}]
+				});
+			}
 
 			/* houseMode button code */
 			if (options['houseMode'] == 1){
