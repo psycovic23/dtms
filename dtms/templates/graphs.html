@@ -1,0 +1,15 @@
+<div id="graph_nav">
+	<div class="houseMode_graph"<span id="your_graph">your items</span><span id="house_graph">{{ house_name}} items</span>
+	</div>
+	<br>
+	<div style="float: right">
+		<select id="archive_dropdown">
+			<option>-- view archives --</option>
+			{% for x in archive_list %}
+			<option value="{{x.0}}">{{x.1}} - {{x.2}}</option>
+			{% endfor %}
+		</select>
+	</div>
+</div>
+<div id="graph">
+</div>
