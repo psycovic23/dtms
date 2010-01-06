@@ -59,28 +59,31 @@ class Item_list:
         if houseMode == 0:
             new_list = self.item_list.filter(users__id__exact=self.uid)
 
-        display_str = new_list.order_by('purch_date')[0].purch_date.strftime('%b %d, %y')
-        display_str = display_str + ' - ' + new_list.order_by('-purch_date')[0].purch_date.strftime('%b %d, %y')
-        for i in new_list:
-            if str(i.tag) not in x:
-                x[str(i.tag)] = 0
+        if new_list:
+            display_str = new_list.order_by('purch_date')[0].purch_date.strftime('%b %d, %y')
+            display_str = display_str + ' - ' + new_list.order_by('-purch_date')[0].purch_date.strftime('%b %d, %y')
+            for i in new_list:
+                if str(i.tag) not in x:
+                    x[str(i.tag)] = 0
 
-            if houseMode == 0:
-                x[str(i.tag)] += i.users_o()[str(self.uid)][0]
-            else:
-                x[str(i.tag)] += i.price
-        
-        categories = []
-        series = []
-        for (k,v) in x.iteritems():
-            categories.append(k)
-            series.append(float(v))
+                if houseMode == 0:
+                    x[str(i.tag)] += i.users_o()[str(self.uid)][0]
+                else:
+                    x[str(i.tag)] += i.price
+            
+            categories = []
+            series = []
+            for (k,v) in x.iteritems():
+                categories.append(k)
+                series.append(float(v))
 
-        if len(categories) == 1:
-            categories.append(' ')
-            series.append(float(0))
-        return {'categories': categories, 'series': series, 'display_date':
+            if len(categories) == 1:
+                categories.append(' ')
+                series.append(float(0))
+            return {'categories': categories, 'series': series, 'display_date':
                display_str}
+        else:
+            return {'categories': [], 'series': [], 'display_date': 'you have no items for this month!'}
         
     def gen_balancing_transactions(self):
         balances = {}
