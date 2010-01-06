@@ -1,83 +1,17 @@
-<div id="topblock">
+<div class="yui-ge">
+<div class="yui-u first">
 	{% ifnotequal empty "0" %}
-		<div id="titlebar">
-			<span class="header">{{ category.0 }} to {{ category.1 }}</span>
-			<a id="showAnalysis">&nbsp&nbsp&nbsp<img src="../static/images/graph_20px.png" /></a>
-			<a id="houseMode"></a>
-			<span id="archive_id" style="display:none">{{ archive_id }}</span>
-		</div>
-		<br>
+		<span class="date_range">{{ category.0 }} to {{ category.1 }}</span>
+		<div class="houseMode"<span id="your">your items</span><span id="house">{{ house_name}} items</span></div>
+		<span id="archive_id" style="display:none">{{ archive_id }}</span>
+			<br><br><br>
 		
-		{% ifequal houseMode "0" %}
-		<div id="moneyStatus">
-			<div class="ind_balance">
-				<span style="margin-left: 45px" class="gray">your balance</span><br>
-				{% ifequal list.ind_sign 'p' %}
-					<span class="pos">+{{ list.ind_balance|floatformat:2 }}</span>
-				{% endifequal %}
-				{% ifnotequal list.ind_sign 'p' %}
-					<span class="neg">{{ list.ind_balance|floatformat:2 }}</span>
-				{% endifnotequal %}
-			</div>
-		
-			<span class="gray" style="float:right;">transactions</span><br>
-			<table id="tableTransactions">
-		
-				{% for x in list.ind_will_pay %}
-				<tr><td>you owe {{ x.4 }}</td><td> {{ x.2|floatformat:2 }}</td></tr>
-				{% endfor %}
-		
-				{% for x in list.ind_expects %}
-				<tr><td>{{x.3}} pays </td><td>{{ x.2|floatformat:2 }}</td></tr>
-				{% endfor %}
-			</table>
-			<div style="clear:both"></div>
-		</div>
-		<div id="graph">
-		</div>
-		{% endifequal %}
-		
-		
-		
-		{% ifequal houseMode "1" %}
-		<div id="moneyStatus">
-			<div style="float:left">
-				<table>
-					{% for x in list.names_and_balances %}
-					<tr><td class="hoverable">{{ x.0 }}</td><td> {{ x.1|floatformat:2 }}</td></tr>
-					{% endfor %}
-				</table>
-			</div>
-			<div style="float:right">
-				<table>
-					{% for x in list.transactions %}
-					<tr><td>{{ x.3 }} owes {{ x.4 }}</td><td> {{ x.2|floatformat:2 }}</td></tr>
-					{% endfor %}
-				</table>
-			</div>
-			<div style="clear:both"></div>
-		</div>
-		<div id="graph">
-		</div>
-		{% endifequal %}
 	{% endifnotequal %}
 
 	{% ifequal empty 0 %}
 		<h1>no items!</h1>
 	{% endifequal %}
 
-</div>
-
-<div id="bottomblock">
-	<div id="toggleTagList" class="gray">filter by tags</div>
-	<div id="tagList">
-		<span class="gray">tags: &nbsp</span>
-		{% for t in tags %}
-			<a class="tagNames">{{ t.name }}</a>
-		{% endfor %}
-		<a class="tagNames">all</a>
-	</div>
-	
 	<br>
 	<table id="list">
 		<tr class="gray">
@@ -97,8 +31,9 @@
 			<td style="text-align: right">{{ x.buyerName}}</td>
 			<td>{{ x.purch_date|date:"m/d" }}</td>
 			{% ifequal archive_id "0" %}
-			<td class="edit"><img src="../static/images/edit_15px.png" /></td>
-			<td class="delete"><img src="../static/images/delete_15px.png"</td>
+
+				<td class="edit"><img src="images/edit_15px.png" /></td>
+				<td class="delete"><img src="images/delete_15px.png"</td>
 			{% endifequal %}
 		</tr>
 		<tr class="item_description">
@@ -123,4 +58,73 @@
 		</tr>
 		{% endfor %}
 	</table>
+</div>
+
+<div id="sidepanel" class="yui-u">
+		<div id="add_item">
+			add item
+		</div>
+
+		<a id="clearCyclePopupButton">clear</a>
+
+		<select id="archive_dropdown">
+			<option value="0"> -- view archives --</option>
+			{% for x in archive_list %}
+			<option value="{{x.0}}">{{x.1}} - {{x.2}}</option>
+			{% endfor %}
+		</select>
+		{% ifequal houseMode "0" %}
+			<div class="ind_balance">
+				<span class="gray">your balance</span><br>
+				{% ifequal list.ind_sign 'p' %}
+					<span class="pos">+{{ list.ind_balance|floatformat:2 }}</span>
+				{% endifequal %}
+				{% ifnotequal list.ind_sign 'p' %}
+					<span class="neg">{{ list.ind_balance|floatformat:2 }}</span>
+				{% endifnotequal %}
+			</div>
+			<span class="gray">transactions</span><br>
+			<table class="side_table">
+				{% for x in list.ind_will_pay %}
+				<tr><td>you owe {{ x.4 }}</td><td> {{ x.2|floatformat:2 }}</td></tr>
+				{% endfor %}
+			
+				{% for x in list.ind_expects %}
+				<tr><td>{{x.3}} pays </td><td>{{ x.2|floatformat:2 }}</td></tr>
+				{% endfor %}
+			</table>
+		{% endifequal %}
+		
+		{% ifequal houseMode "1" %}
+			<span class="gray">everyone's balances</span>
+			<table class="side_table">
+				{% for x in list.names_and_balances %}
+				<tr><td class="hoverable">{{ x.0 }}</td><td> {{ x.1|floatformat:2 }}</td></tr>
+				{% endfor %}
+			</table>
+			<span class="gray">transactions</span>
+			<table class="side_table">
+				{% for x in list.transactions %}
+				<tr><td>{{ x.3 }} owes {{ x.4 }}</td><td> {{ x.2|floatformat:2 }}</td></tr>
+				{% endfor %}
+			</table>
+		{% endifequal %}
+	<div id="taglist">
+		<span class="gray">tags: &nbsp</span>
+		{% for t in tags %}
+			<a class="tagNames">{{ t.name }}</a>
+		{% endfor %}
+		<a class="tagNames">all</a>
+	</div>
+</div>
+</div>
+<div class="jqmWindow" id="clearCyclePopup">
+	are you sure you want to clear this cycle?<br><br>
+	<a id="confirmClearCycle" class="jqmClose">yes</a>
+	<a class="jqmClose">no</a>
+</div>
+<div class="jqmWindow" id="deleteItemPopup">
+	are you sure you want to delete this item?<br><br>
+	<a id="confirmDeleteItem" class="jqmClose">yes</a>
+	<a class="jqmClose">no</a>
 </div>

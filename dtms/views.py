@@ -15,7 +15,6 @@ def item_list(request, a_num=0, houseMode=0):
 
     items = newItem.objects.select_related().filter(house_id=request.session['house_id']).filter(archive_id=a_num)
 
-
     # throw items into Item_list for all the methods in the class Item_list
     # workaround for the user/house bug where transactions were based on the
     # viewed list, as opposed to the entire house
@@ -40,12 +39,9 @@ def item_list(request, a_num=0, houseMode=0):
     t = get_template('list.html')
     empty = len(items)
 
-    if houseMode == "1":
-        graphData = itemlist.barGraphData(1)
-    else:
-        graphData = itemlist.barGraphData()
-        #graphData = []
+    arch = showArchDates(request)
 
+    house_name = User.objects.get(id=request.session['user_id']).house_name
     html = t.render(Context({"empty": empty, 
                              "uid": request.session['user_id'], 
                              "items": items,
@@ -53,11 +49,48 @@ def item_list(request, a_num=0, houseMode=0):
                              "tags": tags, 
                              "category": category,
                              "houseMode": houseMode,
+                             "house_name": house_name,
+                             "archive_list": arch,
                              "archive_id": a_num}))
 
-    x = json.dumps({'html': html, 'graphData': graphData})
+    return HttpResponse(html)
 
-    return HttpResponse(x)
+def showArchDates(request):
+    # retrieve archive_id groups and their ranges to display in the archive
+    # section
+    r = newItem.objects.filter(house_id=request.session['house_id']).order_by('archive_id').reverse()
+    if r.count() != 0:
+        m = r[0].archive_id + 1
+    else:
+        m = 0
+
+    arch = []
+
+    for i in range(1, m):
+        x = newItem.objects.filter(archive_id=i).order_by('purch_date')
+        arch.append([i, x[0].purch_date.strftime('%b %d, %y'),
+                     x[len(x)-1].purch_date.strftime('%b %d, %y')])
+    return arch
+
+def graphData(request, a_num=0, houseMode=0):
+
+    items = newItem.objects.select_related().filter(house_id=request.session['house_id']).filter(archive_id=a_num)
+    itemlist = Item_list(item_list=items,
+                  house_id=request.session['house_id'],
+                  user_id=request.session['user_id'], archive_id=a_num,
+                         houseMode=houseMode)
+    if houseMode == "1":
+        graphData = itemlist.barGraphData(1)
+    else:
+        graphData = itemlist.barGraphData()
+
+    return HttpResponse(json.dumps(graphData))
+
+def graphs(request):
+    house_name = User.objects.get(id=request.session['user_id']).house_name
+    arch = showArchDates(request)
+    return render_to_response('graphs.html', {"house_name": house_name,
+                                              "archive_list": arch})
 
 def adduser(request):
     if not request.POST:
@@ -98,22 +131,6 @@ def addItemPage(request):
 
 
 
-def showArchives(request):
-    # retrieve archive_id groups and their ranges to display in the archive
-    # section
-    r = newItem.objects.filter(house_id=request.session['house_id']).order_by('archive_id').reverse()
-    if r.count() != 0:
-        m = r[0].archive_id + 1
-    else:
-        m = 0
-
-    arch = []
-
-    for i in range(1, m):
-        x = newItem.objects.filter(archive_id=i).order_by('purch_date')
-        arch.append([i, str(x[0].purch_date), str(x[len(x)-1].purch_date)])
-
-    return render_to_response('showArchives.html', {"archive_list": arch})
 
 def index(request):
     try:
@@ -240,7 +257,6 @@ def edit_item(request):
         info['ind_pay'] = ind_pay
         info['buyer_pay'] = buyer_pay
 
-        print json.dumps(info)
         return HttpResponse(json.dumps(info))
 
 def clear_cycle(request):

@@ -59,6 +59,8 @@ class Item_list:
         if houseMode == 0:
             new_list = self.item_list.filter(users__id__exact=self.uid)
 
+        display_str = new_list.order_by('purch_date')[0].purch_date.strftime('%b %d, %y')
+        display_str = display_str + ' - ' + new_list.order_by('-purch_date')[0].purch_date.strftime('%b %d, %y')
         for i in new_list:
             if str(i.tag) not in x:
                 x[str(i.tag)] = 0
@@ -77,7 +79,8 @@ class Item_list:
         if len(categories) == 1:
             categories.append(' ')
             series.append(float(0))
-        return json.dumps([{'categories': categories, 'series': series}])
+        return {'categories': categories, 'series': series, 'display_date':
+               display_str}
         
     def gen_balancing_transactions(self):
         balances = {}

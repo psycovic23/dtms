@@ -13,8 +13,9 @@
 	<script type="text/javascript" src="jquery.autocomplete.js"></script>
 	<script type="text/javascript" src="jqModal.js"></script>
 	<script type="text/javascript" src="json2.js"></script>
+	<script type="text/javascript" src="jquery-ui-1.7.2.custom.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="reset-fonts-grids.css">
-	<link rel="stylesheet" type="text/css" href="base.css">
+	<link rel="stylesheet" type="text/css" href="css/ui-lightness/jquery-ui-1.7.2.custom.css">
 	<link type="text/css" href="style.css" rel="Stylesheet" />
 	<link type="text/css" href="jquery.autocomplete.css" rel="Stylesheet" />
 	{% endifequal %}
@@ -32,46 +33,31 @@
 	<link type="text/css" href="../static/jquery.autocomplete.css" rel="Stylesheet" />
 	{% endifnotequal %}
 	<title>dtms</title>
-	
-
 </head>
 <body>
-<div id="doc3" class="yui-t1">
-	<div id="hd">
-		<span class="banner">dtms</span>
-	</div>
+<div style="position: absolute;top:0">
+	<span class="banner">dtms</span>
+</div>
+<div id="doc">
 	<div id="bd">
-		<div id="yui-main">
+		<div  id="yui-main">
 			<div class="yui-b">
-				<div id="rightPanel">
-					<div id="list">
-					</div>
+				<div id="tabs">
+					<ul>
+						<li><a href="/dtms/item_list/0/0/" title="mainContainer">items</a></li>
+						<li><a href="/dtms/graphs" title="graphContainer">graphs</a></li>
+					</ul>
+					<div id="mainContainer"></div>
+					<div id="graphContainer"></div>
 				</div>
-				<div id="addItemBox">
-				</div>
-			
-			</div>
-		</div>
-		<div id="yui-b">
-			<div id="leftMenu">
-				<ul>
-					<li><a id="loadItemList">item list</a></li>
-					<li><a id="add_item">add item</a></li>
-					<li><a id="showArchives">show archives</a></li>
-					<li><a id="newCycleMenu">new cycle</a></li>
-					<p id="uid" style="display: none;">{{user_id}}</p>
-				</ul>
 			</div>
 		</div>
 	</div>
 	<div id="ft">
-		<!-- PUT FOOTER CODE HERE -->
+		<br>
+		Developed by Victor Hwang. Send all comments to dtms [at] hwanger [dot] com
+		<br>
 	</div>
-</div>
-<div class="jqmWindow" id="clearCyclePopup">
-	are you sure you want to clear this cycle?<br><br>
-	<a id="confirmClearCycle" class="jqmClose">yes</a>
-	<a class="jqmClose">no</a>
 </div>
 </body>
 </html>
