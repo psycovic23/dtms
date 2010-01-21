@@ -11,6 +11,16 @@ from operator import eq
 from mysite.dtms.models import *
 from re import sub
 
+def shoppingList(request):
+    return render_to_response('shoppingList.html', {})
+
+def read(request):
+    return render_to_response('read.html', {},
+                              context_instance = RequestContext(request))
+
+def loadSL(request):
+    return HttpResponse(json.dumps({'aoeu': 'new'}))
+
 def item_list(request, a_num=0, houseMode=0):
 
     items = newItem.objects.select_related().filter(house_id=request.session['house_id']).filter(archive_id=a_num)
@@ -29,10 +39,10 @@ def item_list(request, a_num=0, houseMode=0):
     arch = items.order_by('purch_date')
     if arch:
         if a_num == '0':
-            category = ([arch[0].purch_date.strftime('%b %d, %Y'), "current"])
+            category = ([arch[0].purch_date.strftime('%b %d, \'%y'), "current"])
         else:
-            category = ([arch[0].purch_date.strftime('%b %d, %Y'),
-                         arch[len(arch)-1].purch_date.strftime('%b %d, %Y')])
+            category = ([arch[0].purch_date.strftime('%b %d, \'%y'),
+                         arch[len(arch)-1].purch_date.strftime('%b %d, \'%y')])
     else:
         category = [' ', 'no items!']
 

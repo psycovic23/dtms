@@ -197,6 +197,16 @@ function loadItemList(args){
 
 		/* code for row behaviors in table */
 
+		$(".item").hover(
+			function(){
+				$(".edit", this).css('visibility', 'visible');
+				$(".delete", this).css('visibility', 'visible');
+			}, function(){
+				$(".edit", this).css('visibility', 'hidden');
+				$(".delete", this).css('visibility', 'hidden');
+			}
+		);
+				
 		$(".item").toggle(
 			function(){
 				$(this).css({'borderBottom': 0});
@@ -215,7 +225,6 @@ function loadItemList(args){
 		// hide item_description on load
 		$(".item_description").hide();
 	
-	
 		// edit button behavior
 		$(".edit").click(function(){
 			// this id corresponds to the unique id in the django db
@@ -223,13 +232,10 @@ function loadItemList(args){
 			loadAddItem(edit_id);
 		});
 
-
-
 		/* archive list */
 		$("select").change(function(){
 			loadItemList({'archive_id': $(this).val()});
 		});
-
 
 		// filtering for tag list
 		$(".tagNames").click(function(){
@@ -678,7 +684,6 @@ function loadGraphs(args){
 			$(".houseMode_graph").unbind('click');
 			$(".houseMode_graph").click(function(){
 				if (!$(this).hasClass('selected')){
-					// change this later
 					loadGraphs({'houseMode': (options['houseMode'] + 1) % 2, 'archive_id': options['archive_id']});
 				}
 			});
@@ -697,6 +702,15 @@ function loadClearCycle(){
 	});
 }
 
+function loadSL(){
+	$.ajax({
+		url: '/dtms/loadSL',
+		success: function(){
+		},
+		error: function(data){ document.write(data.responseText); }
+	});
+}
+
 $(document).ready(function(){
 
 //---------------- JS code for index page -------------------
@@ -711,6 +725,9 @@ $(document).ready(function(){
 				loadItemList();
 			if (selected == 1){
 				loadGraphs();
+			}
+			if (selected == 2){
+				loadSL();
 			}
 		},
 	});

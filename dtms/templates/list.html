@@ -1,8 +1,8 @@
 <div class="yui-ge">
 <div class="yui-u first">
-	{% ifnotequal empty "0" %}
+	{% ifnotequal empty 0 %}
 		<span class="date_range">{{ category.0 }} to {{ category.1 }}</span>
-		<div class="houseMode"<span id="your">your items</span><span id="house">{{ house_name}} items</span></div>
+		<div class="houseMode"<span id="your" title="see items you bought">your items</span><span id="house" title="see items your house bought">{{ house_name}} items</span></div>
 		<span id="archive_id" style="display:none">{{ archive_id }}</span>
 			<br><br><br>
 		
@@ -10,10 +10,13 @@
 
 	{% ifequal empty 0 %}
 		<h1>no items!</h1>
+		<br><br>
+		<a style="margin-left: 40px;font-size: 18pt;" id="add_item" title="add a new item">add an item</a>
 	{% endifequal %}
 
 	<br>
 	<table id="list">
+		{% ifnotequal empty 0 %}
 		<tr class="gray">
 			{% ifequal houseMode "1" %}
 			<td>total cost</td><td>item name</td>
@@ -23,6 +26,7 @@
 			<td>you paid</td><td>your items</td>
 			{% endifequal %}
 		</tr>
+		{% endifnotequal %}
 		{% for x in list.ret_list %}
 		<tr id="{{ x.id }}list" class="item">
 			<td class="price">${{x.price|floatformat:2}}</td>
@@ -61,19 +65,23 @@
 </div>
 
 <div id="sidepanel" class="yui-u">
-		<div id="add_item">
-			add item
-		</div>
-
-		<a id="clearCyclePopupButton">clear</a>
+		{% ifnotequal empty 0%}	
+		<a id="add_item" title="add a new item">add item</a>
+		{% endifnotequal %}
 		<br>
 
-		<select id="archive_dropdown">
-			<option value="0"> -- view archives --</option>
-			{% for x in archive_list %}
-			<option value="{{x.0}}">{{x.1}} - {{x.2}}</option>
+
+		<a id="clearCyclePopupButton" title="clear the list and start a new cycle">clear bills</a>
+		<br>
+		<br>
+
+		<div id="taglist">
+			<span class="gray">tags: &nbsp</span>
+			{% for t in tags %}
+				<a class="tagNames" title="filter list by this tag">{{ t.name }}</a>
 			{% endfor %}
-		</select>
+			<a class="tagNames">all</a>
+		</div>
 		<br><br>
 		{% ifequal houseMode "0" %}
 			<div class="ind_balance">
@@ -111,13 +119,12 @@
 				{% endfor %}
 			</table>
 		{% endifequal %}
-	<div id="taglist">
-		<span class="gray">tags: &nbsp</span>
-		{% for t in tags %}
-			<a class="tagNames">{{ t.name }}</a>
-		{% endfor %}
-		<a class="tagNames">all</a>
-	</div>
+		<select id="archive_dropdown">
+			<option value="0"> -- view archives --</option>
+			{% for x in archive_list %}
+			<option value="{{x.0}}">{{x.1}} - {{x.2}}</option>
+			{% endfor %}
+		</select>
 </div>
 </div>
 <div class="jqmWindow" id="clearCyclePopup">

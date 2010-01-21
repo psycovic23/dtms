@@ -199,6 +199,13 @@ class newItem(models.Model):
     def __unicode__(self):
         return self.name
 
+# shopping list items
+class SL_item(models.Model):
+    name        = models.CharField(max_length=40)
+    added_by    = models.ForeignKey(User)
+    marked      = models.IntegerField()
+    list_id     = models.IntegerField()
+
 class User_item(models.Model):
     user        = models.ForeignKey(User)
     item        = models.ForeignKey(newItem)

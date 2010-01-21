@@ -7,9 +7,12 @@ from views import *
 
 urlpatterns = patterns('',
 	(r'^signup$', adduser),
+    (r'^read$', read),
     (r'^addItem$', addItemPage),
     (r'^graphs$', graphs),
 	(r'^graphData$', graphData),
+    (r'^shoppingList$', shoppingList),
+    (r'^loadSL$', loadSL),
 	(r'^graphData/(?P<a_num>\d+)/(?P<houseMode>\d+)/$', graphData),
     (r'^item_list$', item_list),
 	(r'^item_list/(?P<a_num>\d+)/$', item_list),
@@ -21,6 +24,6 @@ urlpatterns = patterns('',
     (r'^delete_item$', delete_item),
 	(r'^edit_item$', edit_item),
     (r'^(?P<path>.*)$', 'django.views.static.serve', {'document_root':
-                       '/home/victor/Programming/django/mysite/includes'}),
+                       '/home/victor/Dropbox/Programming/django/mysite/includes'}),
 )
 
