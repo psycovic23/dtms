@@ -218,6 +218,8 @@ function loadItemList(args){
 					$(this).css({'background-color': '#ffc97c'});})
 				.bind('mouseout', function(){
 					$(this).css({'background-color': '#fff'});
+				$(".edit", this).css('visibility', 'hidden');
+				$(".delete", this).css('visibility', 'hidden');
 				});
 			});
 
