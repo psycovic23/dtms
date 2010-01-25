@@ -214,7 +214,7 @@ td.hoverable:hover {
 }
 
 .edit, .delete {
-	visibility: hidden;
+	/*visibility: hidden;*/
 }
 
 /* shopping list */
