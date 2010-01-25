@@ -196,15 +196,15 @@ function loadItemList(args){
 
 		/* code for row behaviors in table */
 
-		$(".item").hover(
-			function(){
-				$(".edit", this).css('visibility', 'visible');
-				$(".delete", this).css('visibility', 'visible');
-			}, function(){
-				$(".edit", this).css('visibility', 'hidden');
-				$(".delete", this).css('visibility', 'hidden');
-			}
-		);
+		//$(".item").hover(
+		//	function(){
+		//		$(".edit", this).css('visibility', 'visible');
+		//		$(".delete", this).css('visibility', 'visible');
+		//	}, function(){
+		//		$(".edit", this).css('visibility', 'hidden');
+		//		$(".delete", this).css('visibility', 'hidden');
+		//	}
+		//);
 				
 		$(".item").toggle(
 			function(){
@@ -218,8 +218,8 @@ function loadItemList(args){
 					$(this).css({'background-color': '#ffc97c'});})
 				.bind('mouseout', function(){
 					$(this).css({'background-color': '#fff'});
-				$(".edit", this).css('visibility', 'hidden');
-				$(".delete", this).css('visibility', 'hidden');
+				//$(".edit", this).css('visibility', 'hidden');
+				//$(".delete", this).css('visibility', 'hidden');
 				});
 			});
 
