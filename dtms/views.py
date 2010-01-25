@@ -12,13 +12,40 @@ from mysite.dtms.models import *
 from re import sub
 
 def shoppingList(request):
-    return render_to_response('shoppingList.html', {})
+    lists = {}
+    for l in SL.objects.filter(house_id=request.session['house_id']):
+        items = l.sl_item_set.all()
+        lists[l] = items
+
+    return render_to_response('shoppingList.html', {'lists': lists})
 
 def read(request):
     return render_to_response('read.html', {},
                               context_instance = RequestContext(request))
+def addSLItem(request):
+    newItem = SL_item(name=request.POST['name'], marked=0,
+                      list=SL.objects.get(id=request.POST['listID']),
+                                          added_by=User.objects.get(id=request.session['user_id']))
+    newItem.save()
+    return HttpResponse()
 
-def loadSL(request):
+def deleteSL(request):
+    l = SL.objects.get(id=request.POST['listID'])
+    items = SL_item.objects.filter(list=l)
+    items.delete()
+    l.delete()
+    return HttpResponse()
+
+def editSLItem(request):
+    item = SL_item.objects.get(id=request.POST['id'].replace('SLI', ''))
+    item.name = request.POST['value']
+    item.save()
+    return HttpResponse(request.POST['value'])
+
+def createList(request):
+    newList = SL(name=request.POST['listName'],
+                 house_id=request.session['house_id'])
+    newList.save()
     return HttpResponse(json.dumps({'aoeu': 'new'}))
 
 def item_list(request, a_num=0, houseMode=0):
@@ -138,9 +165,6 @@ def addItemPage(request):
     tags = Tag.objects.filter(house_id=request.session['house_id'])
     return HttpResponse(json.dumps({'html': html, 'tags': [p.name for p in
                                                            tags]}))
-
-
-
 
 def index(request):
     try:

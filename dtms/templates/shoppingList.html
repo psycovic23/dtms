@@ -1,13 +1,52 @@
-aoeu
 <div class="yui-ge">
 	<div class="yui-u first">
-		aoeu
+		{% for l, items in lists.items %}
+		<table class="SLTable" id="{{l.id}}SL">
+			<tr class="SL_banner">
+				<td></td>
+				<td>{{ l.name }}</td>
+				<td><a class="addSLItem"><b>+</b></td>
+				<td><a class="deleteSLButton"><img src="../static/images/delete_15px.png" /></a></td>
+			</tr>
+			{% for x in items %}
+			<tr class="SLItem">
+				<td><input type="checkbox"></td>
+				<td class="SLItemName" id="{{x.id}}SLI">{{ x.name }}</td>
+				<td></td>
+				<td><a class="deleteSLItem"><img class="SLDeleteImg"src="../static/images/delete_15px.png"></a></td>
+			</tr>
+			{% endfor %}
+		</table>
 		<br>
+		{% endfor %}
+			
 	</div>
 	<div id="sidepanel" class="yui-u">
-		aoeu
+		<button id="addListButton" type="button">add new list</button>
 		<br>
 	</div>
+</div>
+
+<div class="jqmWindow" id="deleteSLDialog">
+	are you sure you want to delete this list?
+	<br>
+	<a id="confirmSLDelete" class="jqmClose">delete list</a>
+	<a class="jqmClose">cancel</a>
+</div>
+<div class="jqmWindow" id="addSLItemDialog">
+	what do you want to add?
+	<br>
+	<input type="text" id="SLItemName">
+	<a id="createSLItem" class="jqmClose">add</a>
+	<a class="jqmClose">cancel</a>
+</div>
+
+<div class="jqmWindow" id="addListDialog">
+	what do you want to call this list?
+	<br>
+	<input type="text" id="listName">
+	<a id="createList" class="jqmClose">create</a>
+	<a class="jqmClose">cancel</a>
 </div>
 
 <div class="jqmWindow" id="clearCyclePopup">

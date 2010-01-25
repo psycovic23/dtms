@@ -116,16 +116,13 @@ h3 {
 
 /* styles for the list of items that comes from /list */
 
-#add_item, #clearCyclePopupButton {
-	cursor: pointer;
-	color: #069;
-}
 .tagNames {
 	cursor: pointer;
 	padding:0px 5px;
 	-webkit-transition: background-color .15s ease-in-out;
 	background-color: #fff;
 }
+
 a.tagNames:hover {
 	background-color: #ffc97c;
 }
@@ -219,6 +216,20 @@ td.hoverable:hover {
 .edit, .delete {
 	visibility: hidden;
 }
+
+/* shopping list */
+.SL_banner { 
+	border-bottom: 1px #000 solid;
+}
+
+.SLDeleteImg {
+	visibility: hidden;
+}
+
+.SLTable {
+	float: left;
+}
+
 /* graph page */
 #graph, #graphcontainer {
 	margin: auto;

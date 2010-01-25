@@ -136,7 +136,7 @@
 })(jQuery);
 
 // ------------------------------------------------
-
+//				ITEM TAB
 
 /* this refreshes the item list in the right panel. 
  * takes in the archive_id and housemode, only two things needed.
@@ -155,7 +155,7 @@ function loadItemList(args){
 	/* applies JS code to the item list that's dumped into the DOM.
 	 * this function doesn't actually make the ajax call, it just applies what's needed once the call is made.
 	 **/
-	function onListUpdate(data, options){
+	function configItemList(data, options){
 		
 		// load the data into mainContainer	
 		$("#mainContainer").html(data);
@@ -166,9 +166,8 @@ function loadItemList(args){
 			loadAddItem();
 		});
 
-
 		// clear_cycle and delete_item jqmodal triggers
-		$('#clearCyclePopup').jqm({trigger: 'a#clearCyclePopupButton'});
+		$('#clearCyclePopup').jqm({trigger: '#clearCyclePopupButton'});
 		$('#deleteItemPopup').jqm();
 
 		/* clear_cycle behavior */
@@ -279,7 +278,7 @@ function loadItemList(args){
 
 	}
 
-	/* makes the ajax call, then calls onListUpdate to make everything pretty */
+	/* makes the ajax call, then calls configItemList to make everything pretty */
 	// determine what archive list to load, based on arguments from options
 	var url_str = '/dtms/item_list';
 	url_str += '/' + options['archive_id'] + '/' + options['houseMode'] + '/';
@@ -288,7 +287,7 @@ function loadItemList(args){
 		url: url_str,
 		success: function(data){
 			// maybe throw these back into the config function
-			onListUpdate(data, options);
+			configItemList(data, options);
 		},
 		error: function(data){
 			document.write(data.responseText);
@@ -296,8 +295,20 @@ function loadItemList(args){
 	});
 }
 
+/* clear fiscal period */
+function loadClearCycle(){
+	$.ajax({
+		url: '/dtms/clear_cycle',
+		success: function(){
+			loadItemList();
+		},
+		error: function(data){ document.write(xhr.responseText); }
+	});
+}
 
-/* scrapes form and submits to /add_item */
+// ---------------------------------------
+// 			ADD ITEM PAGE
+
 function submitForm(list_users, list_buyers){
 
 	/* scrapes a div containing input fields and stores the values into an array */
@@ -481,7 +492,7 @@ function loadAddItem(edit_id){
 	// sets all input fields to zero
 
 	/* again, does all the js stuff, but doesn't make the ajax call */
-	function addItemConfigure(data){
+	function configAddItem(data){
 		// create the basic_user listing by using the toggle_selected plugin
 		var $list_users = $('#list_users').toggle_selected(true);
 		var $list_buyers = $("#list_buyers").toggle_selected(false);
@@ -553,7 +564,7 @@ function loadAddItem(edit_id){
 			// initialization steps - make action active, clear fields and plugin, configure DOM obj
 			$("#action").text('submit');
 			setFieldsToZero();
-			$list_users = addItemConfigure(data);
+			$list_users = configAddItem(data);
 			$list_users.clear_names();
 	
 			/* if we're editing an item, as opposed to creating a new one.
@@ -604,8 +615,76 @@ function loadAddItem(edit_id){
 	});
 }
 
-/* graph code - json call is made by jquery tabs */
+// --------------------------------------
+// 			GRAPH PAGE
 function loadGraphs(args){
+	
+	function configGraphs(data){
+		if (data['categories'].length > 0){
+			var chart1 = new Highcharts.Chart({
+				chart: {
+					renderTo: 'graph',
+					defaultSeriesType: 'column',
+					width:600,
+					height:500,
+					margin: [50,50,100,80]
+				},
+				title: {
+					text: data['display_date']
+				},
+				credits: {
+					enabled: false
+				},
+				xAxis: {
+					categories: data['categories'],
+					labels: {
+						rotation: -45,
+						align: 'right',
+						style: {
+							font: 'normal 13px georgia, sans-serif'
+						}
+					}
+				},
+				yAxis: {
+					min: 0,
+					title: {
+						text: '$'
+					}
+				},
+				legend: {
+					enabled: false
+				},
+				tooltip: {
+					formatter: function(){
+						return '<b>'+ this.x + ': $' + this.y + '</b><br/>';
+					}
+				},
+				series: [{
+					name: 'money',
+					data: data['series'],
+					dataLabels: {
+						enabled: false
+					}
+				}]
+			});
+		}
+
+		/* houseMode button code */
+		if (options['houseMode'] == 1){
+			$("#house_graph").addClass('selected');
+			$("#your_graph").removeClass('selected').css('cursor', 'pointer');
+		} else {
+			$("#your_graph").addClass('selected');
+			$("#house_graph").removeClass('selected').css('cursor', 'pointer');
+		}
+		$(".houseMode_graph").unbind('click');
+		$(".houseMode_graph").click(function(){
+			if (!$(this).hasClass('selected')){
+				loadGraphs({'houseMode': (options['houseMode'] + 1) % 2, 'archive_id': options['archive_id']});
+			}
+		});
+	}
+
 	var default_args = {
 		'archive_id':	'0',
 		'houseMode':	'0'
@@ -624,97 +703,101 @@ function loadGraphs(args){
 		url: url_str,
 		dataType: 'json',
 		success: function(data){
-			if (data['categories'].length > 0){
-				var chart1 = new Highcharts.Chart({
-					chart: {
-						renderTo: 'graph',
-						defaultSeriesType: 'column',
-						width:600,
-						height:500,
-						margin: [50,50,100,80]
-					},
-					title: {
-						text: data['display_date']
-					},
-					credits: {
-						enabled: false
-					},
-					xAxis: {
-						categories: data['categories'],
-						labels: {
-							rotation: -45,
-							align: 'right',
-							style: {
-								font: 'normal 13px georgia, sans-serif'
-							}
-						}
-					},
-					yAxis: {
-						min: 0,
-						title: {
-							text: '$'
-						}
-					},
-					legend: {
-						enabled: false
-					},
-					tooltip: {
-						formatter: function(){
-							return '<b>'+ this.x + ': $' + this.y + '</b><br/>';
-						}
-					},
-					series: [{
-						name: 'money',
-						data: data['series'],
-						dataLabels: {
-							enabled: false
-						}
-					}]
-				});
-			}
-
-			/* houseMode button code */
-			if (options['houseMode'] == 1){
-				$("#house_graph").addClass('selected');
-				$("#your_graph").removeClass('selected').css('cursor', 'pointer');
-			} else {
-				$("#your_graph").addClass('selected');
-				$("#house_graph").removeClass('selected').css('cursor', 'pointer');
-			}
-			$(".houseMode_graph").unbind('click');
-			$(".houseMode_graph").click(function(){
-				if (!$(this).hasClass('selected')){
-					loadGraphs({'houseMode': (options['houseMode'] + 1) % 2, 'archive_id': options['archive_id']});
-				}
-			});
+			configGraphs(data);
 		},
 		error: function(xhr){ document.write(xhr.responseText); }
 	});
 }
-/* clear fiscal period */
-function loadClearCycle(){
-	$.ajax({
-		url: '/dtms/clear_cycle',
-		success: function(){
-			loadItemList();
-		},
-		error: function(data){ document.write(xhr.responseText); }
-	});
-}
 
+// ---------------------------------------------------
+// 					shopping cart page
 function loadSL(){
+	function configSL(data){
+		// create list code
+		$("#addListDialog").jqm({trigger: '#addListButton'});
+		$("#createList").click(function(){
+			$.ajax({
+				url: '/dtms/createList',
+				data: {'listName': $("#listName").val()},
+				type: 'POST',
+				success: function(data){ loadSL(); },
+				error: function(data){ document.write(data.responseText); }
+			});
+		});
+
+		// launch add SL item dialog
+		$("#addSLItemDialog").jqm();
+		$(".addSLItem").click(function(){
+			$("#addSLItemDialog").jqmShow();
+			$("#createSLItem").data('listID', parseInt($(this).closest('table').attr('id')));
+		});
+
+		// add SL item
+		$("#createSLItem").click(function(){
+			$.ajax({
+				url: '/dtms/addSLItem',
+				type: 'POST',
+				data: {'listID': $("#createSLItem").data('listID'),
+					   'name': $("#SLItemName").val()},
+				success: function(){ loadSL(); },
+				error: function(data){ document.write(data.responseText); }
+			});
+		});
+
+		// launch delete SL dialog
+		$("#deleteSLDialog").jqm();
+		$(".deleteSLButton").click(function(){
+			$("#deleteSLDialog").jqmShow();
+			$("#confirmSLDelete").data('listID', parseInt($(this).closest('table').attr('id')));
+		});
+
+		// delete SL
+		$("#confirmSLDelete").click(function(){
+			$.ajax({
+				url: '/dtms/deleteSL',
+				type: 'POST',
+				data: {'listID': $("#confirmSLDelete").data('listID')},
+				success: function(){ loadSL(); },
+				error: function(data){ document.write(data.responseText); }
+			});
+		});
+
+		// strikethrough code
+		$(':checkbox').change(function(){
+			if (this.checked === true)
+				$(this).parent().next().css('text-decoration', 'line-through');
+			if (this.checked === false)
+				$(this).parent().next().css('text-decoration', 'none');
+		});
+
+		// editable names
+		$('.SLItemName').editable('/dtms/editSLItem', {
+			indicator: 'Saving...',
+			tooltip: 'Click to edit, then enter to save'
+		});
+
+		// hide delete button
+		$(".SLItem").hover(
+			function(){
+				$(".SLDeleteImg", this).css('visibility', 'visible');
+			}, function(){
+				$(".SLDeleteImg", this).css('visibility', 'hidden');
+			}
+		);
+	}
+
 	$.ajax({
-		url: '/dtms/loadSL',
-		success: function(){
+		url: '/dtms/shoppingList',
+		success: function(data){
+			$('#shoppingList').html(data);
+			configSL(data);
 		},
 		error: function(data){ document.write(data.responseText); }
 	});
 }
 
+//---------------- JS code for tabs -------------------
 $(document).ready(function(){
-
-//---------------- JS code for index page -------------------
-
 	$("#tabs").tabs({
 		load: function(event, ui){
 			// dunno why

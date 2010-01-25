@@ -2,7 +2,7 @@
 <div class="yui-u first">
 	{% ifnotequal empty 0 %}
 		<span class="date_range">{{ category.0 }} to {{ category.1 }}</span>
-		<div class="houseMode"<span id="your" title="see items you bought">your items</span><span id="house" title="see items your house bought">{{ house_name}} items</span></div>
+		<div class="houseMode"<a id="your" title="see items you bought">your items</a><a id="house" title="see items your house bought">{{ house_name}} items</a></div>
 		<span id="archive_id" style="display:none">{{ archive_id }}</span>
 			<br><br><br>
 		
@@ -66,12 +66,12 @@
 
 <div id="sidepanel" class="yui-u">
 		{% ifnotequal empty 0%}	
-		<a id="add_item" title="add a new item">add item</a>
+		<button type="button" id="add_item">add item</button>
 		{% endifnotequal %}
 		<br>
 
 
-		<a id="clearCyclePopupButton" title="clear the list and start a new cycle">clear bills</a>
+		<button type="button" id="clearCyclePopupButton">clear bills</button>
 		<br>
 		<br>
 
