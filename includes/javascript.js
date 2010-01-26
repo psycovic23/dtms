@@ -816,4 +816,5 @@ $(document).ready(function(){
 			}
 		},
 	});
+	loadItemList();
 });
