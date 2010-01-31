@@ -8,7 +8,7 @@ from django.template.loader import get_template
 from django.utils import simplejson as json
 import operator, decimal, pdb
 from operator import eq
-from mysite.dtms.models import *
+from dtms.models import *
 from re import sub
 
 def shoppingList(request):

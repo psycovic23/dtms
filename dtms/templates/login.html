@@ -16,7 +16,7 @@
 				$("#msgbox").removeClass().addClass('messagebox').text('Validating....').fadeIn(1000);
 				//check the username exists or not from ajax
 	            $.ajax({
-	        		url: '/dtms/login',
+	        		url: '/login',
 	                type: 'POST',
 					data: {  
 						username:$('#username').val(),
@@ -29,7 +29,7 @@
 								$(this).html('Logging in.....')
 								.addClass('messageboxok')
 								.fadeTo(900,1, function(){
-	                                document.location='/dtms';
+	                                document.location='/';
 	                            });
 	                    	});
 	                    } else {

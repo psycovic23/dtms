@@ -179,7 +179,7 @@ function loadItemList(args){
 		$("#confirmDeleteItem").click(function(){
 			delete_id = $("#confirmDeleteItem").data('delete_id');
 			$.ajax({
-				url: '/dtms/delete_item',
+				url: '/delete_item',
 				data: {'delete_id': delete_id},
 				type: 'POST',
 				dataType: 'json',
@@ -282,7 +282,7 @@ function loadItemList(args){
 
 	/* makes the ajax call, then calls configItemList to make everything pretty */
 	// determine what archive list to load, based on arguments from options
-	var url_str = '/dtms/item_list';
+	var url_str = '/item_list';
 	url_str += '/' + options['archive_id'] + '/' + options['houseMode'] + '/';
 
 	$.ajax({
@@ -300,7 +300,7 @@ function loadItemList(args){
 /* clear fiscal period */
 function loadClearCycle(){
 	$.ajax({
-		url: '/dtms/clear_cycle',
+		url: '/clear_cycle',
 		success: function(){
 			loadItemList();
 		},
@@ -472,7 +472,7 @@ function submitForm(list_users, list_buyers){
 		// submit data
 		var c = JSON.stringify(data);
 		$.ajax({
-			url: '/dtms/add_item', 
+			url: '/add_item', 
 			type: "POST",
 			data: {'string': c},
 			success: function(data){
@@ -558,7 +558,7 @@ function loadAddItem(edit_id){
 
 	/* makes the ajax call to load additem. lots of code if we're editing an item */
 	$.ajax({
-		url: '/dtms/addItem',
+		url: '/addItem',
 		dataType: 'json',
 		success: function(data){
 			$("#mainContainer").html(data['html']);
@@ -583,7 +583,7 @@ function loadAddItem(edit_id){
 				/* if we're editing, make ajax call to get data we need to fill in fields */
 				d = {'item_id': edit_id};
 				$.ajax({
-					url: '/dtms/edit_item',
+					url: '/edit_item',
 					type: 'POST',
 					data: d,
 					dataType: 'json',
@@ -620,7 +620,6 @@ function loadAddItem(edit_id){
 // --------------------------------------
 // 			GRAPH PAGE
 function loadGraphs(args){
-	
 	function configGraphs(data){
 		if (data['categories'].length > 0){
 			var chart1 = new Highcharts.Chart({
@@ -698,9 +697,11 @@ function loadGraphs(args){
 	$("select").unbind("change").change(function(){
 		loadGraphs({'archive_id': $(this).val()});
 	});
+
 	$("#graph").remove();
 	$("#graphContainer").append("<div id='graph'></div>");
-	var url_str = '/dtms/graphData/' + options['archive_id'] + '/' + options['houseMode'] + '/';
+
+	var url_str = '/graphData/' + options['archive_id'] + '/' + options['houseMode'] + '/';
 	$.ajax({
 		url: url_str,
 		dataType: 'json',
@@ -719,7 +720,7 @@ function loadSL(){
 		$("#addListDialog").jqm({trigger: '#addListButton'});
 		$("#createList").click(function(){
 			$.ajax({
-				url: '/dtms/createList',
+				url: '/createList',
 				data: {'listName': $("#listName").val()},
 				type: 'POST',
 				success: function(data){ loadSL(); },
@@ -737,7 +738,7 @@ function loadSL(){
 		// add SL item
 		$("#createSLItem").click(function(){
 			$.ajax({
-				url: '/dtms/addSLItem',
+				url: '/addSLItem',
 				type: 'POST',
 				data: {'listID': $("#createSLItem").data('listID'),
 					   'name': $("#SLItemName").val()},
@@ -756,7 +757,7 @@ function loadSL(){
 		// delete SL
 		$("#confirmSLDelete").click(function(){
 			$.ajax({
-				url: '/dtms/deleteSL',
+				url: '/deleteSL',
 				type: 'POST',
 				data: {'listID': $("#confirmSLDelete").data('listID')},
 				success: function(){ loadSL(); },
@@ -773,7 +774,7 @@ function loadSL(){
 		});
 
 		// editable names
-		$('.SLItemName').editable('/dtms/editSLItem', {
+		$('.SLItemName').editable('/editSLItem', {
 			indicator: 'Saving...',
 			tooltip: 'Click to edit, then enter to save'
 		});
@@ -789,7 +790,7 @@ function loadSL(){
 	}
 
 	$.ajax({
-		url: '/dtms/shoppingList',
+		url: '/shoppingList',
 		success: function(data){
 			$('#shoppingList').html(data);
 			configSL(data);
@@ -806,8 +807,9 @@ $(document).ready(function(){
 			$(".yui-ge").remove();
 			var $tabs = $('#tabs').tabs();
 			var selected = $tabs.tabs('option', 'selected');
-			if (selected == 0)
-				loadItemList();
+			console.log('load' + selected);
+			//if (selected == 0)
+			//	loadItemList();
 			if (selected == 1){
 				loadGraphs();
 			}
@@ -815,6 +817,15 @@ $(document).ready(function(){
 				loadSL();
 			}
 		},
+		select: function(event, ui){
+			var $tabs = $('#tabs').tabs();
+			var selected = $tabs.tabs('option', 'selected');
+			console.log('selected' + selected);
+			if (selected == 2){
+				loadItemList();
+				console.log('graphs');
+			}
+		}
 	});
 	loadItemList();
 });
