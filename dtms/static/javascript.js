@@ -805,9 +805,6 @@ $(document).ready(function(){
 		load: function(event, ui){
 			// dunno why
 			$(".yui-ge").remove();
-			console.log('load' + ui.index);
-			//if (selected == 0)
-			//	loadItemList();
 			if (ui.index == 1){
 				loadGraphs();
 			}

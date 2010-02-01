@@ -104,7 +104,7 @@ def showArchDates(request):
     arch = []
 
     for i in range(1, m):
-        x = newItem.objects.filter(archive_id=i).order_by('purch_date')
+        x = newItem.objects.filter(house_id=request.session['house_id']).filter(archive_id=i).order_by('purch_date')
         arch.append([i, x[0].purch_date.strftime('%b %d, %y'),
                      x[len(x)-1].purch_date.strftime('%b %d, %y')])
     return arch
