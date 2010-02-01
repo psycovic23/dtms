@@ -32,7 +32,6 @@ class Item_list:
         self.houseMode = houseMode
 
     def ret_list(self):
-        print self.houseMode
         if self.houseMode=='1':
             return self.item_list.order_by('-purch_date')
         else:

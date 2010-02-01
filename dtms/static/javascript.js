@@ -805,25 +805,19 @@ $(document).ready(function(){
 		load: function(event, ui){
 			// dunno why
 			$(".yui-ge").remove();
-			var $tabs = $('#tabs').tabs();
-			var selected = $tabs.tabs('option', 'selected');
-			console.log('load' + selected);
+			console.log('load' + ui.index);
 			//if (selected == 0)
 			//	loadItemList();
-			if (selected == 1){
+			if (ui.index == 1){
 				loadGraphs();
 			}
-			if (selected == 2){
+			if (ui.index == 2){
 				loadSL();
 			}
 		},
 		select: function(event, ui){
-			var $tabs = $('#tabs').tabs();
-			var selected = $tabs.tabs('option', 'selected');
-			console.log('selected' + selected);
-			if (selected == 2){
+			if (ui.index == 0){
 				loadItemList();
-				console.log('graphs');
 			}
 		}
 	});
