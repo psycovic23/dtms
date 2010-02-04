@@ -30,7 +30,7 @@
 			d.password = $("#password").val();
 			
 			$.ajax({
-				url: '/dtms/signup',
+				url: '/signup',
 				type: 'POST',
 				data: {'d': JSON.stringify(d)},
 				success: function(data){
@@ -59,7 +59,7 @@
     <div id="container">dtms - create a house <br><br>
 		<div id="error" style="color: red;"></div>
 		<div style="text-align: center">
-			<p>choose a house name</p>
+			<p>choose a house name (case sensitive)</p>
 			<input type="text" id="house_name"><br>
 			
 			<p>how many people live in your house?</p>
