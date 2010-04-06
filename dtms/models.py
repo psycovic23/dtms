@@ -33,12 +33,12 @@ class Item_list:
 
     def ret_list(self):
         if self.houseMode=='1':
-            return self.item_list.order_by('-purch_date')
+            return self.item_list.order_by('-purch_date', 'id')
         else:
             # find anything that you bought or used and how much you paid for it
             u = User.objects.select_related().get(id=self.uid)
             items = self.item_list.filter((Q(user_item__user__exact=u) |
-                                      Q(buyer_item__user__exact=u))).distinct().order_by('-purch_date')
+                                      Q(buyer_item__user__exact=u))).distinct().order_by('-purch_date', 'id')
 
             for t in items:
                 u_o = t.users_o()
