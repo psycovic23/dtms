@@ -5,10 +5,12 @@ from dtms.views import *
 from sms.views import process_sms
 
 # Uncomment the next two lines to enable the admin:
-    #from django.contrib import admin
-    #admin.autodiscover()
+from django.contrib import admin
+admin.autodiscover()
 
 urlpatterns = patterns('',
+    #admin
+    (r'^admin/', include(admin.site.urls)),
     # non app stuff
 	(r'^signup$', adduser),
     (r'^read$', read),
