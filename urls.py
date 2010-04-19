@@ -42,6 +42,6 @@ urlpatterns = patterns('',
 
 	(r'^$', index),
     (r'^(?P<path>.*)$', 'django.views.static.serve', {'document_root':
-                       '/home/victor/Dropbox/Programming/django/mysite/dtms/static'}),
+                       '/home/victor/Dropbox/Programming/django/mysite/static'}),
 )
 

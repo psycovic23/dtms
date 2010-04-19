@@ -804,7 +804,7 @@ $(document).ready(function(){
 	console.log('aoeu');
 	$("#tabs").tabs({
 		load: function(event, ui){
-			// dunno why
+			// remove the div and then reload it later
 			$(".yui-ge").remove();
 			if (ui.index == 1){
 				loadGraphs();
