@@ -1,5 +1,7 @@
 from django.conf.urls.defaults import *
-from views import * 
+
+# go into the dtms app
+from dtms.views import * 
 
 # Uncomment the next two lines to enable the admin:
     #from django.contrib import admin
