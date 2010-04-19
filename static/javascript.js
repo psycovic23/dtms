@@ -801,7 +801,6 @@ function loadSL(){
 
 //---------------- JS code for tabs -------------------
 $(document).ready(function(){
-	console.log('aoeu');
 	$("#tabs").tabs({
 		load: function(event, ui){
 			// remove the div and then reload it later
