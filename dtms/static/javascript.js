@@ -801,6 +801,7 @@ function loadSL(){
 
 //---------------- JS code for tabs -------------------
 $(document).ready(function(){
+	console.log('aoeu');
 	$("#tabs").tabs({
 		load: function(event, ui){
 			// dunno why
