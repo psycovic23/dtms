@@ -2,6 +2,7 @@ from django.conf.urls.defaults import *
 
 # go into the dtms app
 from dtms.views import * 
+from sms.views import process_sms
 
 # Uncomment the next two lines to enable the admin:
     #from django.contrib import admin
@@ -34,6 +35,10 @@ urlpatterns = patterns('',
     (r'^createList$', createList),
     (r'^editSLItem$', editSLItem),
     (r'^deleteSL$', deleteSL),
+
+    # sms
+    (r'^sms/(?P<sms_string>.+)/$', process_sms),
+    (r'^sms$', process_sms),
 
 	(r'^$', index),
     (r'^(?P<path>.*)$', 'django.views.static.serve', {'document_root':
