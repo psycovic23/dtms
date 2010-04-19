@@ -41,7 +41,10 @@ urlpatterns = patterns('',
     (r'^sms$', process_sms),
 
 	(r'^$', index),
-    (r'^(?P<path>.*)$', 'django.views.static.serve', {'document_root':
-                       '/home/victor/Dropbox/Programming/django/mysite/static'}),
 )
+if not settings.PROD:
+    urlpatterns += patterns('', 
+        (r'^(?P<path>.*)$', 'django.views.static.serve', {'document_root':\
+                       '/home/victor/Dropbox/Programming/django/mysite/static'}),
+                           )
 
