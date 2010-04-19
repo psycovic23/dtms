@@ -802,7 +802,6 @@ function loadSL(){
 //---------------- JS code for tabs -------------------
 $(document).ready(function(){
 	$("#tabs").tabs({
-		console.log('test');
 		load: function(event, ui){
 			// remove the div and then reload it later
 			$(".yui-ge").remove();
