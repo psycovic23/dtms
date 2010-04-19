@@ -40,7 +40,6 @@ urlpatterns = patterns('',
 
     # sms
     (r'^sms/(?P<sms_string>.+)/$', process_sms),
-    (r'^sms$', process_sms),
 
 	(r'^$', index),
 )
