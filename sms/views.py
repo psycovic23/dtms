@@ -3,7 +3,8 @@ from django.http import HttpResponse
 
 from dtms.models import User, Tag, newItem, Buyer_item, User_item
 
-import datetime, decimal, json
+import datetime, decimal
+from django.utils import simplejson as json
 
 def process_sms(request, sms_string):
     words = sms_string.split('+')
