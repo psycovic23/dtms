@@ -58,9 +58,6 @@ def process_sms(request, sms_string):
     user_array = {}
     user_array[user.id] = [price, user.name]
 
-    print buyer_array
-    print user_array
-
     # fix name
     if item_description:
         name = item_description
@@ -86,8 +83,5 @@ def process_sms(request, sms_string):
     u_link = User_item(user=user, item=ref_item)
     u_link.save()
 
-
-    print ref_item.id
-    
     return HttpResponse(request.session['house_id'])
 
