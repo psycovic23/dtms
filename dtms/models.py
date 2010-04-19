@@ -7,7 +7,6 @@ import decimal
 from django.db.models import Q, Sum
 from django.contrib import admin
 
-admin.site.register(User)
 def decimal_parse(s): 
     return decimal.Decimal(str(round(float(s), 2)))
 
