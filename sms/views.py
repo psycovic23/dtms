@@ -9,7 +9,7 @@ import pdb
 import logging
 LOG_FILENAME = '/home/vhwang/log'
 logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG)
-# not found house, user, missing data
+# not found house, user, missing data, everyone owes ___
 def process_sms(request, sms_string):
     logging.debug(sms_string)
     words = sms_string.split('+')
@@ -21,7 +21,7 @@ def process_sms(request, sms_string):
     # find house name
     for i in range(len(words)):
         if User.objects.filter(house_name__exact=words[i]):
-            house_name = words[i]
+            house_name = words[i].lower()
             del words[i]
             break
 
@@ -32,7 +32,7 @@ def process_sms(request, sms_string):
 
     # found first name
     for i in range(len(words)):
-        if words[i] in names:
+        if words[i].lower() in names:
             user = User.objects.get(name=words[i],
                                      house_id=house_id)
             del words[i]
@@ -40,7 +40,7 @@ def process_sms(request, sms_string):
 
     # found second name
     for i in range(len(words)):
-        if words[i] in names:
+        if words[i].lower() in names:
             buyer = User.objects.get(name=words[i],
                                     house_id=house_id)
             del words[i]
