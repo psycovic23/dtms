@@ -33,7 +33,7 @@ def process_sms(request, sms_string):
     # found first name
     for i in range(len(words)):
         if words[i] in names:
-            buyer = User.objects.get(name=words[i],
+            user = User.objects.get(name=words[i],
                                      house_id=house_id)
             del words[i]
             break
@@ -41,7 +41,7 @@ def process_sms(request, sms_string):
     # found second name
     for i in range(len(words)):
         if words[i] in names:
-            user = User.objects.get(name=words[i],
+            buyer = User.objects.get(name=words[i],
                                     house_id=house_id)
             del words[i]
             break
