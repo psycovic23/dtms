@@ -90,7 +90,7 @@ def process_sms(request, sms_string):
         name = name,
         price = decimal.Decimal(str(round(float(price), 2))),
         archive_id = 0,
-        house_id = request.session['house_id'],
+        house_id = house_id,
         tag = tag,
         comments = "",
         purch_date = today,
