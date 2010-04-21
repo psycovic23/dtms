@@ -9,12 +9,20 @@ import pdb
 
 def process_sms(request, sms_string):
     words = sms_string.split('+')
-    users = User.objects.filter(house_id=request.session['house_id'])
-    names = [p.name for p in users]
     buyer = None
     user = None
     price = None
     item_description = None
+
+    # find house name
+    for i in range(len(words)):
+        if User.objects.filter(house_name__exact=words[i]):
+            house_name = words[i]
+            del words[i]
+            break
+
+    users = User.objects.filter(house_name__exact=house_name)
+    names = [p.name for p in users]
 
     # found first name
     for i in range(len(words)):
