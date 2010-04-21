@@ -101,5 +101,5 @@ def process_sms(request, sms_string):
     u_link = User_item(user=user, item=ref_item)
     u_link.save()
 
-    return HttpResponse(request.session['house_id'])
+    return HttpResponse('success')
 
