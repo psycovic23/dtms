@@ -7,6 +7,7 @@ import datetime, decimal
 from django.utils import simplejson as json
 import pdb
 
+# not found house, user, missing data
 def process_sms(request, sms_string):
     words = sms_string.split('+')
     buyer = None
@@ -22,13 +23,14 @@ def process_sms(request, sms_string):
             break
 
     users = User.objects.filter(house_name__exact=house_name)
+    house_id = users[0].house_id
     names = [p.name for p in users]
 
     # found first name
     for i in range(len(words)):
         if words[i] in names:
             buyer = User.objects.get(name=words[i],
-                                     house_id=request.session['house_id'])
+                                     house_id=house_id)
             del words[i]
             break
 
@@ -36,7 +38,7 @@ def process_sms(request, sms_string):
     for i in range(len(words)):
         if words[i] in names:
             user = User.objects.get(name=words[i],
-                                    house_id=request.session['house_id'])
+                                    house_id=house_id)
             del words[i]
             break
 
@@ -56,8 +58,15 @@ def process_sms(request, sms_string):
 
     # set current time as purch date
     today =  datetime.datetime.today()
-    tag = Tag.objects.get(name='uncategorized',
-                          house_id=request.session['house_id'])
+
+    # set tag
+    try:
+        tag = Tag.objects.get(name='uncategorized',
+                              house_id=house_id)
+    except:
+        tag = Tag(name='uncategorized', house_id=house_id)
+        tag.save()
+
 
     
     # generate the buyer and user price data
