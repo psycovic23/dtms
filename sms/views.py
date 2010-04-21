@@ -5,6 +5,7 @@ from dtms.models import User, Tag, newItem, Buyer_item, User_item
 
 import datetime, decimal
 from django.utils import simplejson as json
+import pdb
 
 def process_sms(request, sms_string):
     words = sms_string.split('+')
@@ -60,7 +61,7 @@ def process_sms(request, sms_string):
 
     # fix name
     if item_description:
-        name = item_description
+        name = (' ').join(item_description)
     else:
         name = 'phone entry'
 
