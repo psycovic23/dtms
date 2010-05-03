@@ -6,12 +6,8 @@ from dtms.models import User, Tag, newItem, Buyer_item, User_item
 import datetime, decimal
 from django.utils import simplejson as json
 import pdb
-import logging
-LOG_FILENAME = '/home/vhwang/log'
-logging.basicConfig(filename=LOG_FILENAME,level=logging.DEBUG)
 # not found house, user, missing data, everyone owes ___
 def process_sms(request, sms_string):
-    logging.debug(sms_string)
     words = sms_string.split('+')
     buyer = None
     user = None
@@ -27,7 +23,6 @@ def process_sms(request, sms_string):
 
     users = User.objects.filter(house_name__exact=house_name)
     house_id = users[0].house_id
-    logging.debug(house_id)
     names = [p.name for p in users]
 
     # found first name
@@ -38,6 +33,7 @@ def process_sms(request, sms_string):
             del words[i]
             break
 
+
     # found second name
     for i in range(len(words)):
         if words[i].lower() in names:
@@ -46,12 +42,12 @@ def process_sms(request, sms_string):
             del words[i]
             break
 
-    # get price
+    # get price BUG
     for i in range(len(words)):
         try:
             price = float(words[i])
         except:
-            pass
+            HttpResponse('problem with price')
 
     # find everything after 'for'
     try:

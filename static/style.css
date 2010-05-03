@@ -11,9 +11,31 @@ h1, .mega {
 	font-size:12pt;
 }
 
+#top_header {
+	height: 50px;
+}
+#gradient-top {
+	position: absolute;
+	z-index: -1;
+	top: 0;
+	height: 300px;
+	width: 100%;
+	background-image: url('images/banner.png');
+	background-repeat: repeat-x;
+}
+#gradient-bot {
+	position: absolute;
+	z-index: 0;
+	bottom: 0;
+	height: 100px;
+	width: 100%;
+	background-image: url('images/bannerbot.png');
+	background-repeat: repeat-x;
+}
 .banner {
 	font-size: 36pt;
 	color: #ccc;
+	background-color: transparent;
 }
 
 h2 { 
