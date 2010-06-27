@@ -318,7 +318,7 @@ function submitForm(list_users, list_buyers){
 		var values = [];
 		var $d = $("#" + id + " input");
 		$d.each(function(){
-			values.push([parseInt($(this).attr('id')),$(this).val()]);
+			values.push([Math.round(parseInt($(this).attr('id'))*100)/100, $(this).val()]);
 		});
 		return values;
 	}
