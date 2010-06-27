@@ -46,21 +46,21 @@ urlpatterns = patterns('',
 
 	(r'^$', index),
 
+
+    # gal
+    (r'^gal$', gal.index),
+    (r'^gal/process/$', gal.process),
+    (r'^gal/edit_pic/(?P<id>\d+)/$', gal.edit_pic),
+    (r'^gal/view_pic/(?P<id>\d+)/$', gal.view_pic),
+    (r'^gal/save/$', gal.save),
+    (r'^gal/viewer/(?P<category>\w+)/(?P<pageNumber>\d+)/$', gal.innerviewer),
+    (r'^gal/display/(?P<category>\w+)/$', gal.display),
+    (r'^gal/display/(?P<category>\w+)/(?P<pageNumber>\d+)/$', gal.display),
 )
 
 if not settings.PROD:
     urlpatterns += patterns('', 
         (r'^(?P<path>.*)$', 'django.views.static.serve', {'document_root':\
                        '/home/victor/dropbox/Programming/django/mysite/static'}),
-
-        # gal
-        (r'^gal$', gal.index),
-        (r'^gal/process/$', gal.process),
-        (r'^gal/edit_pic/(?P<id>\d+)/$', gal.edit_pic),
-        (r'^gal/view_pic/(?P<id>\d+)/$', gal.view_pic),
-        (r'^gal/save/$', gal.save),
-        (r'^gal/viewer/(?P<category>\w+)/(?P<pageNumber>\d+)/$', gal.innerviewer),
-        (r'^gal/display/(?P<category>\w+)/$', gal.display),
-        (r'^gal/display/(?P<category>\w+)/(?P<pageNumber>\d+)/$', gal.display),
-    )
+                           )
 
